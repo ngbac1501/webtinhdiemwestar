@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Map Đấu | WeStar Team</title>
+    <meta name="description" content="Chi tiết thành tích từng bản đồ - WeStar Team ZingSpeed Mobile">
+    <link rel="icon" href="assets/images/logows.png" sizes="any">
+
+    <!-- CSS Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+    <!-- Aurora Racing Shared CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        /* ==================== AURORA RACING — map-detail.html ==================== */
+        :root {
+            --luxury-obsidian: #04040e;
+            --luxury-charcoal: #07071a;
+            --luxury-graphite: #0c0c22;
+            --luxury-titanium: #181840;
+            --luxury-silver: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #7c3aed;
+            --accent-green: #10b981;
+            --accent-gold: #f59e0b;
+            --dark-bg: #04040e;
+            --card-bg: rgba(17, 17, 48, 0.75);
+            --glass-bg: rgba(17, 17, 48, 0.5);
+            --speed-gradient: linear-gradient(135deg, #06b6d4, #7c3aed);
+            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
+            --silver-gradient: linear-gradient(135deg, #cbd5e1 0%, #64748b 100%);
+            --bronze-gradient: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+            --neon-cyan: #06b6d4;
+            --neon-blue: #7c3aed;
+        }
+
+        body {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            background-color: #04040e;
+            background-image:
+                radial-gradient(ellipse at 0% 0%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 100% 0%, rgba(6, 182, 212, 0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 100% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
+                radial-gradient(ellipse at 0% 100%, rgba(124, 58, 237, 0.07) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: #e8e8f5;
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+            position: relative;
+        }
+
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #04040e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #7c3aed, #06b6d4);
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #a78bfa, #22d3ee);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Typography */
+        .admin-title {
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #ffffff, #c4b5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+
+        /* Pagination Styles */
+        .map-pagination-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(17, 17, 48, 0.6);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            color: #94a3b8;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .map-pagination-btn:hover {
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+
+        .map-pagination-btn.active {
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            color: white;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+            border-color: #7c3aed;
+            transform: scale(1.1);
+        }
+
+
+        /* Glassmorphism Card */
+        .neon-card {
+            background: rgba(14, 14, 36, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .neon-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                    rgba(124, 58, 237, 0.08) 0%,
+                    rgba(6, 182, 212, 0.04) 50%,
+                    transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .neon-card:hover::before {
+            opacity: 1;
+        }
+
+        .neon-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: rgba(124, 58, 237, 0.4);
+            box-shadow:
+                0 20px 50px rgba(124, 58, 237, 0.2),
+                0 0 30px rgba(124, 58, 237, 0.1),
+                inset 0 0 30px rgba(124, 58, 237, 0.04);
+        }
+
+
+        /* Enhanced Map Preview */
+        .map-preview {
+            width: 100%;
+            height: 320px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .map-preview::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(4, 4, 14, 0.1) 0%,
+                    rgba(4, 4, 14, 0.9) 100%),
+                radial-gradient(circle at 30% 70%, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .map-preview:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 50px rgba(124, 58, 237, 0.3);
+        }
+
+
+        /* Racer Card */
+        .racer-card {
+            background: linear-gradient(135deg,
+                    rgba(124, 58, 237, 0.12) 0%,
+                    rgba(14, 14, 36, 0.95) 100%);
+            border: 2px solid rgba(124, 58, 237, 0.25);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .racer-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: var(--speed-gradient);
+            background-size: 200% 200%;
+            animation: gradientFlow 4s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .racer-card:hover {
+            border-color: rgba(0, 243, 255, 0.6);
+            transform: translateX(8px) translateY(-3px);
+            box-shadow:
+                0 15px 40px rgba(0, 243, 255, 0.3),
+                0 0 30px rgba(0, 243, 255, 0.1);
+        }
+
+        .racer-card.rank-1 {
+            background: linear-gradient(135deg,
+                    rgba(255, 215, 0, 0.25) 0%,
+                    rgba(18, 18, 26, 0.95) 100%);
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .racer-card.rank-1::before {
+            background: linear-gradient(to bottom, #FFD700, #FFA500, #FF8C00);
+        }
+
+        /* Enhanced Speed Button */
+        .btn-admin {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg,
+                    rgba(0, 243, 255, 0.15),
+                    rgba(0, 102, 255, 0.15));
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: white;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 16px;
+            padding: 14px 28px;
+            backdrop-filter: blur(8px);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .btn-admin::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            transition: left 0.7s;
+        }
+
+        .btn-admin:hover::before {
+            left: 100%;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow:
+                0 12px 35px rgba(0, 243, 255, 0.4),
+                0 0 35px rgba(0, 243, 255, 0.2),
+                inset 0 0 25px rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+            background: linear-gradient(135deg,
+                    rgba(0, 243, 255, 0.25),
+                    rgba(0, 102, 255, 0.25));
+        }
+
+        /* Stat Labels */
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            background: var(--speed-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Enhanced Map Info Overlay */
+        .map-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 32px;
+            z-index: 2;
+            background: linear-gradient(180deg,
+                    transparent 0%,
+                    rgba(10, 10, 15, 0.6) 50%,
+                    /* Giảm từ 0.9 xuống 0.6 */
+                    rgba(10, 10, 15, 0.8) 100%);
+            /* Giảm từ 0.98 xuống 0.8 */
+        }
+
+        /* Difficulty Badge Enhancement */
+        .difficulty-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .difficulty-easy {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.3));
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #10b981;
+        }
+
+        .difficulty-medium {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.3));
+            border-color: rgba(245, 158, 11, 0.5);
+            color: #f59e0b;
+        }
+
+        .difficulty-hard {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.3));
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+        }
+
+        .difficulty-expert {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(124, 58, 237, 0.3));
+            border-color: rgba(139, 92, 246, 0.5);
+            color: #8b5cf6;
+        }
+
+        /* Enhanced Table */
+        .admin-table {
+            background: rgba(18, 18, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .admin-table thead {
+            background: linear-gradient(90deg,
+                    rgba(0, 243, 255, 0.15),
+                    rgba(0, 102, 255, 0.1));
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .admin-table th {
+            text-align: center;
+            vertical-align: middle;
+            border: none;
+            padding: 20px 16px;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .admin-table tbody tr {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(0, 243, 255, 0.08);
+            transform: scale(1.01);
+            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.15);
+        }
+
+        /* Enhanced Map Score Cell */
+        .map-score-cell {
+            padding: 16px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+            text-shadow:
+                0 0 20px rgba(0, 243, 255, 0.9),
+                0 2px 6px rgba(0, 0, 0, 0.9),
+                0 0 40px rgba(0, 243, 255, 0.5);
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .map-score-cell:hover {
+            transform: scale(1.1);
+            text-shadow:
+                0 0 30px rgba(0, 243, 255, 1),
+                0 0 60px rgba(0, 243, 255, 0.6);
+        }
+
+        /* Enhanced Record Items */
+        .record-item {
+            background: linear-gradient(135deg,
+                    rgba(0, 102, 255, 0.1) 0%,
+                    rgba(18, 18, 26, 0.8) 100%);
+            border: 1px solid rgba(0, 102, 255, 0.25);
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .record-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--speed-gradient);
+        }
+
+        .record-item:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            transform: translateX(5px) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 243, 255, 0.25);
+        }
+
+        .record-rank-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 2;
+        }
+
+        .record-rank-badge.gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FF8C00);
+            color: #000;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            animation: goldGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes goldGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.9);
+            }
+        }
+
+        /* Real-time Notification */
+        #realtime-notification {
+            animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            background: linear-gradient(135deg,
+                    rgba(16, 185, 129, 0.95),
+                    rgba(5, 150, 105, 0.95));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%) rotate(10deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) rotate(0deg);
+            }
+        }
+
+        /* Enhanced Loading Spinner */
+        .loading-spinner {
+            border: 4px solid rgba(0, 243, 255, 0.1);
+            border-top: 4px solid var(--neon-cyan);
+            border-right: 4px solid var(--neon-blue);
+            border-bottom: 4px solid var(--neon-purple);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Enhanced Equipment Tag */
+        .equipment-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 102, 255, 0.2);
+            border: 1px solid rgba(0, 102, 255, 0.4);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .equipment-tag:hover {
+            background: rgba(0, 243, 255, 0.25);
+            border-color: rgba(0, 243, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Enhanced Scrollbar REMOVED - using global dark scrollbar */
+
+        /* Enhanced Section Animations */
+        .fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Racer Bonus Badge Enhancement */
+        .racer-bonus-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #10b981, #059669, #047857);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Orbitron', sans-serif;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Map Stars Enhancement */
+        .map-star {
+            animation: starTwinkle 3s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.2s);
+        }
+
+        @keyframes starTwinkle {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Navigation Buttons Enhancement */
+        .nav-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-button:hover .nav-button-content {
+            transform: translateX(var(--tx, 0)) scale(1.05);
+        }
+
+        /* Gradient Border Effect */
+        .gradient-border {
+            position: relative;
+            border-radius: 20px;
+            background: var(--dark-bg);
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            background: var(--speed-gradient);
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .gradient-border:hover::before {
+            opacity: 1;
+        }
+
+        /* Enhanced Map Navigation Info */
+        .map-nav-info {
+            background: linear-gradient(135deg,
+                    rgba(0, 243, 255, 0.1),
+                    rgba(0, 102, 255, 0.1));
+            padding: 12px 24px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            animation: infoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes infoPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(0, 243, 255, 0.4);
+            }
+        }
+
+        /* Enhanced Header */
+        .sticky-header {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: linear-gradient(180deg,
+                    rgba(10, 10, 15, 0.95) 0%,
+                    rgba(10, 10, 15, 0.85) 100%);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Enhanced Footer */
+        .footer-gradient {
+            background: linear-gradient(180deg,
+                    transparent 0%,
+                    rgba(0, 243, 255, 0.05) 100%);
+            border-top: 1px solid rgba(0, 243, 255, 0.1);
+        }
+
+        /* Responsive Enhancements */
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive-wrapper::-webkit-scrollbar-track {
+            background: rgba(18, 18, 26, 0.3);
+            border-radius: 4px;
+        }
+
+        .table-responsive-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr !important;
+            }
+
+            .leader-card-large,
+            .top3-cards-container {
+                grid-column: 1;
+            }
+
+            .top3-cards-container {
+                gap: 1.5rem;
+            }
+
+            .racers-grid-2x2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .map-preview {
+                height: 220px;
+            }
+
+            .racer-card {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .btn-admin {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .neon-card {
+                border-radius: 20px;
+                padding: 1.25rem;
+                /* 20px */
+            }
+
+            #map-name {
+                font-size: 2rem;
+                /* 32px */
+            }
+
+            .main-layout,
+            main.container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            header .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.25rem;
+                /* 20px */
+            }
+
+            .btn-admin {
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
+
+            #map-name {
+                font-size: 1.75rem;
+                /* 28px */
+            }
+
+            .map-preview {
+                height: 180px;
+            }
+
+            .nav-button span {
+                display: none;
+                /* Hide text on nav buttons */
+            }
+
+            .nav-button {
+                padding: 10px;
+            }
+        }
+
+        /* Smooth transitions */
+        * {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection color */
+        ::selection {
+            background: rgba(0, 243, 255, 0.3);
+            color: white;
+        }
+
+        /* Focus styles */
+        :focus {
+            outline: 2px solid var(--neon-cyan);
+            outline-offset: 2px;
+        }
+
+        /* Particle effects */
+        .speed-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            background: var(--speed-gradient);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+
+        /* Enhanced Loading Screen */
+        .loading-screen {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0c0c14 100%);
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-content {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Race Status Enhancement */
+        .race-status-indicator {
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Dynamic Racers Layout Styles */
+        .racers-grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .racers-leader-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .leader-card-large {
+            grid-column: 1;
+            background: linear-gradient(135deg,
+                    rgba(255, 215, 0, 0.25) 0%,
+                    rgba(18, 18, 26, 0.95) 100%);
+            border: 3px solid rgba(255, 215, 0, 0.6);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+        }
+
+        .leader-card-large::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(to bottom, #FFD700, #FFA500, #FF8C00);
+        }
+
+        .leader-photo-large {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 24px;
+        }
+
+        .top3-cards-container {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .top3-card-compact {
+            background: linear-gradient(135deg,
+                    rgba(0, 102, 255, 0.15) 0%,
+                    rgba(18, 18, 26, 0.95) 100%);
+            border: 2px solid rgba(0, 102, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-height: 0;
+        }
+
+        .top3-card-compact::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--speed-gradient);
+        }
+
+        .top3-card-compact:hover {
+            border-color: rgba(0, 243, 255, 0.6);
+            transform: translateX(8px);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.25);
+        }
+
+        .top3-photo-compact {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .racer-card-2x2 {
+            background: linear-gradient(135deg,
+                    rgba(0, 102, 255, 0.15) 0%,
+                    rgba(18, 18, 26, 0.95) 100%);
+            border: 2px solid rgba(0, 102, 255, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .racer-card-2x2:hover {
+            border-color: rgba(0, 243, 255, 0.6);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.3);
+        }
+
+        .racer-photo-2x2 {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .racers-leader-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .leader-card-large,
+            .top3-cards-container {
+                grid-column: 1;
+            }
+
+            .top3-cards-container {
+                gap: 1.5rem;
+            }
+
+            .racers-grid-2x2 {
+                grid-template-columns: 1fr;
+            }
+
+            /* Enhanced Equipment Images */
+            .equipment-image-large {
+                width: 64px;
+                height: 64px;
+                object-fit: contain;
+                padding: 8px;
+                background: rgba(15, 23, 42, 0.8);
+                border-radius: 12px;
+                border: 2px solid rgba(0, 243, 255, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .equipment-image-large:hover {
+                transform: scale(1.1);
+                border-color: rgba(0, 243, 255, 0.5);
+                box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            }
+
+            /* Car Image Specific */
+            .car-image {
+                background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(0, 102, 255, 0.1));
+            }
+
+            /* Pet Image Specific */
+            .pet-image {
+                background: linear-gradient(135deg, rgba(157, 0, 255, 0.1), rgba(255, 0, 255, 0.1));
+            }
+
+            /* Equipment Container for Grid Layout */
+            .equipment-container-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .equipment-item-grid {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+            }
+
+            /* Equipment Container for Leader Layout */
+            .equipment-container-leader {
+                display: flex;
+                gap: 24px;
+                justify-content: center;
+                margin-top: 16px;
+            }
+
+            .equipment-item-leader {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            /* Equipment Name Styles */
+            .equipment-name {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #e2e8f0;
+                text-align: center;
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* Top 3 Equipment Styles */
+            .equipment-top3 {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .equipment-image-top3 {
+                width: 48px;
+                height: 48px;
+                object-fit: contain;
+                padding: 6px;
+                background: rgba(15, 23, 42, 0.7);
+                border-radius: 10px;
+                border: 1px solid rgba(0, 243, 255, 0.2);
+            }
+        }
+
+        /* ===================================
+   ENHANCED BACKGROUND EFFECTS
+   =================================== */
+
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        /* Grid Background */
+        .grid-background {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background-image:
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
+        }
+
+        /* Animated Orbs */
+        .orbs-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            animation: orbFloat 15s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #00f3ff, transparent);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #9d00ff, transparent);
+            top: 50%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, #ff00ff, transparent);
+            bottom: 10%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+
+            75% {
+                transform: translate(40px, 40px) scale(1.05);
+            }
+        }
+
+        /* Speed Lines */
+        .speed-lines-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .speed-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(0, 243, 255, 0.5),
+                    transparent);
+            animation: speedLineMove 2s linear infinite;
+        }
+
+        @keyframes speedLineMove {
+            0% {
+                left: -100%;
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+
+        /* Scanline Effect */
+        .scanline {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg,
+                    transparent 0%,
+                    rgba(0, 243, 255, 0.03) 50%,
+                    transparent 100%);
+            animation: scanlineMove 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanlineMove {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100%);
+            }
+        }
+
+        /* Enhanced Particles */
+        #particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Particle Glow Effect */
+        .speed-particle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            box-shadow: 0 0 10px currentColor;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) translateX(calc(var(--dx) * 20px)) scale(1);
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-10vh) translateX(calc(var(--dx) * 100px)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Performance Optimization */
+        .background-effects * {
+            will-change: transform, opacity;
+        }
+
+        /* ===================================
+   RACER CARD BACKGROUND EFFECTS
+   =================================== */
+
+        /* Animated Background for All Racer Cards */
+        .racer-card-2x2,
+        .leader-card-large,
+        .top3-card-compact {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Gradient Overlay */
+        .racer-card-2x2::after,
+        .leader-card-large::after,
+        .top3-card-compact::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center,
+                    rgba(0, 243, 255, 0.1) 0%,
+                    rgba(0, 102, 255, 0.05) 25%,
+                    transparent 50%);
+            animation: rotateGradient 8s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rotateGradient {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Shimmer Effect */
+        .racer-card-2x2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%);
+            animation: shimmer 3s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            50%,
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Floating Particles Inside Cards */
+        .card-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 243, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatInCard 4s ease-in-out infinite;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+        }
+
+        @keyframes floatInCard {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(var(--float-x), var(--float-y));
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Leader Card Special Effect */
+        .leader-card-large::after {
+            background: radial-gradient(circle at center,
+                    rgba(255, 215, 0, 0.15) 0%,
+                    rgba(255, 165, 0, 0.08) 25%,
+                    transparent 50%);
+            animation: rotateGradient 6s linear infinite;
+        }
+
+        /* Pulsing Glow for Leader */
+        .leader-card-large {
+            animation: leaderPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes leaderPulse {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 0 40px rgba(255, 215, 0, 0.2),
+                    0 0 60px rgba(255, 215, 0, 0.1),
+                    inset 0 0 40px rgba(255, 215, 0, 0.05);
+            }
+
+            50% {
+                box-shadow:
+                    0 0 60px rgba(255, 215, 0, 0.3),
+                    0 0 80px rgba(255, 215, 0, 0.15),
+                    inset 0 0 60px rgba(255, 215, 0, 0.08);
+            }
+        }
+
+        /* Top 3 Cards Subtle Glow */
+        .top3-card-compact {
+            animation: top3Glow 4s ease-in-out infinite;
+        }
+
+        @keyframes top3Glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            }
+        }
+
+        /* Enhanced shimmer for top3 cards */
+        .top3-card-compact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%);
+            animation: shimmer 3s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Leader card shimmer */
+        .leader-card-large::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 215, 0, 0.2) 50%,
+                    transparent 100%);
+            animation: shimmer 4s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Grid Lines Inside Cards */
+        .card-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.5;
+        }
+
+        /* Ensure content stays above effects */
+        .racer-card-2x2>*,
+        .leader-card-large>*,
+        .top3-card-compact>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Corner Accents */
+        .card-corner-accent {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card-corner-accent.top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+            animation: cornerPulse 2s ease-in-out infinite;
+        }
+
+        .card-corner-accent.bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+            animation: cornerPulse 2s ease-in-out infinite 1s;
+        }
+
+        @keyframes cornerPulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Scanline for Cards */
+        .card-scanline {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(0, 243, 255, 0.5) 50%,
+                    transparent 100%);
+            top: 0;
+            animation: cardScan 3s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes cardScan {
+            0% {
+                top: 0;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        /* Hover Enhancement */
+        .racer-card-2x2:hover::after,
+        .top3-card-compact:hover::after {
+            animation-duration: 4s;
+        }
+
+        /* ===================================
+   BROADCAST STYLE V2.0
+   =================================== */
+        .broadcast-layout {
+            display: grid;
+            grid-template-columns: 400px 1fr 400px;
+            gap: 24px;
+            align-items: start;
+            margin-top: 1rem;
+        }
+
+        .broadcast-layout.is-1vs1 {
+            align-items: stretch;
+        }
+
+        .broadcast-layout.is-1vs1 #player-column-left .best-racer-card,
+        .broadcast-layout.is-1vs1 #player-column-right .other-rankings-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Broadcast Player Card (Dark Glass) */
+        .broadcast-player-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            height: 440px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .broadcast-player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            border-color: rgba(0, 243, 255, 0.2);
+        }
+
+        .player-main-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            background: transparent;
+        }
+
+        .player-photo-container {
+            width: 60%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            z-index: 2;
+        }
+
+        .player-equipment-area {
+            width: 40%;
+            padding: 16px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .equipment-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .equipment-box .name {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #cbd5e1;
+            /* Light text */
+            text-align: center;
+            max-width: 100px;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .equipment-box .icon-img {
+            width: 60px;
+            height: 48px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .player-footer {
+            height: 80px;
+            display: grid;
+            grid-template-columns: 1fr 1px 150px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(10, 10, 15, 0.8);
+            /* Darker footer */
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .player-name-plate {
+            background: linear-gradient(90deg, #e11d48 0%, rgba(225, 29, 72, 0.8) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 16px;
+            clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+            min-width: 160px;
+        }
+
+        .player-name-text {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: capitalize;
+            line-height: 1.1;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .player-personal-record {
+            font-size: 16px;
+            font-weight: 800;
+            color: #fbbf24;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-time-plate {
+            background: rgba(5, 5, 8, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #06b6d4;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+        }
+
+        /* Center Map Panel */
+        .broadcast-map-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Dark Glass Map Hero */
+        .map-hero-card {
+            background: rgba(30, 30, 40, 0.4);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .map-hero-image {
+            width: 100%;
+            height: 440px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .map-hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            color: white;
+            border-top: 4px solid #e11d48;
+        }
+
+        .map-hero-info .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 800;
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+
+        .map-hero-info .value {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .map-hero-stats {
+            display: flex;
+            gap: 32px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .hero-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-stat-item .label {
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .hero-stat-item .value {
+            font-size: 24px;
+        }
+
+        /* Rankings Panel below Map */
+        .rankings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .best-racer-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .best-racer-header {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+
+        .best-racer-name {
+            font-size: 24px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .best-racer-equipment {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .best-racer-equipment img {
+            height: 60px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+        }
+
+        .other-rankings-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .ranking-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ranking-row:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-rank {
+            font-weight: 900;
+            color: #e11d48;
+            font-size: 18px;
+            width: 30px;
+        }
+
+        .ranking-name {
+            flex: 1;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .ranking-time {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 1100px) {
+            .broadcast-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .broadcast-player-column {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .broadcast-player-column {
+                grid-template-columns: 1fr;
+            }
+
+            .rankings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Animated Background Effects -->
+    <div class="background-effects">
+        <!-- Grid Background -->
+        <div class="grid-background"></div>
+
+        <!-- Animated Orbs -->
+        <div class="orbs-container">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <!-- Speed Lines -->
+        <div class="speed-lines-container"></div>
+
+        <!-- Scanline Effect -->
+        <div class="scanline"></div>
+    </div>
+
+    <!-- Animated Background Particles -->
+    <div id="particles-js"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen fixed inset-0 flex flex-col items-center justify-center z-50">
+        <div class="loading-content">
+            <div class="relative">
+                <div class="loading-spinner"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fas fa-flag-checkered text-6xl text-accent animate-pulse"></i>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-10">
+            <h2 class="text-5xl font-bold admin-title mb-6 animate__animated animate__pulse">ZINGSPEED RACING</h2>
+            <p class="text-2xl font-medium text-accent mb-4 animate__animated animate__fadeIn">Đang tải thông tin
+                map...</p>
+            <p class="text-slate-400 text-lg animate__animated animate__fadeIn animate__delay-1s">Vui lòng đợi trong
+                giây lát</p>
+        </div>
+        <div class="w-80 mt-12">
+            <div class="h-2 bg-slate-800/50 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-full animate-progress"
+                    style="animation: progressLoad 2s ease-in-out infinite;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="hidden min-h-screen">
+        <!-- Enhanced Header (Static) -->
+        <header class="relative z-10 border-b border-slate-700 bg-opacity-50">
+            <div class="container mx-auto px-4 md:px-6 py-5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-5">
+                        <button onclick="goBack()" class="btn-admin px-5 py-3 group nav-button" title="Quay lại">
+                            <div class="nav-button-content flex items-center gap-2 group-hover:gap-3 transition-all duration-300"
+                                style="--tx: -5px">
+                                <i class="fas fa-arrow-left text-lg"></i>
+                                <span class="font-bold">Quay lại</span>
+                            </div>
+                        </button>
+                        <div>
+                            <h1
+                                class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold admin-title animate__animated animate__fadeIn">
+                                CHI TIẾT MAP ĐẤU</h1>
+                            <p class="text-slate-400/80 text-sm md:text-base mt-2 flex items-center gap-2">
+                                <i class="fas fa-map-marked-alt text-accent"></i>
+                                <span>Thông tin diễn biến và thành tích chi tiết</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <!-- New Map Navigation in Header -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div
+                                class="flex items-center bg-slate-900/50 rounded-xl p-1 border border-slate-700 backdrop-blur-md">
+                                <button id="prev-map-btn" onclick="navigateMap(-1)"
+                                    class="p-2 px-3 text-accent hover:bg-cyan-500/10 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                                    title="Map trước">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="px-3 border-x border-white/10 flex flex-col items-center min-w-[70px] cursor-pointer hover:bg-white/5 transition-colors group/select"
+                                    onclick="openMapModal()" title="Chọn map đấu">
+                                    <div
+                                        class="text-[9px] text-slate-500 uppercase font-black tracking-tighter group-hover/select:text-accent transition-colors">
+                                        Chọn Map</div>
+                                    <div id="map-number"
+                                        class="text-xl font-black text-white font-orbitron leading-none group-hover/select:scale-110 transition-transform">
+                                        #1</div>
+                                </div>
+                                <button id="next-map-btn" onclick="navigateMap(1)"
+                                    class="p-2 px-3 text-accent hover:bg-cyan-500/10 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                                    title="Map sau">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <!-- Small Pagination Indicator in Header -->
+                            <div id="min-pagination-indicator" class="flex gap-1">
+                                <!-- Dots generated by JS -->
+                            </div>
+                        </div>
+
+                        <a href="scoreboard.html" class="btn-admin px-5 py-3 group nav-button"
+                            title="Bảng điểm chi tiết">
+                            <div class="nav-button-content flex items-center gap-2 transition-all duration-300">
+                                <i class="fas fa-table text-lg text-accent"></i>
+                                <span class="font-bold">BẢNG ĐIỂM</span>
+                            </div>
+                        </a>
+                        <div class="relative group">
+                            <div
+                                class="w-12 h-12 rounded-xl from-cyan-500 to-blue-600 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-route text-white text-xl"></i>
+                            </div>
+                            <div
+                                class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-dark-bg animate-pulse">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Container -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Broadcast Racing Layout v2.0 -->
+            <section id="broadcast-container" class="broadcast-layout animate__animated animate__fadeInUp">
+
+                <!-- Left Column: Player 1 & 3 -->
+                <div id="player-column-left" class="broadcast-player-column flex flex-col gap-6">
+                    <!-- Player 1 Slot -->
+                    <div id="player-slot-1" class="player-slot">
+                        <div class="text-center text-slate-500 py-20">
+                            <i class="fas fa-spinner fa-spin text-accent"></i>
+                        </div>
+                    </div>
+                    <!-- Player 3 Slot -->
+                    <div id="player-slot-3" class="player-slot">
+                        <div class="text-center text-slate-500 py-20">
+                            <i class="fas fa-spinner fa-spin text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Column: Map Hero & Stats -->
+                <div id="middle-column-broadcast" class="broadcast-map-panel flex flex-col gap-6">
+                    <!-- Map Hero Card -->
+                    <div class="map-hero-card relative">
+                        <!-- Badge hiển thị số sao độ khó -->
+                        <div id="map-stars" class="absolute top-4 left-4 z-20 flex gap-1.5">
+                            <!-- Các icon sao sẽ được tự động vẽ ở đây -->
+                        </div>
+                        <div id="map-hero-image" class="map-hero-image"
+                            style="background-image: url('assets/images/map-placeholder.jpg');">
+                            <div class="map-hero-overlay">
+                                <div class="map-hero-info">
+                                    <div class="label">Map</div>
+                                    <div id="broadcast-map-name" class="value">ĐANG TẢI...</div>
+                                </div>
+                                <div class="map-hero-stats font-orbitron">
+                                    <div class="hero-stat-item">
+                                        <div class="label">Laps</div>
+                                        <div id="broadcast-map-laps" class="value">2</div>
+                                    </div>
+                                    <div class="hero-stat-item">
+                                        <div class="label">Difficult</div>
+                                        <div id="broadcast-map-difficulty" class="value">--</div>
+                                    </div>
+                                    <div class="hero-stat-item">
+                                        <div class="label">Mode</div>
+                                        <div id="broadcast-map-mode" class="value">SOLO</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rankings Section below Hero -->
+                    <div class="rankings-grid">
+                        <!-- Best Racer Info -->
+                        <div id="broadcast-best-racer-card" class="best-racer-card">
+                            <div class="best-racer-header">Best Racer</div>
+                            <div id="broadcast-best-racer-name" class="best-racer-name">XXXXXXXXX</div>
+                            <div class="flex items-center gap-12">
+                                <div class="flex flex-col gap-1">
+                                    <div class="text-[10px] font-extrabold uppercase text-slate-400">Car</div>
+                                    <div id="broadcast-best-racer-car" class="best-racer-equipment">
+                                        <i class="fas fa-car text-slate-300"></i>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="text-[10px] font-extrabold uppercase text-slate-400">Pet</div>
+                                    <div id="broadcast-best-racer-pet" class="best-racer-equipment">
+                                        <i class="fas fa-paw text-slate-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="text-[10px] font-extrabold uppercase text-slate-400">Best Record</div>
+                                <div id="broadcast-best-record"
+                                    class="text-4xl font-black text-accent font-orbitron drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]">
+                                    0:00.00</div>
+                            </div>
+                        </div>
+
+                        <!-- Top 2, 3, 4 Ranking List -->
+                        <div id="broadcast-other-rankings-card" class="other-rankings-card flex flex-col gap-4">
+                            <div class="ranking-row">
+                                <div class="ranking-rank">#2</div>
+                                <div id="rank-2-name" class="ranking-name">Player 2</div>
+                                <div id="rank-2-time" class="ranking-time">0:00.00</div>
+                            </div>
+                            <div class="ranking-row">
+                                <div class="ranking-rank">#3</div>
+                                <div id="rank-3-name" class="ranking-name">Player 3</div>
+                                <div id="rank-3-time" class="ranking-time">0:00.00</div>
+                            </div>
+                            <div class="ranking-row">
+                                <div class="ranking-rank">#4</div>
+                                <div id="rank-4-name" class="ranking-name">Player 4</div>
+                                <div id="rank-4-time" class="ranking-time">0:00.00</div>
+                            </div>
+                            <div class="ranking-row">
+                                <div class="ranking-rank">#5</div>
+                                <div id="rank-5-name" class="ranking-name">Player 5</div>
+                                <div id="rank-5-time" class="ranking-time">0:00.00</div>
+                            </div>
+                            <div class="ranking-row">
+                                <div class="ranking-rank">#6</div>
+                                <div id="rank-6-name" class="ranking-name">Player 6</div>
+                                <div id="rank-6-time" class="ranking-time">0:00.00</div>
+                            </div>
+                        </div>
+                        <!-- Top Cars (Col 1 Row 2) -->
+                        <div id="broadcast-top-cars-card" class="mt-1 best-racer-card"
+                            style="min-height: 120px; justify-content: center;">
+                            <div
+                                class="text-[10px] font-extrabold uppercase text-slate-400 mb-1 tracking-wider text-center">
+                                TOP CAR
+                            </div>
+                            <div id="popular-cars-list" class="flex items-center gap-4 justify-center flex-wrap">
+                                <!-- Images only -->
+                            </div>
+                        </div>
+
+                        <!-- Top Pets (Col 2 Row 2) -->
+                        <div id="broadcast-top-pets-card" class="mt-1 best-racer-card"
+                            style="min-height: 120px; justify-content: center;">
+                            <div
+                                class="text-[10px] font-extrabold uppercase text-slate-400 mb-1 tracking-wider text-center">
+                                TOP PET
+                            </div>
+                            <div id="popular-pets-list" class="flex items-center gap-4 justify-center flex-wrap">
+                                <!-- Images only -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Banned Maps Panel (1vs1 Mode) -->
+                    <div id="broadcast-banned-maps-card" class="best-racer-card mt-1 hidden"
+                        style="justify-content: center; min-height: 120px; padding: 16px;">
+                        <div id="banned-maps-list" class="grid grid-cols-4 gap-4 justify-items-center w-full">
+                            <!-- Images and map names of banned maps -->
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+                <!-- Right Column: Player 2 & 4 -->
+                <div id="player-column-right" class="broadcast-player-column flex flex-col gap-6">
+                    <!-- Player 2 Slot -->
+                    <div id="player-slot-2" class="player-slot">
+                        <div class="text-center text-slate-500 py-20">
+                            <i class="fas fa-spinner fa-spin text-accent"></i>
+                        </div>
+                    </div>
+                    <!-- Player 4 Slot -->
+                    <div id="player-slot-4" class="player-slot">
+                        <div class="text-center text-slate-500 py-20">
+                            <i class="fas fa-spinner fa-spin text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🤖 AI COMBO RECOMMENDER (Col-span-full to stretch all the way across from left to right column) -->
+                <div class="best-racer-card mt-6 col-span-full animate__animated animate__fadeIn" id="ai-combo-panel"
+                    style="min-height: 200px; grid-column: 1 / -1; width: 100%;">
+                    <h3
+                        class="text-xl sm:text-2xl font-black text-purple-400 uppercase tracking-widest flex items-center border-b border-white/5 pb-3 mb-4">
+                        <i class="fas fa-robot mr-2.5 text-2xl sm:text-3xl text-purple-400 animate-bounce"></i> Gợi Ý
+                        Combo XE/PET
+                    </h3>
+
+                    <!-- Equipment Records Leaderboard (Now takes 100% full width) -->
+                    <div
+                        class="bg-black/40 p-6 rounded-xl border border-purple-500/20 flex flex-col justify-between w-full">
+                        <div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <!-- Top Cars by Record -->
+                                <div class="flex flex-col">
+                                    <div
+                                        class="text-sm sm:text-base md:text-lg text-cyan-400 font-black uppercase mb-4 tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-car text-cyan-400 text-base sm:text-lg"></i> Top Xe Đua Kỷ Lục
+                                    </div>
+                                    <div class="flex flex-col gap-3" id="ai-top-cars-list">
+                                        <div class="text-slate-500 text-xs italic py-4">Đang phân tích...</div>
+                                    </div>
+                                </div>
+
+                                <!-- Top Pets by Record -->
+                                <div class="flex flex-col">
+                                    <div
+                                        class="text-sm sm:text-base md:text-lg text-pink-400 font-black uppercase mb-4 tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-paw text-pink-400 text-base sm:text-lg"></i> Top Thú Cưng Kỷ
+                                        Lục
+                                    </div>
+                                    <div class="flex flex-col gap-3" id="ai-top-pets-list">
+                                        <div class="text-slate-500 text-xs italic py-4">Đang phân tích...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="ai-recom-rationale"
+                            class="text-sm sm:text-base md:text-lg text-slate-100 mt-6 leading-relaxed bg-white/5 p-4 sm:p-5 rounded-xl border border-white/5 shadow-inner">
+                            Đang tổng hợp thông tin và phân tích dữ liệu kỷ lục cho bản đồ này...
+                        </p>
+                    </div>
+                </div>
+
+            </section>
+
+
+        </main>
+
+        <!-- Enhanced Footer -->
+        <footer class="footer-gradient text-center py-8 md:py-12 mt-12 md:mt-16">
+            <div class="mb-6 md:mb-8 relative">
+                <div
+                    class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent">
+                </div>
+                <div class="relative inline-block bg-dark-bg px-8 md:px-12">
+                    <img src="assets/images/logows.png" alt="Logo WeStar Team"
+                        class="h-12 md:h-16 w-auto mx-auto hover-glow cursor-pointer transition-all duration-500 hover:scale-110">
+                </div>
+            </div>
+            <p class="text-slate-400 text-base md:text-lg font-medium">WeStar Team</p>
+            <p class="text-sm md:text-base text-slate-500/80 mt-2 md:mt-3">ZingSpeed Mobile Vietnam © 2026</p>
+            <div class="flex justify-center space-x-6 mt-6 md:mt-8">
+                <a href="#"
+                    class="text-slate-500/80 hover:text-accent transition-all duration-300 text-xl hover:scale-125">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#"
+                    class="text-slate-500/80 hover:text-blue-400 transition-all duration-300 text-xl hover:scale-125">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="#"
+                    class="text-slate-500/80 hover:text-danger transition-all duration-300 text-xl hover:scale-125">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+
+    <script>
+        // Add visual effects to racer cards
+        function addCardEffects(cardElement, cardType = 'normal') {
+            // Add grid background
+            const gridOverlay = document.createElement('div');
+            gridOverlay.className = 'card-grid';
+            cardElement.appendChild(gridOverlay);
+
+            // Add corner accents
+            const cornerTopLeft = document.createElement('div');
+            cornerTopLeft.className = 'card-corner-accent top-left';
+            cardElement.appendChild(cornerTopLeft);
+
+            const cornerBottomRight = document.createElement('div');
+            cornerBottomRight.className = 'card-corner-accent bottom-right';
+            cardElement.appendChild(cornerBottomRight);
+
+            // Add scanline
+            const scanline = document.createElement('div');
+            scanline.className = 'card-scanline';
+            cardElement.appendChild(scanline);
+
+            // Add floating particles
+            const particleCount = cardType === 'leader' ? 8 : 5;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'card-particle';
+
+                const floatX = (Math.random() - 0.5) * 50;
+                const floatY = (Math.random() - 0.5) * 50;
+                const delay = Math.random() * 4;
+
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.setProperty('--float-x', `${floatX}px`);
+                particle.style.setProperty('--float-y', `${floatY}px`);
+                particle.style.animationDelay = `${delay}s`;
+
+                // Leader card has golden particles
+                if (cardType === 'leader') {
+                    particle.style.background = 'rgba(255, 215, 0, 0.6)';
+                    particle.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.8)';
+                }
+
+                cardElement.appendChild(particle);
+            }
+        }
+
+        // Khởi tạo animations
+        document.addEventListener('DOMContentLoaded', function () {
+            // GSAP animations
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Animate cards on scroll
+            gsap.utils.toArray('.fade-in').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    ease: "power2.out"
+                });
+            });
+
+            // Animate stats cards on hover
+            document.querySelectorAll('.hover-scale').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, {
+                        scale: 1.05,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        scale: 1,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+            // Animate navigation buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    gsap.to(button, {
+                        scale: 1.05,
+                        duration: 0.3,
+                        ease: "back.out(1.7)"
+                    });
+                });
+
+                button.addEventListener('mouseleave', () => {
+                    gsap.to(button, {
+                        scale: 1,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- ==================== MODULES ==================== -->
+
+    <script src="js/modules/notification-system.js"></script>
+
+    <script src="js/modules/user-profile.js"></script>
+    <script src="js/modules/data-export-import.js"></script>
+    <script src="js/modules/performance-optimizer.js"></script>
+    <script src="js/modules/analytics-dashboard.js"></script>
+    <script src="js/modules/mobile-app-ux.js"></script>
+    <script src="js/modules/permission-system.js"></script>
+
+    <!-- Particles.js Animation -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="js/modules/particles-config.js"></script>
+
+    <!-- Firebase -->
+    <script type="module" src="./map-detail.js"></script>
+    <!-- Map Selection Modal -->
+    <div id="map-selection-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeMapModal()"></div>
+
+        <!-- Modal Content -->
+        <div
+            class="relative bg-slate-900/90 border border-white/10 rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl transform transition-all scale-100 opacity-100 animate__animated animate__zoomIn">
+
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <div>
+                    <h3 class="text-2xl font-black text-white font-orbitron tracking-wider">CHỌN MAP ĐẤU</h3>
+                    <p class="text-slate-400 text-sm mt-1">Chọn map để xem chi tiết thành tích</p>
+                </div>
+                <button onclick="closeMapModal()"
+                    class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-red-500/20 hover:text-danger transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Map Grid -->
+            <div id="modal-map-grid"
+                class="flex-1 p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto custom-scrollbar min-h-[300px]">
+                <!-- Map Items Generated by JS -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-white/10 bg-black/20 flex justify-end">
+                <button onclick="closeMapModal()"
+                    class="px-6 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold transition-colors">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Honor Popup Inserted Here -->
+    <div id="record-honor-popup"
+        class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 hidden opacity-0 transition-opacity duration-500 p-4">
+        <div
+            class="relative w-full max-w-lg bg-slate-900 border-2 border-amber-500/50 rounded-2xl overflow-y-auto max-h-[90vh] shadow-[0_0_60px_rgba(245,158,11,0.4)] animate__animated">
+            <!-- Map image banner -->
+            <div class="relative h-40 w-full overflow-hidden">
+                <img id="record-map-img" src="" alt="Map" class="w-full h-full object-cover opacity-60">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-900"></div>
+                <div class="absolute top-3 left-3">
+                    <span
+                        class="text-[10px] text-amber-400 font-black uppercase tracking-widest bg-black/60 px-2 py-1 rounded-full border border-amber-500/30">Kỷ
+                        lục mới</span>
+                </div>
+                <button id="close-record-popup"
+                    class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors bg-black/50 w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 z-10">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Content section -->
+            <div class="relative px-6 pb-6 -mt-14 text-center z-10">
+                <!-- Crown icon -->
+                <div class="flex justify-center mb-2">
+                    <i
+                        class="fas fa-crown text-4xl text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.9)] animate-pulse"></i>
+                </div>
+
+                <!-- Racer avatar -->
+                <div class="flex justify-center mb-3">
+                    <div class="relative">
+                        <div
+                            class="absolute -inset-2 bg-gradient-to-r from-amber-500 to-amber-700 rounded-full blur-md opacity-70 animate-pulse">
+                        </div>
+                        <img id="record-racer-img" src="assets/images/logows.png" alt="Racer"
+                            class="relative w-24 h-24 object-cover rounded-full border-4 border-amber-500 shadow-xl z-20">
+                    </div>
+                </div>
+
+                <h3 id="record-racer-name"
+                    class="text-3xl font-black text-white uppercase tracking-wider drop-shadow-lg mb-1">TÊN TAY ĐUA</h3>
+                <h2
+                    class="text-sm font-bold admin-title text-amber-500 mb-5 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">
+                    KỶ LỤC MỚI BẢN ĐỒ!</h2>
+
+                <!-- Map + Time -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-black/40 p-3 rounded-xl border border-white/10">
+                        <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Bản Đồ</div>
+                        <div id="record-map-name" class="text-base text-white font-bold truncate">Tên Bản Đồ</div>
+                    </div>
+                    <div class="bg-black/40 p-3 rounded-xl border border-white/10">
+                        <div class="text-[10px] text-amber-500/80 uppercase font-black tracking-widest mb-1">Thành Tích
+                        </div>
+                        <div id="record-time" class="text-xl text-amber-400 font-bold">00'00'00</div>
+                    </div>
+                </div>
+
+                <!-- Car + Pet with images -->
+                <div class="flex justify-center space-x-4">
+                    <div
+                        class="flex items-center text-slate-300 bg-white/5 py-2 px-3 rounded-xl border border-cyan-500/20 w-1/2">
+                        <img id="record-car-img" src="" alt="Car" class="w-10 h-10 object-contain mr-2 rounded hidden">
+                        <i id="record-car-icon" class="fas fa-car text-accent mr-2 text-lg"></i>
+                        <div class="text-left min-w-0">
+                            <div class="text-[9px] text-accent font-black uppercase mb-0.5">Xe</div>
+                            <span id="record-car-name" class="font-bold text-sm truncate block">-</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center text-slate-300 bg-white/5 py-2 px-3 rounded-xl border border-pink-500/20 w-1/2">
+                        <img id="record-pet-img" src="" alt="Pet" class="w-10 h-10 object-contain mr-2 rounded hidden">
+                        <i id="record-pet-icon" class="fas fa-paw text-pink-400 mr-2 text-lg"></i>
+                        <div class="text-left min-w-0">
+                            <div class="text-[9px] text-pink-400 font-black uppercase mb-0.5">Pet</div>
+                            <span id="record-pet-name" class="font-bold text-sm truncate block">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Close Button -->
+                <div class="mt-5">
+                    <button id="close-record-popup-btn"
+                        class="w-full py-3 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300 bg-gradient-to-r from-amber-500/20 to-amber-700/20 border border-amber-500/40 text-amber-400 hover:from-amber-500/40 hover:to-amber-700/40 hover:text-white hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-times-circle"></i>
+                        Đóng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Glowing background -->
+            <div class="absolute inset-0 pointer-events-none">
+                <div
+                    class="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent opacity-60">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

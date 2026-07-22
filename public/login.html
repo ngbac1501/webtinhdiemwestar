@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeStar Team — Đăng Nhập</title>
+    <meta name="description" content="WeStar Team — Hệ thống quản lý điểm thi đấu ZingSpeed Mobile Vietnam">
+    <link rel="icon" href="assets/images/logows.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:        #060611;
+            --surface:   #0d0d1f;
+            --card:      rgba(13, 13, 31, 0.75);
+            --border:    rgba(99, 102, 241, 0.2);
+            --border-h:  rgba(99, 102, 241, 0.5);
+            --primary:   #6366f1;
+            --primary-h: #818cf8;
+            --cyan:      #22d3ee;
+            --text:      #f1f5f9;
+            --muted:     #64748b;
+            --danger:    #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ── Animated Background ── */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: glowPulse 8s ease-in-out infinite alternate;
+        }
+        .bg-glow-1 {
+            width: 600px; height: 600px;
+            background: var(--primary);
+            top: -200px; left: -200px;
+        }
+        .bg-glow-2 {
+            width: 500px; height: 500px;
+            background: var(--cyan);
+            bottom: -150px; right: -150px;
+            animation-delay: 3s;
+            opacity: 0.1;
+        }
+        .bg-glow-3 {
+            width: 300px; height: 300px;
+            background: #a855f7;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 5s;
+            opacity: 0.08;
+        }
+
+        /* Grid lines */
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Speed lines */
+        .speed-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
+            animation: speedLine 4s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes speedLine {
+            0%   { transform: translateX(-100%); opacity: 0; width: 200px; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.6; }
+            100% { transform: translateX(110vw); opacity: 0; width: 300px; }
+        }
+        @keyframes glowPulse {
+            0%   { transform: scale(1); opacity: 0.12; }
+            100% { transform: scale(1.2); opacity: 0.18; }
+        }
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-8px); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(0.9); opacity: 0.8; }
+            70%  { transform: scale(1.1); opacity: 0; }
+            100% { transform: scale(0.9); opacity: 0; }
+        }
+
+        /* ── Card ── */
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 16px;
+            animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 32px 32px;
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 24px 48px rgba(0,0,0,0.5),
+                0 0 80px rgba(99,102,241,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top border accent */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--cyan), var(--primary), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        /* ── Logo area ── */
+        .logo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-ring-wrap {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+        }
+
+        .logo-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: var(--cyan);
+            animation: spin 3s linear infinite;
+        }
+
+        .logo-ring-2 {
+            inset: -12px;
+            border-top-color: transparent;
+            border-bottom-color: rgba(99,102,241,0.3);
+            animation: spin 5s linear infinite reverse;
+        }
+
+        .logo-pulse-dot {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            animation: pulse-ring 3s ease-out infinite;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(99,102,241,0.4);
+            animation: floatY 4s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            background: linear-gradient(135deg, #f1f5f9, var(--primary-h), var(--cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-sub {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 24px 0;
+        }
+
+        /* ── Heading ── */
+        .login-heading {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .login-heading h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .login-heading p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ── Google Button ── */
+        .google-btn {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .google-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(34,211,238,0.04));
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .google-btn:hover::before { opacity: 1; }
+        .google-btn:hover {
+            border-color: var(--border-h);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99,102,241,0.15), 0 0 0 1px rgba(99,102,241,0.1);
+        }
+        .google-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .google-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .google-btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .google-btn-icon img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+
+        .google-btn-text {
+            flex: 1;
+        }
+        .google-btn-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.02em;
+        }
+        .google-btn-sub {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .google-btn-arrow {
+            color: var(--primary-h);
+            opacity: 0.6;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .google-btn:hover .google-btn-arrow {
+            transform: translateX(4px);
+            opacity: 1;
+        }
+
+        /* ── Loading state ── */
+        #loading-spinner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: rgba(99,102,241,0.06);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 0;
+        }
+        #loading-spinner.show { display: flex; }
+
+        .spinner-ring {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(99,102,241,0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
+        }
+
+        .spinner-text {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--primary-h);
+        }
+
+        /* ── Error ── */
+        #error-message {
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(239,68,68,0.07);
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        #error-message.show { display: flex; }
+
+        #error-message i {
+            color: var(--danger);
+            font-size: 0.95rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        #error-message p {
+            font-size: 0.82rem;
+            color: #fca5a5;
+            line-height: 1.5;
+        }
+
+        /* ── Stats grid ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .stat-item:hover { border-color: var(--border); }
+
+        .stat-icon {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+        .stat-icon.cyan  { color: var(--cyan); }
+        .stat-icon.indigo { color: var(--primary-h); }
+        .stat-icon.amber { color: #fbbf24; }
+
+        .stat-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+        .stat-value {
+            font-size: 0.6rem;
+            color: rgba(100,116,139,0.6);
+            margin-top: 2px;
+        }
+
+        /* ── Footer ── */
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: rgba(100,116,139,0.5);
+            letter-spacing: 0.05em;
+        }
+        .login-footer span {
+            color: rgba(99,102,241,0.5);
+            font-weight: 600;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 480px) {
+            .login-card { padding: 28px 20px 24px; }
+            .brand-name { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Layer -->
+    <div class="bg-layer">
+        <div class="bg-glow bg-glow-1"></div>
+        <div class="bg-glow bg-glow-2"></div>
+        <div class="bg-glow bg-glow-3"></div>
+        <div class="bg-grid"></div>
+        <!-- Speed lines (injected by JS) -->
+        <div id="speed-lines"></div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <!-- Logo & Brand -->
+            <div class="logo-wrap">
+                <div class="logo-ring-wrap">
+                    <div class="logo-pulse-dot"></div>
+                    <div class="logo-ring"></div>
+                    <div class="logo-ring logo-ring-2"></div>
+                    <img src="assets/images/logows.png" alt="WeStar Logo" class="logo-img">
+                </div>
+                <div class="brand-name">WESTAR TEAM</div>
+                <div class="brand-sub">ZingSpeed Mobile · Vietnam</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Heading -->
+            <div class="login-heading">
+                <h2>Chào mừng trở lại 👋</h2>
+                <p>Đăng nhập để truy cập bảng điều khiển<br>quản lý thi đấu của đội</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="error-details">Đăng nhập thất bại. Vui lòng thử lại.</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-spinner">
+                <div class="spinner-ring"></div>
+                <span class="spinner-text">Đang xác thực...</span>
+            </div>
+
+            <!-- Google Login Button -->
+            <button id="google-login-btn" class="google-btn">
+                <div class="google-btn-icon">
+                    <img src="assets/images/logogg.png" alt="Google">
+                </div>
+                <div class="google-btn-text">
+                    <div class="google-btn-label">Đăng nhập với Google</div>
+                    <div class="google-btn-sub">Kết nối an toàn · Truy cập đầy đủ</div>
+                </div>
+                <div class="google-btn-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </button>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-icon cyan"><i class="fas fa-bolt"></i></div>
+                    <div class="stat-label">Real-time</div>
+                    <div class="stat-value">Sync live</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon indigo"><i class="fas fa-cloud"></i></div>
+                    <div class="stat-label">Cloud</div>
+                    <div class="stat-value">Firebase</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon amber"><i class="fas fa-shield-halved"></i></div>
+                    <div class="stat-label">Secure</div>
+                    <div class="stat-value">Encrypted</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            © 2026 WeStar Team · <span>Aurora Racing Edition</span>
+        </div>
+    </div>
+
+    <script>
+        // Speed lines
+        const linesContainer = document.getElementById('speed-lines');
+        for (let i = 0; i < 8; i++) {
+            const line = document.createElement('div');
+            line.className = 'speed-line';
+            const top = Math.random() * 100;
+            const delay = Math.random() * 6;
+            const dur = 3 + Math.random() * 3;
+            line.style.cssText = `top:${top}%;width:${150+Math.random()*250}px;animation-delay:${delay}s;animation-duration:${dur}s;`;
+            linesContainer.appendChild(line);
+        }
+
+        // GSAP entrance
+        if (window.gsap) {
+            gsap.from('.login-wrapper', {
+                opacity: 0, y: 30, duration: 0.9,
+                ease: 'power3.out'
+            });
+            gsap.from('.bg-glow', {
+                opacity: 0, scale: 0.7, duration: 1.5,
+                stagger: 0.3, ease: 'power2.out'
+            });
+        }
+    </script>
+
+    <script type="module" src="./login.js"></script>
+</body>
+
+</html>

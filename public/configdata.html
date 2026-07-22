@@ -1,0 +1,2906 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Dữ liệu | WeStar Dashboard Pro</title>
+    <meta name="description" content="Quản lý dữ liệu tay đua và bản đồ - WeStar Team Admin">
+    <link rel="icon" href="assets/images/logows.png" sizes="any">
+    <link rel="icon" href="assets/images/logows.png" type="image/svg+xml">
+
+    <!-- CSS Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Aurora Racing Shared CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        /* ==================== WESTAR ADMIN — configdata.html ==================== */
+        /* Soft, clean design matching index.html style */
+
+        :root {
+            --bg-base: #020617;
+            --bg-surface: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #263348;
+            --border-color: rgba(51, 65, 85, 0.7);
+            --border-light: rgba(51, 65, 85, 0.4);
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-rgb: 99, 102, 241;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            /* Legacy compat */
+            --neon-cyan: #6366f1;
+            --neon-blue: #6366f1;
+            --neon-purple: #818cf8;
+            --neon-red: #ef4444;
+            --accent-cyan: #6366f1;
+            --accent-blue: #6366f1;
+            --accent-green: #10b981;
+            --accent-gold: #f59e0b;
+            --accent-purple: #6366f1;
+            --dark-bg: #020617;
+            --card-bg: rgba(30,41,59,0.6);
+            --card-bg-hover: rgba(38,51,72,0.9);
+            --glass-bg: rgba(255,255,255,0.03);
+            --border-color-old: rgba(51,65,85,0.6);
+            --speed-gradient: linear-gradient(135deg, #6366f1, #818cf8);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Space Grotesk', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* ── App Shell Layout ── */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            height: calc(100vh - 56px);
+            margin-top: 56px;
+        }
+
+        .app-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            min-width: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .app-main { padding: 16px; }
+        }
+        @media (max-width: 640px) {
+            .app-main { padding: 12px; }
+        }
+
+        /* ── Header ── */
+        .cd-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            z-index: 200;
+            background: rgba(2,6,23,0.92);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            gap: 12px;
+        }
+
+        .cd-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .cd-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+        .cd-menu-btn {
+            display: none;
+            width: 34px; height: 34px;
+            align-items: center; justify-content: center;
+            border: none; background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .cd-menu-btn:hover { background: rgba(99,102,241,0.1); color: var(--text-primary); }
+        @media (max-width: 1024px) { .cd-menu-btn { display: flex; } }
+
+        .cd-back-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border-color);
+            background: rgba(99,102,241,0.06);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .cd-back-btn:hover { background: rgba(99,102,241,0.15); color: var(--accent-hover); border-color: rgba(99,102,241,0.3); }
+
+        .cd-logo { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .cd-logo-img {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .cd-logo-text { min-width: 0; overflow: hidden; }
+        .cd-logo-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cd-logo-sub {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .cd-realtime {
+            display: flex; align-items: center; gap: 6px;
+            padding: 4px 10px;
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #34d399;
+        }
+        .cd-realtime-dot {
+            width: 7px; height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: rtPulse 2s ease-in-out infinite;
+        }
+        @keyframes rtPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
+        }
+        @media (max-width: 640px) { .cd-realtime { display: none; } }
+
+        /* Avatar dropdown */
+        .cd-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid rgba(99,102,241,0.25);
+            transition: border-color 0.2s;
+        }
+        .cd-avatar:hover { border-color: var(--accent); }
+        .cd-user-menu {
+            position: absolute;
+            right: 0; top: calc(100% + 8px);
+            width: 220px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+            overflow: hidden;
+            z-index: 300;
+        }
+        .cd-user-menu-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .cd-user-menu-name { font-weight: 600; font-size: 0.875rem; color: var(--text-primary); }
+        .cd-user-menu-email { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cd-user-menu-btn {
+            width: 100%;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px;
+            background: none; border: none;
+            color: #f87171; font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-align: left;
+        }
+        .cd-user-menu-btn:hover { background: rgba(239,68,68,0.08); }
+
+        /* ── Sidebar ── */
+        .cd-sidebar {
+            width: 240px;
+            min-width: 240px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .cd-sidebar-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 10px 16px;
+        }
+        .cd-sidebar-scroll::-webkit-scrollbar { width: 3px; }
+        .cd-sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .cd-sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 2px; }
+
+        /* Sidebar header */
+        .cd-sidebar-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 14px 10px;
+            border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+        .cd-sidebar-brand {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cd-sidebar-icon {
+            width: 28px; height: 28px;
+            background: var(--accent);
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; color: white;
+            flex-shrink: 0;
+        }
+        .cd-sidebar-brandname {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.05em;
+        }
+        .cd-sidebar-close {
+            width: 28px; height: 28px;
+            display: none; align-items: center; justify-content: center;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .cd-sidebar-close:hover { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.3); }
+        @media (max-width: 1024px) { .cd-sidebar-close { display: flex; } }
+
+        /* Section label */
+        .cd-sidebar-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 14px 6px 6px;
+        }
+
+        /* Nav link */
+        .cd-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            width: 100%;
+            text-align: left;
+        }
+        .cd-nav-link:hover {
+            background: rgba(99,102,241,0.08);
+            color: var(--text-primary);
+        }
+        .cd-nav-link.active {
+            background: rgba(99,102,241,0.12);
+            color: var(--accent-hover);
+            font-weight: 600;
+        }
+        .cd-nav-icon {
+            width: 32px; height: 32px; min-width: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 7px;
+            background: rgba(51,65,85,0.4);
+            font-size: 0.85rem;
+            transition: all 0.15s;
+        }
+        .cd-nav-link:hover .cd-nav-icon,
+        .cd-nav-link.active .cd-nav-icon {
+            background: rgba(99,102,241,0.15);
+            color: var(--accent-hover);
+        }
+
+        .cd-sidebar-divider {
+            height: 1px;
+            background: var(--border-light);
+            margin: 10px 0;
+        }
+
+        /* Mobile overlay */
+        .cd-overlay {
+            position: fixed;
+            inset: 56px 0 0 0;
+            background: rgba(2,6,23,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 190;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .cd-overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* Mobile sidebar */
+        @media (max-width: 1024px) {
+            .cd-sidebar {
+                position: fixed;
+                top: 56px; left: 0; bottom: 0;
+                z-index: 195;
+                transform: translateX(-100%);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+            }
+            .cd-sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* ── Page Header ── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .page-header-left h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        .page-header-left p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .page-header-actions {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        @media (max-width: 640px) {
+            .page-header { flex-direction: column; align-items: flex-start; }
+            .page-header-actions { width: 100%; }
+            .page-header-actions button { flex: 1; justify-content: center; min-width: max-content; }
+        }
+
+        /* ── Content area ── */
+        .content-area { width: 100%; max-width: 100%; }
+
+        .tab-pane {
+            display: block;
+            animation: tabFade 0.25s ease-out;
+        }
+        @keyframes tabFade {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden { display: none !important; }
+
+        /* ── Cards ── */
+        .data-card {
+            background: rgba(30,41,59,0.55);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .data-card:hover {
+            border-color: rgba(99,102,241,0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+
+        .stat-card {
+            background: rgba(30,41,59,0.55);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(99,102,241,0.35); }
+
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-secondary:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: #475569; }
+
+        .btn-danger {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 16px;
+            background: rgba(239,68,68,0.1);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.5); color: #fca5a5; }
+
+        .btn-warning {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 16px;
+            background: rgba(245,158,11,0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-warning:hover { background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.5); color: #fcd34d; }
+
+        .btn-edit {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: rgba(99,102,241,0.1);
+            color: #a5b4fc;
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 7px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-edit:hover { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.4); }
+
+        .btn-delete {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: rgba(239,68,68,0.1);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 7px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.45); }
+
+        /* ── Inputs ── */
+        .field-input {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(15,23,42,0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(99,102,241,0.18);
+        }
+        .field-input::placeholder { color: var(--text-muted); }
+        .field-input.small { padding: 6px 10px; font-size: 0.8rem; }
+
+        .field-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        .field-group { margin-bottom: 14px; }
+
+        /* ── Tables ── */
+        .data-table {
+            background: rgba(15,23,42,0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table thead {
+            background: rgba(30,41,59,0.8);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+        .data-table tbody tr:hover { background: rgba(99,102,241,0.05); }
+
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .table-responsive-wrapper::-webkit-scrollbar { height: 6px; }
+        .table-responsive-wrapper::-webkit-scrollbar-track { background: rgba(15,23,42,0.4); border-radius: 3px; }
+        .table-responsive-wrapper::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+        /* ── Avatar ── */
+        .user-avatar-img {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(99,102,241,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .user-avatar-img:hover {
+            transform: scale(1.7) rotate(3deg);
+            z-index: 100;
+            position: relative;
+            border-color: var(--accent);
+        }
+        .user-avatar-placeholder {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white; font-size: 14px;
+            cursor: pointer;
+        }
+        .user-name-container, .user-nickname-container { min-width: 140px; }
+
+        /* ── Thumbnails (Cars, Pets, Maps) ── */
+        .map-image-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .map-thumbnail {
+            width: 80px; /* Reduced from original size */
+            height: 48px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: rgba(15,23,42,0.4);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+        }
+        .map-thumbnail:hover {
+            transform: scale(1.15) rotate(-2deg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border-color: var(--accent);
+            z-index: 10;
+            position: relative;
+        }
+        .map-name-with-image {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        /* ── Skeleton ── */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(30,41,59,0.8) 25%, rgba(51,65,85,0.6) 50%, rgba(30,41,59,0.8) 75%);
+            background-size: 200% 100%;
+            animation: skeletonAnim 1.5s infinite;
+            border-radius: 6px;
+        }
+        @keyframes skeletonAnim {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-loading { background: linear-gradient(90deg, rgba(30,41,59,0.8) 25%, rgba(51,65,85,0.6) 50%, rgba(30,41,59,0.8) 75%); background-size: 200% 100%; animation: skeletonAnim 1.5s infinite; }
+        .skeleton-card { height: 100px; border-radius: 10px; margin-bottom: 12px; }
+        .skeleton-row { height: 52px; margin-bottom: 6px; border-radius: 6px; }
+        .skeleton-text { height: 16px; margin-bottom: 6px; }
+        .skeleton-text-sm { height: 12px; width: 60%; }
+        .skeleton-avatar { width: 36px; height: 36px; border-radius: 50%; }
+        .skeleton-table { display: flex; flex-direction: column; gap: 6px; padding: 12px; }
+
+        /* ── Bulk actions ── */
+        .bulk-actions {
+            display: none; align-items: center; gap: 10px;
+            padding: 10px 16px;
+            background: rgba(239,68,68,0.07);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        .bulk-actions.show { display: flex; }
+        .bulk-checkbox { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+        .bulk-count { color: var(--accent-hover); font-weight: 700; }
+        .bulk-delete-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            background: #ef4444; color: white;
+            border: none; border-radius: 6px;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .bulk-delete-btn:hover { background: #dc2626; }
+        .bulk-cancel-btn {
+            padding: 6px 14px;
+            background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .bulk-cancel-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+        /* ── Undo Toast ── */
+        .undo-toast {
+            position: fixed;
+            bottom: 28px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 20px;
+            display: flex; align-items: center; gap: 14px;
+            z-index: 9999;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.3s ease;
+            min-width: 280px;
+        }
+        .undo-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .undo-toast-text { color: var(--text-primary); font-size: 0.875rem; font-weight: 500; flex: 1; }
+        .undo-toast-btn {
+            padding: 6px 14px;
+            background: var(--accent); color: white;
+            font-weight: 600; border-radius: 6px; border: none;
+            cursor: pointer; font-size: 0.8rem; transition: all 0.2s; white-space: nowrap;
+        }
+        .undo-toast-btn:hover { background: var(--accent-hover); }
+        .undo-toast-timer { position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.08); border-radius: 0 0 10px 10px; overflow: hidden; }
+        .undo-toast-timer-bar { height: 100%; background: var(--accent); animation: timerDown 5s linear forwards; }
+        @keyframes timerDown { from { width: 100%; } to { width: 0%; } }
+
+        /* ── Pagination ── */
+        .pagination {
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 16px 0 8px;
+            flex-wrap: wrap;
+        }
+        .page-button {
+            min-width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 6px; cursor: pointer;
+            font-size: 0.875rem; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .page-button:hover { background: rgba(99,102,241,0.1); color: var(--accent-hover); border-color: rgba(99,102,241,0.3); }
+        .page-button.active { background: var(--accent); color: white; border-color: var(--accent); font-weight: 700; box-shadow: 0 0 10px rgba(99,102,241,0.4); }
+        .page-button:disabled, .page-button.disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ── Status indicator ── */
+        .status-message {
+            position: fixed; top: 70px; right: 16px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            z-index: 9000;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        /* ── Top rank ── */
+        .top-1 { background: linear-gradient(90deg, rgba(255,215,0,0.08), transparent); border-left: 3px solid #fbbf24; }
+        .top-2 { background: linear-gradient(90deg, rgba(203,213,225,0.08), transparent); border-left: 3px solid #94a3b8; }
+        .top-3 { background: linear-gradient(90deg, rgba(205,127,50,0.08), transparent); border-left: 3px solid #d97706; }
+        .top-rank { font-weight: 700; font-size: 1.1em; }
+        .top-rank-1 { color: #fbbf24; }
+        .top-rank-2 { color: #94a3b8; }
+        .top-rank-3 { color: #d97706; }
+
+        /* ── Text accent ── */
+        .text-accent {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+
+        /* ── Racer styles ── */
+        .racer-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .racer-card:hover {
+            background: rgba(99,102,241,0.08) !important;
+            border-color: rgba(99,102,241,0.2);
+        }
+        .racer-card.active {
+            background: rgba(99,102,241,0.12) !important;
+            border-color: rgba(99,102,241,0.35);
+        }
+        .racer-rank-badge {
+            position: absolute; top: -4px; right: -4px;
+            width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: white;
+        }
+        .racer-rank-1 { background: linear-gradient(135deg, #fbbf24, #d97706); }
+        .racer-rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+        .racer-rank-3 { background: linear-gradient(135deg, #d97706, #92400e); }
+        .racer-header-gradient {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(129,140,248,0.08));
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(30,41,59,0.3); border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 3px; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 60px 20px; text-align: center;
+            background: rgba(15,23,42,0.4);
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+        }
+        .empty-state-icon { font-size: 2.5rem; color: var(--text-muted); margin-bottom: 16px; opacity: 0.6; }
+        .empty-state-title { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+        .empty-state-description { font-size: 0.85rem; color: var(--text-secondary); max-width: 340px; margin-bottom: 20px; line-height: 1.6; }
+        .empty-state-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 20px;
+            background: var(--accent); color: white;
+            font-weight: 600; border-radius: 8px; border: none;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .empty-state-btn:hover { background: var(--accent-hover); }
+
+        /* ── Mobile toggle btn (legacy) ── */
+        .mobile-toggle-btn { display: none; }
+        @media (max-width: 1024px) {
+            .mobile-toggle-btn {
+                display: flex; width: 32px; height: 32px;
+                align-items: center; justify-content: center;
+                border: none; background: transparent;
+                color: var(--text-secondary); cursor: pointer;
+                border-radius: 6px;
+            }
+        }
+
+        /* ── Sidebar legacy compat (for JS that uses tab-container) ── */
+        .tab-container { /* mapped to cd-sidebar */ }
+        .tab-button.active { /* legacy */ }
+
+        /* ── Notification badge (header) ── */
+        .notification-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: #ef4444; color: white;
+            font-size: 10px; min-width: 17px; height: 17px;
+            border-radius: 9px; display: flex;
+            align-items: center; justify-content: center;
+            padding: 0 4px; font-weight: 700;
+        }
+
+        /* ── Loading ── */
+        .loading-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(99,102,241,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+            background-size: 200% 100%;
+            animation: progressAnim 1.5s ease infinite;
+            border-radius: 2px;
+        }
+        @keyframes progressAnim {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .loading-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        /* ── Shimmer ── */
+        @keyframes shimmer {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(50%); }
+        }
+        .racer-header-gradient::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        /* ── Layout: Main ── */
+        .main-layout { display: none; }
+        .content-area {
+            animation: tabFade 0.25s ease-out;
+        }
+        @keyframes slideInContent {
+            from { opacity: 0; transform: translateX(8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ── Responsive table ── */
+        @media (max-width: 768px) {
+            .data-table th, .data-table td { padding: 10px 12px; font-size: 0.8rem; }
+            .page-header-actions button, .page-header-actions .btn-primary,
+            .page-header-actions .btn-secondary, .page-header-actions .btn-danger { flex: 1; min-width: max-content; }
+            #modal-form .grid { grid-template-columns: 1fr !important; }
+            .stat-value { font-size: 1.5rem; }
+        }
+        @media (max-width: 480px) {
+            .stat-value { font-size: 1.25rem; }
+            .btn-primary, .btn-secondary, .btn-danger, .btn-warning { padding: 7px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading screen -->
+    <div id="loading-screen" style="position:fixed;inset:0;background:#020617;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;">
+        <div class="loading-spinner"></div>
+        <p style="margin-top:20px;font-size:0.95rem;color:#818cf8;font-weight:600;">Đang kiểm tra quyền truy cập...</p>
+        <div style="margin-top:12px;width:200px;height:3px;background:rgba(99,102,241,0.15);border-radius:2px;overflow:hidden;">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Status message container -->
+    <div id="status-message" class="status-message hidden"></div>
+
+    <!-- Undo Toast -->
+    <div id="undo-toast" class="undo-toast">
+        <i class="fas fa-trash-alt text-danger"></i>
+        <span class="undo-toast-text" id="undo-toast-text">Đã xóa 1 mục</span>
+        <button class="undo-toast-btn" onclick="undoDelete()">
+            <i class="fas fa-undo mr-1"></i>Hoàn tác
+        </button>
+        <div class="undo-toast-timer">
+            <div class="undo-toast-timer-bar" id="undo-timer-bar"></div>
+        </div>
+    </div>
+
+    <!-- Main app -->
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header class="cd-header">
+            <!-- Left side -->
+            <div class="cd-header-left">
+                <!-- Hamburger (mobile) -->
+                <button class="cd-menu-btn" id="mobile-sidebar-toggle" onclick="toggleSidebar()" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Back button -->
+                <button class="cd-back-btn" onclick="window.location.href='./index.html'" title="Về trang chủ">
+                    <i class="fas fa-arrow-left" style="font-size:0.8rem;"></i>
+                </button>
+
+                <!-- Logo + Title -->
+                <div class="cd-logo">
+                    <img src="assets/images/logows.png" alt="WeStar" class="cd-logo-img">
+                    <div class="cd-logo-text">
+                        <div class="cd-logo-title">WESTAR ADMIN</div>
+                        <div class="cd-logo-sub">Control Panel</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side -->
+            <div class="cd-header-right">
+                <!-- Realtime status -->
+                <div class="cd-realtime">
+                    <div class="cd-realtime-dot"></div>
+                    <span id="realtime-status">Realtime</span>
+                </div>
+
+                <!-- Avatar + dropdown -->
+                <div style="position:relative;">
+                    <img id="user-avatar" src="assets/images/logows.png" alt="Avatar"
+                        class="cd-avatar"
+                        onclick="document.getElementById('user-menu').classList.toggle('hidden')">
+                    <div id="user-menu" class="cd-user-menu hidden">
+                        <div class="cd-user-menu-header">
+                            <div class="cd-user-menu-name" id="user-name">Loading...</div>
+                            <div class="cd-user-menu-email" id="user-email">Loading...</div>
+                        </div>
+                        <button onclick="logout()" class="cd-user-menu-btn">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- App Body: sidebar + content -->
+        <div class="app-body">
+            <!-- Mobile overlay -->
+            <div id="sidebar-overlay" class="cd-overlay" onclick="toggleSidebar()"></div>
+
+            <!-- Sidebar nav -->
+            <nav class="cd-sidebar" id="sidebar">
+                <div class="cd-sidebar-head">
+                    <div class="cd-sidebar-brand">
+                        <div class="cd-sidebar-icon"><i class="fas fa-shield-alt"></i></div>
+                        <span class="cd-sidebar-brandname">ADMIN PRO</span>
+                    </div>
+                    <button class="cd-sidebar-close" onclick="toggleSidebar()">&#10005;</button>
+                </div>
+                <div class="cd-sidebar-scroll">
+                    <div class="cd-sidebar-label">ĐIỀU HƯỚNG</div>
+                    <button onclick="switchTab('dashboard')" class="cd-nav-link active" id="nav-dashboard">
+                        <div class="cd-nav-icon"><i class="fas fa-chart-line"></i></div>Dashboard
+                    </button>
+                    <button onclick="switchTab('cars')" class="cd-nav-link" id="nav-cars">
+                        <div class="cd-nav-icon"><i class="fas fa-car"></i></div>Xe
+                    </button>
+                    <button onclick="switchTab('maps')" class="cd-nav-link" id="nav-maps">
+                        <div class="cd-nav-icon"><i class="fas fa-map"></i></div>Bản đồ
+                    </button>
+                    <button onclick="switchTab('pets')" class="cd-nav-link" id="nav-pets">
+                        <div class="cd-nav-icon"><i class="fas fa-paw"></i></div>Pet
+                    </button>
+                    <button onclick="switchTab('records')" class="cd-nav-link" id="nav-records">
+                        <div class="cd-nav-icon"><i class="fas fa-trophy"></i></div>Kỷ lục
+                    </button>
+                    <button onclick="switchTab('users')" class="cd-nav-link" id="nav-users">
+                        <div class="cd-nav-icon"><i class="fas fa-users"></i></div>Người dùng
+                    </button>
+                    <button onclick="switchTab('banners')" class="cd-nav-link" id="nav-banners">
+                        <div class="cd-nav-icon"><i class="fas fa-image"></i></div>Quản lý Banner
+                    </button>
+                    <div class="cd-sidebar-divider"></div>
+                    <div class="cd-sidebar-label">PHÂN TÍCH</div>
+                    <button onclick="switchTab('racer-stats')" class="cd-nav-link" id="nav-racer-stats">
+                        <div class="cd-nav-icon"><i class="fas fa-chart-bar"></i></div>Thống kê Tay đua
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Main scrollable content -->
+            <main class="app-main">
+                <div class="content-area">
+                    <!-- Dashboard Tab - Enhanced -->
+                    <div id="dashboard-tab" class="tab-pane">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Dashboard Thống kê</h2>
+                                <p>Tổng quan hệ thống và hoạt động • Cập nhật thời gian thực</p>
+                            </div>
+                        </div>
+
+                        <!-- Stats Grid - Improved -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <!-- Total Cars -->
+                            <div class="stat-card">
+                                <div class="flex items-center mb-4">
+                                    <div
+                                        class="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-car text-accent text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-slate-400">Tổng số Xe</p>
+                                        <div class="stat-value" id="total-cars">0</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-success">
+                                        <i class="fas fa-arrow-up mr-1"></i>
+                                        <span id="cars-trend">0</span> tháng này
+                                    </span>
+                                    <button onclick="switchTab('cars')" class="text-accent hover:text-cyan-300">
+                                        Xem chi tiết →
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Total Records -->
+                            <div class="stat-card">
+                                <div class="flex items-center mb-4">
+                                    <div
+                                        class="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-trophy text-accent text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-slate-400">Kỷ lục</p>
+                                        <div class="stat-value" id="total-records">0</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-success">
+                                        <i class="fas fa-bolt mr-1"></i>
+                                        <span id="records-today">0</span> hôm nay
+                                    </span>
+                                    <button onclick="switchTab('records')" class="text-accent hover:text-cyan-300">
+                                        Xem chi tiết →
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Total Users -->
+                            <div class="stat-card">
+                                <div class="flex items-center mb-4">
+                                    <div
+                                        class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-users text-success text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-slate-400">Người dùng</p>
+                                        <div class="stat-value" id="total-users">0</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-success">
+                                        <i class="fas fa-user-plus mr-1"></i>
+                                        <span id="new-users">0</span> mới
+                                    </span>
+                                    <button onclick="switchTab('users')" class="text-accent hover:text-cyan-300">
+                                        Xem chi tiết →
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Total Notifications -->
+                            <div class="stat-card">
+                                <div class="flex items-center mb-4">
+                                    <div
+                                        class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-bell text-danger text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-slate-400">Thông báo</p>
+                                        <div class="stat-value" id="total-notifications">0</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-danger" id="unread-notifications">0 chưa đọc</span>
+                                    <button onclick="switchTab('notifications')"
+                                        class="text-accent hover:text-cyan-300">
+                                        Xem chi tiết →
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Combined Grid Layout -->
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+
+                            <!-- LEFT COLUMN (Main Content) - Span 3 -->
+                            <div class="lg:col-span-3 space-y-6">
+
+                                <!-- Quick Actions Toolbar -->
+                                <div class="data-card p-4 flex flex-wrap items-center justify-between gap-4">
+                                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center">
+                                        <i class="fas fa-bolt mr-2 text-warning"></i>
+                                        Thao tác nhanh
+                                    </h3>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button onclick="openAddModal('car')" class="btn-primary text-xs py-2 px-3">
+                                            <i class="fas fa-car mr-1"></i> Thêm xe
+                                        </button>
+                                        <button onclick="openAddModal('map')" class="btn-primary text-xs py-2 px-3">
+                                            <i class="fas fa-map mr-1"></i> Thêm map
+                                        </button>
+                                        <button onclick="refreshDashboard()"
+                                            class="btn-secondary text-xs py-2 px-3 ml-2">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Charts Row 1 -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Cars Rarity Chart -->
+                                    <div class="data-card p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3
+                                                class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                                                Phân bố Xe
+                                            </h3>
+                                            <span class="text-xs text-white font-mono bg-slate-800 px-2 py-1 rounded"
+                                                id="cars-rarity-total">0</span>
+                                        </div>
+                                        <div class="chart-container h-48">
+                                            <canvas id="cars-rarity-chart"></canvas>
+                                        </div>
+                                    </div>
+                                    <!-- Records Month Chart -->
+                                    <div class="data-card p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3
+                                                class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                                                Kỷ lục tháng
+                                            </h3>
+                                            <span class="text-xs text-white font-mono bg-slate-800 px-2 py-1 rounded"
+                                                id="records-month-total">0</span>
+                                        </div>
+                                        <div class="chart-container h-48">
+                                            <canvas id="records-month-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Charts Row 2 -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Users Role -->
+                                    <div class="data-card p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3
+                                                class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                                                Vai trò
+                                            </h3>
+                                            <span class="text-xs text-white font-mono bg-slate-800 px-2 py-1 rounded"
+                                                id="users-role-total">0</span>
+                                        </div>
+                                        <div class="chart-container h-40">
+                                            <canvas id="users-role-chart"></canvas>
+                                        </div>
+                                    </div>
+                                    <!-- Map Difficulty -->
+                                    <div class="data-card p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3
+                                                class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                                                Độ khó Map
+                                            </h3>
+                                            <span class="text-xs text-white font-mono bg-slate-800 px-2 py-1 rounded"
+                                                id="maps-difficulty-total">0</span>
+                                        </div>
+                                        <div class="chart-container h-40">
+                                            <canvas id="maps-difficulty-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RIGHT COLUMN (Sidebar) - Span 1 -->
+                            <div class="lg:col-span-1 space-y-6">
+                                <!-- System Overview List -->
+                                <div class="data-card p-5">
+                                    <h3
+                                        class="text-sm font-bold text-white uppercase tracking-wider mb-4 pb-2 border-b border-slate-700">
+                                        Tổng quan
+                                    </h3>
+                                    <div class="space-y-4">
+                                        <!-- Map -->
+                                        <div
+                                            class="flex justify-between items-center group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center">
+                                                    <i class="fas fa-map text-blue-400 text-xs"></i>
+                                                </div>
+                                                <span class="text-sm text-slate-300">Bản đồ</span>
+                                            </div>
+                                            <span class="text-white font-bold font-mono" id="total-maps">0</span>
+                                        </div>
+                                        <!-- Pet -->
+                                        <div
+                                            class="flex justify-between items-center group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-8 h-8 rounded bg-pink-500/10 flex items-center justify-center">
+                                                    <i class="fas fa-paw text-pink-400 text-xs"></i>
+                                                </div>
+                                                <span class="text-sm text-slate-300">Pet</span>
+                                            </div>
+                                            <span class="text-white font-bold font-mono" id="total-pets">0</span>
+                                        </div>
+                                        <!-- Active -->
+                                        <div
+                                            class="flex justify-between items-center group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-8 h-8 rounded bg-green-500/10 flex items-center justify-center">
+                                                    <i class="fas fa-user-check text-success text-xs"></i>
+                                                </div>
+                                                <span class="text-sm text-slate-300">Hoạt động</span>
+                                            </div>
+                                            <span class="text-white font-bold font-mono" id="active-users">0</span>
+                                        </div>
+                                        <!-- Admin -->
+                                        <div
+                                            class="flex justify-between items-center group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-8 h-8 rounded bg-orange-500/10 flex items-center justify-center">
+                                                    <i class="fas fa-user-shield text-orange-400 text-xs"></i>
+                                                </div>
+                                                <span class="text-sm text-slate-300">Admin</span>
+                                            </div>
+                                            <span class="text-white font-bold font-mono" id="admin-users">0</span>
+                                        </div>
+                                        <!-- Records Today -->
+                                        <div
+                                            class="flex justify-between items-center group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-8 h-8 rounded bg-yellow-500/10 flex items-center justify-center">
+                                                    <i class="fas fa-calendar-day text-warning text-xs"></i>
+                                                </div>
+                                                <span class="text-sm text-slate-300">KL Hôm nay</span>
+                                            </div>
+                                            <span class="text-white font-bold font-mono"
+                                                id="records-today-count">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Activity List -->
+                                <div class="data-card p-5 mt-6">
+                                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-700">
+                                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">
+                                            Hoạt động gần đây
+                                        </h3>
+                                        <button onclick="loadRecentActivity()" class="text-slate-400 hover:text-accent">
+                                            <i class="fas fa-sync-alt text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <div id="recent-activity"
+                                        class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                                        <div class="text-center py-6 text-slate-500">
+                                            <div class="loading-spinner w-5 h-5 mx-auto mb-2"></div>
+                                            <p class="text-xs">Đang tải...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Recent Activity -->
+                        <!-- Recent Activity Moved to Sidebar -->
+                    </div>
+
+                    <!-- Cars Tab -->
+                    <div id="cars-tab" class="tab-pane hidden">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Quản lý Xe</h2>
+                                <p>Quản lý danh sách xe trong hệ thống</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button onclick="openAddModal('car')" class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Thêm Xe mới
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Thêm sau phần header của Cars tab, trước bảng -->
+                        <div class="data-card p-4 mb-6">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="cars-filter-rarity" class="field-input text-sm py-2 w-48"
+                                    onchange="filterCars()">
+                                    <option value="all">🎯 Tất cả độ hiếm</option>
+                                    <option value="Thường">Thường</option>
+                                    <option value="Hiếm">Hiếm</option>
+                                    <option value="Huyền Thoại">Huyền Thoại</option>
+                                    <option value="Thần Thoại">Thần Thoại</option>
+                                </select>
+
+                                <select id="cars-filter-type" class="field-input text-sm py-2 w-48"
+                                    onchange="filterCars()">
+                                    <option value="all">🚗 Tất cả loại xe</option>
+                                </select>
+
+                                <input type="text" id="cars-search" class="field-input text-sm py-2 flex-1"
+                                    placeholder="🔍 Tìm kiếm xe..." onkeyup="filterCars()">
+
+                                <button onclick="resetCarsFilter()" class="btn-secondary text-sm">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cars Table -->
+                        <div class="data-table">
+                            <div class="table-responsive-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 220px;">Tên Xe</th>
+                                            <th>Độ hiếm</th>
+                                            <th>Tốc độ</th>
+                                            <th>Acceleration</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cars-table-body">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-8">
+                                                <div class="loading-spinner mx-auto"></div>
+                                                <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div id="cars-pagination" class="pagination"></div>
+                    </div>
+
+
+
+                    <!-- Maps Tab -->
+                    <div id="maps-tab" class="tab-pane hidden">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Quản lý Bản đồ</h2>
+                                <p>Quản lý danh sách bản đồ đua</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button onclick="handleResetAllRecords()" class="btn-secondary"
+                                    title="Thiết lập lại record của tất cả map về 00'00'00">
+                                    <i class="fas fa-redo-alt mr-2 text-warning"></i>
+                                    Làm mới Record
+                                </button>
+                                <button onclick="openAddModal('map')" class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Thêm Bản đồ mới
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Thêm sau phần header của Maps tab, trước bảng -->
+                        <div class="data-card p-4 mb-6">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="maps-filter-difficulty" class="field-input text-sm py-2 w-48"
+                                    onchange="filterMaps()">
+                                    <option value="all">⚡ Tất cả độ khó</option>
+                                    <option value="3 sao">3 sao</option>
+                                    <option value="4 sao">4 sao</option>
+                                    <option value="5 sao">5 sao</option>
+                                    <option value="6 sao">6 sao</option>
+                                    <option value="7 sao">7 sao</option>
+                                </select>
+
+                                <input type="text" id="maps-search" class="field-input text-sm py-2 flex-1"
+                                    placeholder="🔍 Tìm kiếm bản đồ..." onkeyup="filterMaps()">
+
+                                <button onclick="resetMapsFilter()" class="btn-secondary text-sm">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Maps Table -->
+                        <div class="data-table">
+                            <div class="table-responsive-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 220px;">Bản đồ</th>
+                                            <th>Độ khó</th>
+                                            <th>Record Time</th>
+                                            <th>Record Racer</th>
+                                            <th>Record Car</th>
+                                            <th>Record Pet</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="maps-table-body">
+                                        <tr>
+                                            <td colspan="7" class="text-center py-8">
+                                                <div class="loading-spinner mx-auto"></div>
+                                                <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div id="maps-pagination" class="pagination"></div>
+                    </div>
+
+                    <!-- Pets Tab -->
+                    <div id="pets-tab" class="tab-pane hidden">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Quản lý Pet</h2>
+                                <p>Quản lý danh sách pet trong game</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button onclick="openAddModal('pet')" class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Thêm Pet mới
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Thêm sau phần header của Pets tab, trước bảng -->
+                        <div class="data-card p-4 mb-6">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="pets-filter-rarity" class="field-input text-sm py-2 w-48"
+                                    onchange="filterPets()">
+                                    <option value="all">🎯 Tất cả độ hiếm</option>
+                                    <option value="Thường">Thường</option>
+                                    <option value="Hiếm">Hiếm</option>
+                                    <option value="Huyền Thoại">Huyền Thoại</option>
+                                    <option value="Thần Thoại">Thần Thoại</option>
+                                </select>
+
+                                <select id="pets-filter-type" class="field-input text-sm py-2 w-48"
+                                    onchange="filterPets()">
+                                    <option value="all">🐾 Tất cả loại pet</option>
+                                </select>
+
+                                <input type="text" id="pets-search" class="field-input text-sm py-2 flex-1"
+                                    placeholder="🔍 Tìm kiếm pet..." onkeyup="filterPets()">
+
+                                <button onclick="resetPetsFilter()" class="btn-secondary text-sm">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pets Table -->
+                        <div class="data-table">
+                            <div class="table-responsive-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 220px;">Tên Pet</th>
+                                            <th>Loại</th>
+                                            <th>Độ hiếm</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pets-table-body">
+                                        <tr>
+                                            <td colspan="5" class="text-center py-8">
+                                                <div class="loading-spinner mx-auto"></div>
+                                                <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div id="pets-pagination" class="pagination"></div>
+                    </div>
+
+                    <!-- Records Tab -->
+                    <div id="records-tab" class="tab-pane hidden">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Quản lý Kỉ lục</h2>
+                                <p>Quản lý kỉ lục đua của người chơi</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button onclick="deleteAllRecords()" class="btn-danger">
+                                    <i class="fas fa-trash-alt"></i>
+                                    Xóa tất cả
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- BỘ FILTER MỚI -->
+                        <div class="data-card p-4 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
+                                <!-- Filter theo Map -->
+                                <div class="field-group relative mb-0">
+                                    <label class="field-label text-xs mb-1">🗺️ Bản đồ</label>
+                                    <input type="text" id="records-filter-map" list="records-map-list"
+                                        class="field-input text-sm py-2 w-full pr-8" placeholder="Tên bản đồ..."
+                                        oninput="filterRecordsNew()">
+                                    <datalist id="records-map-list">
+                                        <!-- Options will be added dynamically -->
+                                    </datalist>
+                                    <span id="map-invalid-icon" class="absolute right-3 bottom-2.5 text-rose-500 hidden"
+                                        title="Không có bản đồ này trong dữ liệu">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </span>
+                                </div>
+
+                                <!-- Filter theo Racer -->
+                                <div class="field-group mb-0">
+                                    <label class="field-label text-xs mb-1">🏃 Tay đua</label>
+                                    <input type="text" id="records-filter-racer" class="field-input text-sm py-2 w-full"
+                                        placeholder="Tên tay đua..." onkeyup="filterRecordsNew()">
+                                </div>
+
+                                <!-- Filter theo Xe -->
+                                <div class="field-group mb-0">
+                                    <label class="field-label text-xs mb-1">🚗 Xe sử dụng</label>
+                                    <input type="text" id="records-filter-car" class="field-input text-sm py-2 w-full"
+                                        placeholder="Tên xe..." onkeyup="filterRecordsNew()">
+                                </div>
+
+                                <!-- Filter theo thời gian -->
+                                <div class="field-group mb-0">
+                                    <label class="field-label text-xs mb-1">⏱️ Khoảng thời gian</label>
+                                    <select id="records-filter-time" class="field-input text-sm py-2 w-full"
+                                        onchange="filterRecordsNew()">
+                                        <option value="all">Tất cả thời gian</option>
+                                        <option value="under_60">Dưới 1 phút</option>
+                                        <option value="60_to_90">1-1.5 phút</option>
+                                        <option value="90_to_120">1.5-2 phút</option>
+                                        <option value="over_120">Trên 2 phút</option>
+                                    </select>
+                                </div>
+
+                                <!-- Lọc Kỷ lục Rác/Lỗi -->
+                                <div class="field-group mb-0">
+                                    <label class="field-label text-xs mb-1 text-rose-400 font-bold">🗑️ Lọc kỷ lục
+                                        rác</label>
+                                    <select id="records-filter-garbage"
+                                        class="field-input text-sm py-2 w-full border-rose-500/30 text-rose-200 focus:border-rose-500"
+                                        onchange="filterRecordsNew()">
+                                        <option value="all" class="text-slate-300">Tất cả kỷ lục</option>
+                                        <option value="any_issue" class="text-rose-300 font-semibold">⚠️ Kỷ lục lỗi/rác
+                                        </option>
+                                        <option value="invalid_map" class="text-rose-300">🗺️ Map không tồn tại</option>
+                                        <option value="invalid_time" class="text-rose-300">⏱️ Thời gian lỗi (<=0 /định
+                                                dạng)</option>
+                                        <option value="suspicious_time" class="text-amber-300">⚡ Thời gian nghi vấn
+                                            (&lt;15s hoặc &gt;3p)</option>
+                                        <option value="duplicate" class="text-amber-300">👥 Trùng lặp (Cùng
+                                            Map+Racer+Time)</option>
+                                        <option value="missing_info" class="text-rose-300">📁 Thiếu thông tin
+                                            (Map/Racer)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Sắp xếp -->
+                                <div class="field-group mb-0">
+                                    <label class="field-label text-xs mb-1">🔤 Sắp xếp</label>
+                                    <select id="records-sort" class="field-input text-sm py-2 w-full"
+                                        onchange="filterRecordsNew()">
+                                        <option value="time_asc">Thời gian tăng dần</option>
+                                        <option value="time_desc">Thời gian giảm dần</option>
+                                        <option value="date_new">Mới nhất</option>
+                                        <option value="date_old">Cũ nhất</option>
+                                        <option value="map_name">Theo tên map</option>
+                                        <option value="racer_name">Theo tên racer</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Buttons & Status Row -->
+                            <div
+                                class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-800/80">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="resetRecordsFilter()" class="btn-secondary text-xs py-1.5 px-3">
+                                        <i class="fas fa-redo mr-1"></i> Reset
+                                    </button>
+                                    <button onclick="bulkCleanGarbage()" class="btn-danger text-xs py-1.5 px-3">
+                                        <i class="fas fa-broom mr-1"></i> Dọn nhanh kỷ lục rác
+                                    </button>
+                                    <button onclick="bulkCleanDuplicates()" class="btn-warning text-xs py-1.5 px-3">
+                                        <i class="fas fa-clone mr-1"></i> Dọn nhanh kỷ lục trùng lặp
+                                    </button>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <span id="records-filter-result" class="text-xs text-slate-400">Hiển thị tất cả kỉ
+                                        lục</span>
+                                    <span id="records-count-display"
+                                        class="text-xs bg-slate-800 text-cyan-400 font-bold py-1 px-2.5 rounded-lg border border-slate-700/80">0
+                                        kỉ lục</span>
+                                    <button onclick="toggleTop10View()" class="btn-primary text-xs py-1.5 px-3">
+                                        <i class="fas fa-trophy mr-1"></i>
+                                        <span id="top10-toggle-text">Xem Top 10</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="top10-by-map" class="data-card p-6 mb-8 hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-white" id="top10-map-title">Top 10 Kỉ lục</h3>
+                                <button onclick="closeTop10View()" class="btn-secondary">
+                                    <i class="fas fa-times"></i> Quay lại
+                                </button>
+                            </div>
+                            <div class="data-table">
+                                <div class="table-responsive-wrapper">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Tay đua</th>
+                                                <th>Thời gian</th>
+                                                <th>Xe</th>
+                                                <th>Pet</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="top10-table-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Records Table ban đầu -->
+                        <div id="all-records-table">
+                            <!-- Bulk Actions Bar -->
+                            <div id="bulk-actions" class="bulk-actions">
+                                <span><span class="bulk-count" id="bulk-count">0</span> mục đã chọn</span>
+                                <button class="bulk-delete-btn" onclick="bulkDeleteRecords()">
+                                    <i class="fas fa-trash-alt"></i>Xóa tất cả
+                                </button>
+                                <button class="bulk-cancel-btn" onclick="cancelBulkSelect()">
+                                    Hủy
+                                </button>
+                            </div>
+
+                            <div class="data-table">
+                                <div class="table-responsive-wrapper">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40px;">
+                                                    <input type="checkbox" class="bulk-checkbox" id="select-all-records"
+                                                        onchange="toggleSelectAllRecords(this)">
+                                                </th>
+                                                <th>#</th>
+                                                <th>
+                                                    <div class="flex items-center">
+                                                        <span>Bản đồ</span>
+                                                        <button onclick="sortRecordsByMap()"
+                                                            class="ml-2 text-slate-400 hover:text-accent">
+                                                            <i class="fas fa-sort"></i>
+                                                        </button>
+                                                    </div>
+                                                </th>
+                                                <th>Tay đua</th>
+                                                <th>Thời gian</th>
+                                                <th>Xe</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="records-table-body">
+                                            <tr>
+                                                <td colspan="7" class="text-center py-8">
+                                                    <div class="loading-spinner mx-auto"></div>
+                                                    <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div id="records-pagination" class="pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- Users Tab -->
+                    <div id="users-tab" class="tab-pane hidden">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Quản lý Người dùng</h2>
+                                <p>Quản lý người dùng và phân quyền</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button onclick="openSendNotificationModal()" class="btn-notification">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Gửi thông báo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Thêm sau phần header của Users tab, trước bảng -->
+                        <div class="data-card p-4 mb-6">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="users-filter-role" class="field-input text-sm py-2 w-48"
+                                    onchange="filterUsers()">
+                                    <option value="all">👥 Tất cả vai trò</option>
+                                    <option value="admin">Quản trị viên</option>
+                                    <option value="racer">Tay đua</option>
+                                    <option value="viewer">Người xem</option>
+                                </select>
+
+                                <select id="users-filter-status" class="field-input text-sm py-2 w-48"
+                                    onchange="filterUsers()">
+                                    <option value="all">📊 Tất cả trạng thái</option>
+                                    <option value="active">Hoạt động</option>
+                                    <option value="inactive">Không hoạt động</option>
+                                    <option value="banned">Bị cấm</option>
+                                </select>
+
+                                <select id="users-filter-admin" class="field-input text-sm py-2 w-48"
+                                    onchange="filterUsers()">
+                                    <option value="all">🔑 Tất cả</option>
+                                    <option value="true">Có quyền Admin</option>
+                                    <option value="false">Không có quyền Admin</option>
+                                </select>
+
+                                <select id="users-filter-newuser" class="field-input text-sm py-2 w-48"
+                                    onchange="filterUsers()">
+                                    <option value="all">🆕 Tất cả người dùng</option>
+                                    <option value="true">Người dùng mới (7 ngày)</option>
+                                    <option value="false">Người dùng cũ</option>
+                                </select>
+
+                                <input type="text" id="users-search" class="field-input text-sm py-2 flex-1"
+                                    placeholder="🔍 Tìm kiếm người dùng..." onkeyup="filterUsers()">
+
+                                <button onclick="resetUsersFilter()" class="btn-secondary text-sm">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Users Table -->
+                        <div class="data-table">
+                            <div class="table-responsive-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Ảnh</th>
+                                            <th>Email</th>
+                                            <th>Tên hiển thị</th>
+                                            <th>Biệt danh</th>
+                                            <th>Vai trò</th>
+                                            <th>Admin</th>
+                                            <th>Trạng thái</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="users-table-body">
+                                        <tr>
+                                            <td colspan="8" class="text-center py-8">
+                                                <div class="loading-spinner mx-auto"></div>
+                                                <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div id="users-pagination" class="pagination"></div>
+                    </div>
+
+
+                    <!-- Banners Tab -->
+                    <div id="banners-tab" class="tab-pane hidden">
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2>Banner</h2>
+                                <p>Cấu hình hình ảnh slide trình chiếu ở trang chủ</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button onclick="openAddModal('banner')" class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Thêm Banner mới
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Banners Table -->
+                        <div class="data-table">
+                            <div class="table-responsive-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 150px;">Ảnh Banner</th>
+                                            <th>Tiêu đề</th>
+                                            <th>Thứ tự</th>
+                                            <th>Trạng thái</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="banners-table-body">
+                                        <tr>
+                                            <td colspan="5" class="text-center py-8">
+                                                <div class="loading-spinner mx-auto"></div>
+                                                <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div id="banners-pagination" class="pagination"></div>
+                    </div>
+
+                    <!-- Racer Stats Tab -->
+                    <div id="racer-stats-tab" class="tab-pane hidden">
+                        <!-- New Header -->
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h2 id="racer-stats-title">Thống kê Tay đua (Pro)</h2>
+                                <p>Phân tích chi tiết thành tích và so sánh kỹ năng</p>
+                            </div>
+                        </div>
+
+                        <!-- Top Section: Intelligent Search & Top Racers Carousel -->
+                        <div
+                            class="bg-slate-800/60 backdrop-blur-md rounded-2xl p-6 border border-slate-700/50 mb-6 shadow-xl relative overflow-hidden">
+                            <!-- Background Decoration -->
+                            <div
+                                class="absolute -right-20 -top-20 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none">
+                            </div>
+
+                            <div class="flex flex-col md:flex-row gap-6 items-center">
+                                <!-- Big Search -->
+                                <div class="w-full md:w-1/3 relative z-10">
+                                    <h3 class="text-white font-bold mb-3 text-sm flex items-center gap-2">
+                                        <i class="fas fa-search text-cyan-400"></i> Tìm Tay Đua
+                                    </h3>
+                                    <div class="relative group">
+                                        <input type="text" id="racer-pro-search"
+                                            class="w-full bg-slate-900/80 border border-slate-600 rounded-xl pl-12 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all shadow-inner"
+                                            placeholder="Nhập tên tay đua...">
+                                        <i
+                                            class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors"></i>
+
+                                        <!-- Search Results Dropdown -->
+                                        <div id="racer-pro-search-results"
+                                            class="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden hidden z-[100] max-h-64 overflow-y-auto custom-scrollbar">
+                                            <!-- Filled by JS -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Top Racers Quick Select -->
+                                <div class="w-full md:w-2/3 z-10">
+                                    <h3 class="text-white font-bold mb-3 text-sm flex items-center gap-2">
+                                        <i class="fas fa-star text-yellow-400"></i> Gương Mặt Nổi Bật
+                                    </h3>
+                                    <div class="flex gap-3 overflow-x-auto custom-scrollbar pb-2"
+                                        id="top-racers-carousel">
+                                        <!-- Skeleton loader or items -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Dashboard Area (Hidden until a racer is selected) -->
+                        <div id="racer-pro-dashboard" class="hidden animate-fade-in-up">
+
+                            <!-- Hero Banner (Glassmorphism) -->
+                            <div class="relative rounded-3xl overflow-hidden mb-6 shadow-2xl group">
+                                <div class="absolute inset-0 bg-cover bg-center opacity-30 transition-transform duration-1000 group-hover:scale-105"
+                                    id="racer-hero-bg"
+                                    style="background-image: url('https://c4.wallpaperflare.com/wallpaper/500/442/354/outrun-vaporwave-hd-wallpaper-preview.jpg');">
+                                </div>
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent">
+                                </div>
+
+                                <div
+                                    class="relative p-8 md:p-10 flex flex-col md:flex-row items-center md:items-start gap-8 z-10">
+                                    <!-- Avatar with glowing border -->
+                                    <div class="relative flex-shrink-0">
+                                        <div class="absolute inset-0 bg-cyan-500 rounded-full blur-md opacity-50"></div>
+                                        <img id="racer-pro-avatar" src="assets/images/logows.png"
+                                            class="relative w-32 h-32 rounded-full border-4 border-slate-800 object-cover shadow-[0_0_20px_rgba(6,182,212,0.5)] bg-slate-800">
+                                        <div class="absolute -bottom-2 -right-2 bg-slate-800 rounded-full p-2 border border-slate-700 shadow-lg"
+                                            title="Racer Level">
+                                            <i
+                                                class="fas fa-medal text-2xl text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"></i>
+                                        </div>
+                                    </div>
+
+                                    <!-- Info -->
+                                    <div class="flex-1 text-center md:text-left">
+                                        <h2 id="racer-pro-name"
+                                            class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-200 mb-2 drop-shadow-sm">
+                                            Tên Tay Đua</h2>
+                                        <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
+                                            <span
+                                                class="px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-300 text-sm flex items-center gap-1 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                                                <i class="fas fa-bolt"></i> <span id="racer-pro-rank">Thần Thoại</span>
+                                            </span>
+                                            <span
+                                                class="px-3 py-1 bg-slate-800/80 border border-slate-600 rounded-full text-slate-300 text-sm flex items-center gap-1">
+                                                <i class="fas fa-history"></i> Kỷ lục mới nhất: <span
+                                                    id="racer-pro-last-active"
+                                                    class="text-white font-medium">--/--/----</span>
+                                            </span>
+                                        </div>
+
+                                        <!-- Key Core Stats (4 Cards) -->
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <!-- Total Records -->
+                                            <div
+                                                class="bg-slate-900/60 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
+                                                <div
+                                                    class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+                                                    <i class="fas fa-flag-checkered text-blue-400"></i> Kỷ lục
+                                                </div>
+                                                <div id="stat-total-records" class="text-2xl font-black text-white">0
+                                                </div>
+                                            </div>
+
+                                            <!-- Top 1 Maps -->
+                                            <div
+                                                class="bg-slate-900/60 border border-white/5 rounded-xl p-4 backdrop-blur-sm relative overflow-hidden">
+                                                <div class="absolute -right-4 -bottom-4 opacity-10">
+                                                    <i class="fas fa-crown text-6xl text-yellow-400"></i>
+                                                </div>
+                                                <div
+                                                    class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1 relative z-10">
+                                                    <i class="fas fa-crown text-yellow-400"></i> Top 1
+                                                </div>
+                                                <div id="stat-top1-count"
+                                                    class="text-2xl font-black text-yellow-400 relative z-10">0 <span
+                                                        class="text-sm font-normal text-slate-400">map</span></div>
+                                            </div>
+
+                                            <!-- Favorite Map -->
+                                            <div
+                                                class="bg-slate-900/60 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
+                                                <div
+                                                    class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+                                                    <i class="fas fa-map-marked-alt text-emerald-400"></i> Map Tủ
+                                                </div>
+                                                <div id="stat-fav-map"
+                                                    class="text-sm font-bold text-white truncate w-full">Chưa có</div>
+                                                <div id="stat-fav-map-count" class="text-xs text-emerald-400 mt-1">0 lần
+                                                    đua</div>
+                                            </div>
+
+                                            <!-- Favorite Combo -->
+                                            <div
+                                                class="bg-slate-900/60 border border-white/5 rounded-xl p-4 backdrop-blur-sm">
+                                                <div
+                                                    class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1">
+                                                    <i class="fas fa-car-side text-purple-400"></i> Combo Yêu Thích
+                                                </div>
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    <img id="stat-fav-car" src="assets/images/default-car.png"
+                                                        class="w-10 h-10 object-contain drop-shadow-md"
+                                                        title="Xe">
+                                                    <span class="text-slate-600 text-xs">+</span>
+                                                    <img id="stat-fav-pet" src="assets/images/default-pet.png"
+                                                        class="w-10 h-10 object-contain drop-shadow-md"
+                                                        title="Pet">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Compare Action Button -->
+                                    <div class="absolute top-6 right-6 z-10 hidden md:block">
+                                        <button onclick="openProCompareModal()"
+                                            class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white px-5 py-2.5 rounded-full font-bold shadow-[0_0_15px_rgba(219,39,119,0.4)] transition-all transform hover:scale-105 flex items-center gap-2">
+                                            <i class="fas fa-bolt"></i> So Sánh Tay Đua
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Analysis Tabs -->
+                            <div
+                                class="bg-slate-800/40 border border-slate-700/50 rounded-2xl backdrop-blur-md overflow-hidden shadow-lg">
+                                <!-- Tab Headers -->
+                                <div
+                                    class="flex border-b border-slate-700 overflow-x-auto custom-scrollbar bg-slate-900/30">
+                                    <button onclick="switchProTab('map-performance')" id="tab-btn-map-performance"
+                                        class="pro-tab-btn active px-6 py-4 text-sm font-bold text-cyan-400 border-b-2 border-cyan-400 bg-cyan-900/10 transition-all flex items-center gap-2 whitespace-nowrap">
+                                        <i class="fas fa-trophy"></i> Kỷ Lục Theo Map
+                                    </button>
+                                    <button onclick="switchProTab('recent-history')" id="tab-btn-recent-history"
+                                        class="pro-tab-btn px-6 py-4 text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-white hover:bg-white/5 transition-all flex items-center gap-2 whitespace-nowrap">
+                                        <i class="fas fa-history"></i> Lịch Sử Hoạt Động
+                                    </button>
+                                    <button onclick="switchProTab('analytics-charts')" id="tab-btn-analytics-charts"
+                                        class="pro-tab-btn px-6 py-4 text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-white hover:bg-white/5 transition-all flex items-center gap-2 whitespace-nowrap">
+                                        <i class="fas fa-chart-pie"></i> Phân Tích Chuyên Sâu
+                                    </button>
+                                </div>
+
+                                <!-- Tab Contents -->
+                                <div class="p-6">
+
+                                    <!-- Tab 1: Map Performance -->
+                                    <div id="pro-tab-map-performance" class="pro-tab-content block animate-fade-in-up">
+                                        <div class="flex justify-between items-end mb-4">
+                                            <h3 class="text-white font-bold text-lg">Bảng Thành Tích Tốt Nhất</h3>
+                                            <div class="text-slate-400 text-sm">Đã tham gia: <span
+                                                    id="total-maps-played" class="text-cyan-400 font-bold">0</span> maps
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="overflow-x-auto rounded-xl border border-slate-700 max-h-[400px] custom-scrollbar">
+                                            <table class="w-full text-sm text-left">
+                                                <thead
+                                                    class="bg-slate-900 text-slate-300 font-bold uppercase text-xs sticky top-0 z-10">
+                                                    <tr>
+                                                        <th class="px-4 py-3 w-1/3">Tên Bản Đồ</th>
+                                                        <th class="px-4 py-3">Thứ hạng</th>
+                                                        <th class="px-4 py-3">Thời Gian Tốt Nhất</th>
+                                                        <th class="px-4 py-3">Combo Sử Dụng</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="pro-map-records-body"
+                                                    class="divide-y divide-slate-800/50 bg-slate-800/20">
+                                                    <!-- Filled by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tab 2: Recent History Timeline -->
+                                    <div id="pro-tab-recent-history" class="pro-tab-content hidden animate-fade-in-up">
+                                        <h3 class="text-white font-bold text-lg mb-6">Hoạt Động Gần Đây (20 Kỷ Lục Mới
+                                            Nhất)</h3>
+                                        <div class="relative border-l-2 border-slate-700 ml-4 md:ml-6 pl-6 pb-4"
+                                            id="pro-timeline-container">
+                                            <!-- Filled by JS -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Tab 3: Analytics Charts -->
+                                    <div id="pro-tab-analytics-charts"
+                                        class="pro-tab-content hidden animate-fade-in-up">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <!-- Pie Chart: Car Usage -->
+                                            <div
+                                                class="bg-slate-900/50 border border-slate-700 rounded-2xl p-5 flex flex-col items-center">
+                                                <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                                                    <i class="fas fa-car text-cyan-400"></i> Tỉ Lệ Sử Dụng Xe
+                                                </h4>
+                                                <div class="w-full max-w-[280px] aspect-square relative">
+                                                    <canvas id="pro-chart-cars"></canvas>
+                                                </div>
+                                            </div>
+
+                                            <!-- Pie Chart: Pet Usage -->
+                                            <div
+                                                class="bg-slate-900/50 border border-slate-700 rounded-2xl p-5 flex flex-col items-center">
+                                                <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                                                    <i class="fas fa-paw text-purple-400"></i> Tỉ Lệ Sử Dụng Pet
+                                                </h4>
+                                                <div class="w-full max-w-[280px] aspect-square relative">
+                                                    <canvas id="pro-chart-pets"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Mobile Compare Button -->
+                            <div class="mt-6 md:hidden">
+                                <button onclick="openProCompareModal()"
+                                    class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2">
+                                    <i class="fas fa-bolt"></i> So Sánh Tay Đua Này
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Empty State (When no racer is selected) -->
+                        <div id="racer-pro-empty-state"
+                            class="flex flex-col items-center justify-center py-20 animate-fade-in-up">
+                            <div
+                                class="w-24 h-24 rounded-full bg-slate-800/50 border border-slate-700 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,0,0,0.5)] inset-shadow">
+                                <i class="fas fa-fingerprint text-5xl text-slate-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-300 mb-2">Chưa Chọn Tay Đua</h3>
+                            <p class="text-slate-500 max-w-md text-center">Hãy tìm kiếm một tay đua ở thanh công cụ phía
+                                trên hoặc chọn từ danh sách nổi bật để xem phân tích chi tiết.</p>
+                        </div>
+
+                        <!-- Full Screen Compare Modal -->
+                        <div id="racer-pro-compare-modal"
+                            class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg z-[999] hidden flex-col">
+                            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+                                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                                    <i class="fas fa-balance-scale text-cyan-400"></i> SO SÁNH TRỰC TIẾP
+                                </h2>
+                                <button onclick="closeProCompareModal()"
+                                    class="text-slate-400 hover:text-white transition-colors">
+                                    <i class="fas fa-times text-2xl"></i>
+                                </button>
+                            </div>
+
+                            <!-- Compare Selection -->
+                            <div
+                                class="bg-slate-800/50 p-6 flex justify-center gap-10 items-center border-b border-slate-800">
+                                <!-- Racer 1 (Current) -->
+                                <div
+                                    class="flex items-center gap-4 bg-slate-900 rounded-full pr-6 border border-slate-700 min-w-[250px]">
+                                    <img id="compare-avatar-1" src="assets/images/logows.png"
+                                        class="w-14 h-14 rounded-full object-cover border-2 border-cyan-500">
+                                    <span id="compare-name-1" class="font-bold text-white text-lg truncate">Tay Đua
+                                        1</span>
+                                </div>
+
+                                <div
+                                    class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-purple-600 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">
+                                    VS</div>
+
+                                <!-- Racer 2 (Selectable) -->
+                                <div
+                                    class="flex items-center gap-4 bg-slate-900 rounded-full pl-6 border border-slate-700 min-w-[250px] flex-row-reverse relative">
+                                    <div class="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center border-2 border-purple-500 overflow-hidden relative group cursor-pointer"
+                                        onclick="document.getElementById('compare-search-2-container').classList.toggle('hidden')">
+                                        <img id="compare-avatar-2" src="assets/images/logows.png"
+                                            class="w-full h-full object-cover hidden">
+                                        <i class="fas fa-plus text-slate-500 group-hover:text-white"
+                                            id="compare-avatar-2-icon"></i>
+                                    </div>
+                                    <div class="relative flex-1">
+                                        <div id="compare-search-2-container"
+                                            class="absolute top-0 right-0 left-0 bg-slate-900 border border-slate-700 rounded-lg shadow-xl z-50">
+                                            <input type="text" id="compare-search-input"
+                                                class="w-full bg-transparent p-3 text-white focus:outline-none"
+                                                placeholder="Tìm tay đua...">
+                                            <div id="compare-search-results"
+                                                class="max-h-48 overflow-y-auto border-t border-slate-700 custom-scrollbar">
+                                            </div>
+                                        </div>
+                                        <span id="compare-name-2"
+                                            class="font-bold text-slate-400 text-lg truncate cursor-pointer"
+                                            onclick="document.getElementById('compare-search-2-container').classList.toggle('hidden')">Chọn
+                                            Đối Thủ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Compare Results -->
+                            <div class="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+                                <div id="compare-empty-state" class="text-center py-20">
+                                    <i class="fas fa-swords text-6xl text-slate-700 mb-4"></i>
+                                    <h3 class="text-2xl font-bold text-slate-400">Chọn đối thủ để bắt đầu so sánh</h3>
+                                </div>
+                                <div id="compare-results-container"
+                                    class="max-w-5xl mx-auto hidden space-y-8 animate-fade-in-up">
+
+                                    <!-- Overall Stats Compare -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div class="bg-slate-900/80 rounded-2xl p-6 border border-slate-700/50">
+                                            <h4
+                                                class="text-center text-cyan-400 font-bold mb-4 uppercase tracking-wider">
+                                                Tổng Kỷ Lục</h4>
+                                            <div class="flex justify-between items-end mb-2">
+                                                <span id="compare-stat-total-1"
+                                                    class="text-4xl font-black text-white">0</span>
+                                                <span id="compare-stat-total-2"
+                                                    class="text-4xl font-black text-white">0</span>
+                                            </div>
+                                            <!-- Progress Bar Compare -->
+                                            <div class="h-4 w-full bg-slate-800 rounded-full flex overflow-hidden">
+                                                <div id="compare-bar-total-1"
+                                                    class="h-full bg-cyan-500 transition-all duration-1000"
+                                                    style="width: 50%"></div>
+                                                <div id="compare-bar-total-2"
+                                                    class="h-full bg-purple-500 transition-all duration-1000"
+                                                    style="width: 50%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="bg-slate-900/80 rounded-2xl p-6 border border-slate-700/50">
+                                            <h4
+                                                class="text-center text-yellow-400 font-bold mb-4 uppercase tracking-wider">
+                                                Số Map Đạt Top 1</h4>
+                                            <div class="flex justify-between items-end mb-2">
+                                                <span id="compare-stat-top1-1"
+                                                    class="text-4xl font-black text-white">0</span>
+                                                <span id="compare-stat-top1-2"
+                                                    class="text-4xl font-black text-white">0</span>
+                                            </div>
+                                            <!-- Progress Bar Compare -->
+                                            <div class="h-4 w-full bg-slate-800 rounded-full flex overflow-hidden">
+                                                <div id="compare-bar-top1-1"
+                                                    class="h-full bg-cyan-500 transition-all duration-1000"
+                                                    style="width: 50%"></div>
+                                                <div id="compare-bar-top1-2"
+                                                    class="h-full bg-purple-500 transition-all duration-1000"
+                                                    style="width: 50%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Head to head Maps -->
+                                    <div class="bg-slate-900/80 rounded-2xl border border-slate-700/50 overflow-hidden">
+                                        <div
+                                            class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                                            <h4 class="font-bold text-white uppercase tracking-wider"><i
+                                                    class="fas fa-road text-emerald-400 mr-2"></i> Thành Tích Đối Đầu
+                                                Trên Cùng 1 Map</h4>
+                                            <span class="text-slate-400 text-sm">Chỉ hiện những map cả 2 cùng có kỷ
+                                                lục</span>
+                                        </div>
+                                        <div class="overflow-x-auto custom-scrollbar max-h-[500px]">
+                                            <table class="w-full text-left text-sm text-white">
+                                                <thead
+                                                    class="bg-slate-800 sticky top-0 z-10 text-xs uppercase text-slate-400">
+                                                    <tr>
+                                                        <th class="px-6 py-4 w-1/3">Tên Map</th>
+                                                        <th class="px-6 py-4 text-center text-cyan-400" id="th-name-1">
+                                                            Tay Đua 1</th>
+                                                        <th class="px-6 py-4 text-center">Kết Quả</th>
+                                                        <th class="px-6 py-4 text-center text-purple-400"
+                                                            id="th-name-2">Tay Đua 2</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="compare-maps-body" class="divide-y divide-slate-800/50">
+                                                    <!-- Filled by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div><!-- /content-area -->
+            </main><!-- /app-main -->
+        </div><!-- /app-body -->
+    </div><!-- /app -->
+
+
+
+    <!-- Send Notification Modal -->
+    <div id="notification-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">Gửi thông báo</h3>
+                <button onclick="closeNotificationModal()" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="notification-modal-form" class="space-y-4">
+                <!-- Notification form will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="image-viewer-title" class="text-xl font-bold text-white"></h3>
+                <button onclick="closeImageViewer()" class="text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex justify-center">
+                <img id="image-viewer-img" src="" alt="Image" class="max-w-full max-h-[70vh] rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./configdata.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Enhanced utility functions
+        function showMessage(message, isError = false) {
+            const container = document.getElementById('status-message');
+            container.textContent = message;
+            container.className = isError
+                ? 'status-message bg-gradient-to-r from-red-600 via-red-500 to-red-700'
+                : 'status-message bg-gradient-to-r from-green-600 via-cyan-500 to-blue-600';
+            container.style.zIndex = '9999';
+            container.classList.remove('hidden');
+
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 10) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize user menu with animation
+        document.getElementById('user-avatar').addEventListener('click', (e) => {
+            e.preventDefault();
+            const menu = document.getElementById('user-menu');
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) {
+                menu.style.animation = 'modalSlideIn 0.3s ease-out';
+                // Add click animation to avatar
+                e.target.classList.add('btn-click');
+                setTimeout(() => {
+                    e.target.classList.remove('btn-click');
+                }, 300);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#user-avatar') && !e.target.closest('#user-menu')) {
+                document.getElementById('user-menu').classList.add('hidden');
+            }
+        });
+
+        // Enhanced button click effects
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-primary, .btn-secondary, .btn-danger, .btn-edit, .btn-delete, .btn-notification')) {
+                const button = e.target.closest('button');
+                if (button) {
+                    button.classList.add('btn-click');
+                    setTimeout(() => {
+                        button.classList.remove('btn-click');
+                    }, 300);
+                }
+            }
+        });
+
+        // === COLLAPSIBLE SIDEBAR ===
+        window.toggleSidebar = function () {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!sidebar) return;
+
+            const isMobile = window.innerWidth <= 1024;
+            if (isMobile) {
+                sidebar.classList.toggle('open');
+                if (overlay) {
+                    if (sidebar.classList.contains('open')) {
+                        overlay.classList.remove('hidden');
+                    } else {
+                        overlay.classList.add('hidden');
+                    }
+                }
+            } else {
+                sidebar.classList.toggle('collapsed');
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                try { localStorage.setItem('sidebarCollapsed', isCollapsed ? '1' : '0'); } catch (e) { }
+            }
+        };
+
+        // Restore sidebar state from localStorage
+        (function restoreSidebarState() {
+            try {
+                const saved = localStorage.getItem('sidebarCollapsed');
+                if (saved === '1') {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) sidebar.classList.add('collapsed');
+                }
+            } catch (e) { }
+        })();
+
+        // Auto-close mobile sidebar when any tab-button inside it is clicked
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!sidebar) return;
+
+            sidebar.addEventListener('click', function (e) {
+                const btn = e.target.closest('.tab-button');
+                if (!btn) return;
+                // Only auto-close on mobile viewport (matches CSS breakpoint ≤1024px)
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.add('hidden');
+                }
+            });
+        });
+
+        // Enhanced tab switching with animations
+        window.switchTab = function (tabName) {
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.add('hidden');
+            }
+
+            // Get all tabs and buttons
+            const tabs = document.querySelectorAll('.tab-pane');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            // Hide all tabs with fade out animation
+            tabs.forEach(tab => {
+                if (!tab.classList.contains('hidden')) {
+                    tab.style.animation = 'fadeOut 0.2s ease-out forwards';
+                    setTimeout(() => {
+                        tab.classList.add('hidden');
+                        tab.style.animation = '';
+                    }, 200);
+                }
+            });
+
+            // Remove active class from all buttons
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab with fade in animation
+            setTimeout(() => {
+                const activeTab = document.getElementById(`${tabName}-tab`);
+                if (!activeTab) {
+                    console.error('Tab not found:', tabName);
+                    return;
+                }
+                activeTab.classList.remove('hidden');
+                activeTab.style.animation = 'tabFadeIn 0.3s ease-out';
+
+                // Add active class to clicked button
+                const tabButton = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+                if (tabButton) tabButton.classList.add('active');
+
+                // Trigger entrance animations for grid items
+                setTimeout(() => {
+                    const gridItems = activeTab.querySelectorAll('.grid-item, .stat-card, .top-racer-card, .notification-card');
+                    gridItems.forEach((item, index) => {
+                        item.style.animationDelay = `${index * 0.1}s`;
+                        item.classList.add('grid-item');
+                    });
+                }, 50);
+
+                // Load racer stats data when switching to that tab
+                if (tabName === 'racer-stats') {
+                    // Gọi init() để load data ngay lập tức (không hiện thông báo)
+                    if (window.racerStatsTab && typeof window.racerStatsTab.init === 'function') {
+                        window.racerStatsTab.init();
+                    }
+                }
+            }, 200);
+        };
+
+        // Add loading animation for initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simulate loading completion
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                const app = document.getElementById('app');
+
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.transition = 'opacity 0.5s ease';
+
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    app.classList.remove('hidden');
+
+                    // Trigger initial animations
+                    const statCards = document.querySelectorAll('.stat-card');
+                    statCards.forEach((card, index) => {
+                        card.style.animationDelay = `${index * 0.1}s`;
+                    });
+                }, 500);
+            }, 1500);
+        });
+
+        // Custom CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+            
+            @keyframes bell {
+                0%, 100% { transform: rotate(0); }
+                10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+                20%, 40%, 60%, 80% { transform: rotate(10deg); }
+            }
+            
+            .animate-bell {
+                animation: bell 0.5s ease-in-out;
+            }
+            
+            @keyframes progress {
+                0% { width: 0%; }
+                50% { width: 70%; }
+                100% { width: 100%; }
+            }
+            
+            .animate-progress {
+                animation: progress 2s ease-in-out;
+            }
+            
+            /* Hover effects for table rows */
+            .data-table tbody tr {
+                cursor: pointer;
+            }
+            
+            /* Smooth transitions for all interactive elements */
+            button, .field-input, select, .tab-button, .page-button {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+            
+            /* Focus states */
+            button:focus, .field-input:focus, select:focus {
+                outline: none;
+                ring: 2px solid var(--neon-cyan);
+                ring-offset: 2px;
+            }
+            
+            /* Loading skeleton animation */
+            @keyframes skeleton {
+                0% { background-position: -200px 0; }
+                100% { background-position: calc(200px + 100%) 0; }
+            }
+            
+            .skeleton {
+                background: linear-gradient(90deg, 
+                    rgba(255, 255, 255, 0.05) 25%, 
+                    rgba(255, 255, 255, 0.1) 50%, 
+                    rgba(255, 255, 255, 0.05) 75%);
+                background-size: 200px 100%;
+                animation: skeleton 1.5s infinite;
+            }
+            
+            /* Shimmer effect */
+            @keyframes shimmer {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+            
+            .shimmer {
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .shimmer::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent
+                );
+                animation: shimmer 2s infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <!-- ==================== MODULES ==================== -->
+
+    <script src="js/modules/notification-system.js"></script>
+
+    <script src="js/modules/user-profile.js"></script>
+    <script src="js/modules/data-export-import.js"></script>
+    <script type="module" src="js/modules/performance-optimizer.js"></script>
+    <script src="js/modules/analytics-dashboard.js"></script>
+    <script src="js/modules/mobile-app-ux.js"></script>
+    <script src="js/modules/permission-system.js"></script>
+
+    <!-- Add/Edit Data Modal -->
+    <div id="modal" class="fixed inset-0 hidden flex items-center justify-center p-4" style="z-index: 9900; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+        <div class="relative bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in-up" style="z-index: 9901;">
+            
+            <div class="p-6 border-b border-slate-700/50 sticky top-0 bg-slate-900/95 backdrop-blur z-10 flex justify-between items-center rounded-t-2xl">
+                <h3 id="modal-title" class="text-xl font-bold text-white flex items-center gap-2">Thêm mới</h3>
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-red-500/80 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <form id="modal-form" onsubmit="event.preventDefault(); saveItem();">
+                    <!-- Form content injected by JS -->
+                </form>
+            </div>
+
+            <div class="p-6 border-t border-slate-700/50 bg-slate-800/30 rounded-b-2xl flex justify-end gap-3 sticky bottom-0">
+                <button onclick="closeModal()" type="button" class="px-5 py-2.5 rounded-xl font-medium text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-600 border border-slate-600 transition-all">
+                    Hủy
+                </button>
+                <button onclick="saveItem()" type="button" class="px-5 py-2.5 rounded-xl font-bold text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 transition-all flex items-center gap-2">
+                    <i class="fas fa-save"></i> Lưu Thay Đổi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crop Image Modal for Admin User Avatar - Đặt cuối cùng để có z-index cao nhất -->
+    <div id="admin-crop-image-modal" class="fixed inset-0 hidden items-center justify-center p-4"
+        style="z-index: 9999; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
+        <div class="absolute inset-0" onclick="closeAdminCropModal()"></div>
+
+        <div class="relative bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style="z-index: 10000;">
+            <div class="p-6 border-b border-slate-700 sticky top-0 bg-slate-900">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-white">
+                        <i class="fas fa-crop text-accent mr-2"></i>Cắt hình ảnh
+                    </h3>
+                    <button onclick="closeAdminCropModal()" class="text-slate-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <!-- Crop area -->
+                <div class="flex justify-center bg-slate-800 rounded-lg p-4">
+                    <img id="admin-crop-image" src="" alt="Crop" class="max-w-full max-h-80">
+                </div>
+
+                <!-- Crop tools -->
+                <div class="flex justify-center gap-2 flex-wrap">
+                    <button onclick="rotateCropImageAdmin()"
+                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-all">
+                        <i class="fas fa-rotate-right mr-1"></i>Quay
+                    </button>
+                    <button onclick="flipCropImageHAdmin()"
+                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-all">
+                        <i class="fas fa-arrows-left-right mr-1"></i>Lật ngang
+                    </button>
+                    <button onclick="flipCropImageVAdmin()"
+                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-all">
+                        <i class="fas fa-arrows-up-down mr-1"></i>Lật dọc
+                    </button>
+                </div>
+
+                <!-- Aspect ratio selection -->
+                <div>
+                    <label class="block text-sm text-slate-300 mb-2">Tỷ lệ khung hình:</label>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="setCropAspectRatioAdmin(1)"
+                            class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-all">
+                            1:1 (Vuông)
+                        </button>
+                        <button onclick="setCropAspectRatioAdmin(NaN)"
+                            class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-all">
+                            Tự do
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex gap-3 justify-end pt-4 border-t border-slate-700">
+                    <button onclick="closeAdminCropModal()"
+                        class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition-all">
+                        Hủy
+                    </button>
+                    <button onclick="applyAdminCrop()"
+                        class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded transition-all">
+                        <i class="fas fa-check mr-1"></i>Áp dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Modules -->
+    <script src="js/modules/racer-stats.js"></script>
+
+    <script>
+        // ── Sidebar Toggle ──
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!sidebar) return;
+            const isOpen = sidebar.classList.contains('open');
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                sidebar.classList.add('open');
+                if (overlay) overlay.classList.add('active');
+                // Only lock scroll on small screens
+                if (window.innerWidth <= 1024) {
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        };
+
+        // ── Patch switchTab to update cd-nav-link active state ──
+        const _origSwitchTab = window.switchTab;
+        window.switchTab = async function(tab) {
+            // Update cd-nav-link active states
+            document.querySelectorAll('.cd-nav-link').forEach(btn => btn.classList.remove('active'));
+            const navBtn = document.getElementById('nav-' + tab);
+            if (navBtn) navBtn.classList.add('active');
+            // Also update legacy tab-button if any remain
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                const oc = btn.getAttribute('onclick') || '';
+                btn.classList.toggle('active', oc.includes("'" + tab + "'"));
+            });
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth <= 1024) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (sidebar && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+            // Call original switchTab logic
+            if (_origSwitchTab) await _origSwitchTab(tab);
+        };
+
+        // ── Show app after auth ── 
+        // The auth system calls document.getElementById('app').classList.remove('hidden')
+        // We need to make sure inline style doesn't override
+        const appEl = document.getElementById('app');
+        if (appEl) {
+            const observer = new MutationObserver(() => {
+                if (!appEl.classList.contains('hidden')) {
+                    appEl.style.display = '';
+                }
+            });
+            observer.observe(appEl, { attributes: true, attributeFilter: ['class'] });
+        }
+
+        // Close user-menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('user-menu');
+            const avatar = document.getElementById('user-avatar');
+            if (menu && avatar && !menu.contains(e.target) && !avatar.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // ── Racer Stats Sub-tabs ──
+        window.switchProTab = function(tabId) {
+            // Update Tab Content
+            document.querySelectorAll('.pro-tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            const targetContent = document.getElementById('pro-tab-' + tabId);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('block');
+            }
+
+            // Update Tab Buttons
+            document.querySelectorAll('.pro-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-cyan-400', 'border-cyan-400', 'bg-cyan-900/10');
+                btn.classList.add('text-slate-400', 'border-transparent', 'hover:text-white', 'hover:bg-white/5');
+            });
+            const targetBtn = document.getElementById('tab-btn-' + tabId);
+            if (targetBtn) {
+                targetBtn.classList.remove('text-slate-400', 'border-transparent', 'hover:text-white', 'hover:bg-white/5');
+                targetBtn.classList.add('active', 'text-cyan-400', 'border-cyan-400', 'bg-cyan-900/10');
+            }
+        };
+
+        window.openProCompareModal = function() {
+            if (typeof window.toggleCompareSection === 'function') {
+                window.toggleCompareSection();
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tính năng đang phát triển',
+                    text: 'Tính năng so sánh tay đua sẽ sớm ra mắt.',
+                    background: '#1e293b',
+                    color: '#fff'
+                });
+            }
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+    </script>
+</body>
+
+</html>

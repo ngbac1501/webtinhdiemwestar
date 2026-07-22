@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeStar Admin | Hệ Thống Tính Điểm Thành Tích</title>
+    <meta name="description" content="WeStar Admin - Hệ thống quản lý điểm thi đấu ZingSpeed Mobile Vietnam">
+    <link rel="icon" href="assets/images/logows.png" sizes="any">
+    <link rel="icon" href="assets/images/logows.png" type="image/svg+xml">
+
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#04040e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/images/logows.png">
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        .fame-card {
+            background: rgba(14, 14, 36, 0.75) !important;
+            backdrop-filter: blur(16px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 0),
+                radial-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 0) !important;
+            background-size: 16px 16px !important;
+            background-position: 0 0, 8px 8px !important;
+        }
+
+
+        .fame-card.active-racers-card {
+            border-color: rgba(245, 158, 11, 0.2) !important;
+            animation: racersBreathing 6s ease-in-out infinite;
+        }
+
+        @keyframes racersBreathing {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(245, 158, 11, 0.02) !important;
+            }
+
+            50% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.06) !important;
+                border-color: rgba(245, 158, 11, 0.35) !important;
+            }
+        }
+
+        .fame-card.active-racers-card:hover {
+            border-color: rgba(245, 158, 11, 0.6) !important;
+            box-shadow: 0 20px 40px rgba(245, 158, 11, 0.2), 0 0 35px rgba(245, 158, 11, 0.1) !important;
+            transform: translateY(-6px) scale(1.01) !important;
+            animation-play-state: paused;
+        }
+
+        .fame-card.records-card {
+            border-color: rgba(6, 182, 212, 0.2) !important;
+            animation: recordsBreathing 6s ease-in-out infinite 2s;
+        }
+
+        @keyframes recordsBreathing {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(6, 182, 212, 0.02) !important;
+            }
+
+            50% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(6, 182, 212, 0.06) !important;
+                border-color: rgba(6, 182, 212, 0.35) !important;
+            }
+        }
+
+        .fame-card.records-card:hover {
+            border-color: rgba(6, 182, 212, 0.6) !important;
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2), 0 0 35px rgba(6, 182, 212, 0.1) !important;
+            transform: translateY(-6px) scale(1.01) !important;
+            animation-play-state: paused;
+        }
+
+        .fame-card.combos-card {
+            border-color: rgba(239, 68, 68, 0.2) !important;
+            animation: combosBreathing 6s ease-in-out infinite 4s;
+        }
+
+        @keyframes combosBreathing {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(239, 68, 68, 0.02) !important;
+            }
+
+            50% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(239, 68, 68, 0.06) !important;
+                border-color: rgba(239, 68, 68, 0.35) !important;
+            }
+        }
+
+        .fame-card.combos-card:hover {
+            border-color: rgba(239, 68, 68, 0.6) !important;
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2), 0 0 35px rgba(239, 68, 68, 0.1) !important;
+            transform: translateY(-6px) scale(1.01) !important;
+            animation-play-state: paused;
+        }
+
+
+        .fame-card::before {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            transition: opacity 0.3s ease, transform 0.4s ease;
+        }
+
+        .fame-card.active-racers-card::before {
+            background: #f59e0b;
+            top: -60px;
+            left: -60px;
+        }
+
+        .fame-card.records-card::before {
+            background: #06b6d4;
+            top: -60px;
+            right: -60px;
+        }
+
+        .fame-card.combos-card::before {
+            background: #ef4444;
+            bottom: -60px;
+            right: -60px;
+        }
+
+        .fame-card:hover::before {
+            opacity: 0.3;
+            transform: scale(1.2);
+        }
+
+
+        .fame-card::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fame-card.active-racers-card::after {
+            background: linear-gradient(95deg, transparent, rgba(245, 158, 11, 0.6) 50%, transparent);
+            animation: fameScan 4s linear infinite;
+        }
+
+        .fame-card.records-card::after {
+            background: linear-gradient(95deg, transparent, rgba(6, 182, 212, 0.6) 50%, transparent);
+            animation: fameScan 4s linear infinite 1.3s;
+        }
+
+        .fame-card.combos-card::after {
+            background: linear-gradient(95deg, transparent, rgba(239, 68, 68, 0.6) 50%, transparent);
+            animation: fameScan 4s linear infinite 2.6s;
+        }
+
+        .fame-card:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes fameScan {
+            0% {
+                top: -2%;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            90% {
+                opacity: 0.8;
+            }
+
+            100% {
+                top: 102%;
+                opacity: 0;
+            }
+        }
+
+
+        .fame-glow-text-gold {
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+            color: #fbbf24 !important;
+        }
+
+        .fame-glow-text-cyan {
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+            color: #22d3ee !important;
+        }
+
+        .fame-glow-text-danger {
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+            color: #f87171 !important;
+        }
+
+
+        .map-score-cell-td {
+            background: rgba(0, 0, 0, 0.5) !important;
+            vertical-align: middle;
+        }
+
+        .map-racer-label {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        .map-score-cell {
+            padding: 12px 10px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow:
+                0 0 15px rgba(124, 58, 237, 0.7),
+                0 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 0.5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .map-score-cell:hover {
+            transform: scale(1.15);
+            text-shadow: 0 0 25px rgba(167, 139, 250, 1);
+        }
+
+        @media (min-width: 768px) {
+            .map-score-cell {
+                padding: 16px;
+                font-size: 1.5rem;
+            }
+        }
+
+
+        .summary-bar-container {
+            background: linear-gradient(90deg, rgba(14, 14, 36, 0.95), rgba(24, 24, 60, 0.95)) !important;
+            border: 2px solid rgba(0, 243, 255, 0.3) !important;
+            border-radius: 50px !important;
+            padding: 12px 32px !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 0 35px rgba(0, 243, 255, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.05) !important;
+            min-height: 80px;
+            width: 100%;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-bar-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: translateX(-100%);
+            animation: summaryShimmer 6s infinite;
+        }
+
+        @keyframes summaryShimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .summary-bar-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-width: 0;
+            padding: 0 16px;
+        }
+
+        .summary-bar-player-name {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .summary-bar-player-score {
+            font-size: 2rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+
+        .summary-bar-player-score.team-red {
+            color: #ef4444 !important;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .summary-bar-player-score.team-blue {
+            color: #3b82f6 !important;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .summary-bar-divider {
+            width: 2px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            flex-shrink: 0;
+        }
+
+        .summary-bar-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
+            border-left: 3px solid #10b981;
+            border-right: 3px solid #06b6d4;
+            padding: 8px 24px;
+            transform: skewX(-12deg);
+            border-radius: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            margin: 0 20px;
+        }
+
+        .summary-bar-center-inner {
+            transform: skewX(12deg);
+            text-align: center;
+        }
+
+        .summary-bar-round {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: #fbbf24;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+
+        .summary-bar-mode {
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 3px;
+            display: inline-block;
+        }
+
+
+        .header-btn-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .header-btn-modern i {
+            font-size: 0.95rem;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+
+        .header-btn-modern[onclick*="openBxhModal"]:hover {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: rgba(124, 58, 237, 0.4);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.25), inset 0 0 8px rgba(124, 58, 237, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .header-btn-modern[onclick*="openBxhModal"]:hover i {
+            transform: scale(1.2) rotate(12deg);
+            color: #fbbf24;
+            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+        }
+
+
+        .header-btn-modern[href*="scoreboard.html"]:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.4);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25), inset 0 0 8px rgba(6, 182, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .header-btn-modern[href*="scoreboard.html"]:hover i {
+            transform: scale(1.2) translate(1px, -1px);
+            color: #22d3ee;
+            filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.6));
+        }
+
+        .header-btn-modern:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+
+        #notification-bell {
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        #notification-bell:hover {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        #notification-bell:hover i {
+            color: #f59e0b;
+            animation: bellShake 0.6s ease-in-out;
+        }
+
+        @keyframes bellShake {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            15% {
+                transform: rotate(18deg);
+            }
+
+            30% {
+                transform: rotate(-18deg);
+            }
+
+            45% {
+                transform: rotate(12deg);
+            }
+
+            60% {
+                transform: rotate(-12deg);
+            }
+
+            75% {
+                transform: rotate(5deg);
+            }
+
+            85% {
+                transform: rotate(-5deg);
+            }
+        }
+
+
+        .profile-trigger {
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .profile-trigger:hover {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 243, 255, 0.05);
+        }
+
+
+        .user-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2.5px 8px;
+            font-size: 0.625rem;
+            font-weight: 800;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            vertical-align: middle;
+            margin-left: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .user-badge-nickname {
+            background: rgba(6, 182, 212, 0.1);
+            color: #22d3ee;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            text-transform: none;
+            font-weight: 600;
+        }
+
+
+        .search-suggestion-item.active {
+            background-color: rgba(6, 182, 212, 0.15) !important;
+            border-left: 3px solid #00f3ff !important;
+        }
+
+        .user-badge-admin {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            animation: pulseGlowAdmin 3s infinite alternate;
+        }
+
+        .user-badge-user {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        @keyframes pulseGlowAdmin {
+            0% {
+                box-shadow: 0 0 4px rgba(239, 68, 68, 0.1);
+                border-color: rgba(239, 68, 68, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+                border-color: rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        /* Banner carousel styles */
+        .banner-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+        .banner-slide.active {
+            opacity: 1;
+            z-index: 20;
+        }
+        .carousel-indicator {
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="relative overflow-x-hidden">
+
+
+    <div id="record-honor-popup"
+        class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 hidden opacity-0 transition-opacity duration-500">
+        <div
+            class="relative w-full max-w-lg bg-slate-900 border-2 border-amber-500/50 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(245,158,11,0.4)] animate__animated">
+
+            <div class="relative h-40 w-full overflow-hidden">
+                <img id="record-map-img" src="" alt="Map" class="w-full h-full object-cover opacity-60">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/40 to-slate-900"></div>
+                <div class="absolute top-3 left-3">
+                    <span
+                        class="text-[10px] text-amber-400 font-black uppercase tracking-widest bg-black/60 px-2 py-1 rounded-full border border-amber-500/30">Kỷ
+                        lục mới</span>
+                </div>
+                <button id="close-record-popup"
+                    class="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors bg-black/50 w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 z-10">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+
+            <div class="relative px-6 pb-6 -mt-14 text-center z-10">
+
+                <div class="flex justify-center mb-2">
+                    <i
+                        class="fas fa-crown text-4xl text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.9)] animate-pulse"></i>
+                </div>
+
+
+                <div class="flex justify-center mb-3">
+                    <div class="relative">
+                        <div
+                            class="absolute -inset-2 bg-gradient-to-r from-amber-500 to-amber-700 rounded-full blur-md opacity-70 animate-pulse">
+                        </div>
+                        <img id="record-racer-img" src="assets/images/logows.png" alt="Racer"
+                            class="relative w-24 h-24 object-cover rounded-full border-4 border-amber-500 shadow-xl z-20">
+                    </div>
+                </div>
+
+                <h3 id="record-racer-name"
+                    class="text-3xl font-black text-white uppercase tracking-wider drop-shadow-lg mb-1">TÊN TAY ĐUA</h3>
+                <h2
+                    class="text-sm font-bold admin-title text-amber-500 mb-5 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]">
+                    KỶ LỤC MỚI BẢN ĐỒ!</h2>
+
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-black/40 p-3 rounded-xl border border-white/10">
+                        <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Bản Đồ</div>
+                        <div id="record-map-name" class="text-base text-white font-bold truncate">Tên Bản Đồ</div>
+                    </div>
+                    <div class="bg-black/40 p-3 rounded-xl border border-white/10">
+                        <div class="text-[10px] text-amber-500/80 uppercase font-black tracking-widest mb-1">Thành Tích
+                        </div>
+                        <div id="record-time" class="text-xl text-amber-400 font-bold">00'00'00</div>
+                    </div>
+                </div>
+
+
+                <div class="flex justify-center space-x-4">
+                    <div
+                        class="flex items-center text-slate-300 bg-white/5 py-2 px-3 rounded-xl border border-cyan-500/20 w-1/2">
+                        <img id="record-car-img" src="" alt="Car" class="w-10 h-10 object-contain mr-2 rounded hidden">
+                        <i id="record-car-icon" class="fas fa-car text-accent mr-2 text-lg"></i>
+                        <div class="text-left min-w-0">
+                            <div class="text-[9px] text-accent font-black uppercase mb-0.5">Xe</div>
+                            <span id="record-car-name" class="font-bold text-sm truncate block">-</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center text-slate-300 bg-white/5 py-2 px-3 rounded-xl border border-pink-500/20 w-1/2">
+                        <img id="record-pet-img" src="" alt="Pet" class="w-10 h-10 object-contain mr-2 rounded hidden">
+                        <i id="record-pet-icon" class="fas fa-paw text-pink-400 mr-2 text-lg"></i>
+                        <div class="text-left min-w-0">
+                            <div class="text-[9px] text-pink-400 font-black uppercase mb-0.5">Pet</div>
+                            <span id="record-pet-name" class="font-bold text-sm truncate block">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="absolute inset-0 pointer-events-none">
+                <div
+                    class="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent opacity-60">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="particles-container"></div>
+
+
+    <div class="speed-line" style="top: 20%; animation-delay: 0s; animation-duration: 25s;"></div>
+    <div class="speed-line" style="top: 40%; animation-delay: 5s; animation-duration: 20s;"></div>
+    <div class="speed-line" style="top: 60%; animation-delay: 10s; animation-duration: 30s;"></div>
+    <div class="speed-line" style="top: 80%; animation-delay: 15s; animation-duration: 22s;"></div>
+
+
+    <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center z-50 backdrop-blur-xl"
+        style="background:rgba(4,4,14,0.97);">
+        <div class="relative mb-8">
+            <div class="absolute inset-0 rounded-full blur-xl opacity-30"
+                style="background:linear-gradient(135deg,#7c3aed,#06b6d4);"></div>
+            <div class="speed-loader h-32 w-32"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i class="fas fa-flag-checkered text-5xl animate-pulse" style="color:#a78bfa;"></i>
+            </div>
+        </div>
+        <div class="text-center space-y-4">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold admin-title mb-4 animate__animated animate__pulse">
+                ZINGSPEED MOBILE</h2>
+            <p class="text-xl font-medium mb-2 animate__animated animate__fadeIn animate__delay-1s"
+                style="color:#a78bfa;">Đang
+                khởi động hệ thống...</p>
+            <p class="text-slate-400 animate__animated animate__fadeIn animate__delay-2s">Chuẩn bị trải nghiệm tốc độ
+                đỉnh cao</p>
+        </div>
+        <div class="w-80 mt-12">
+            <div class="speed-progress rounded-full"></div>
+        </div>
+        <div class="mt-8 flex space-x-4">
+            <div class="w-3 h-3 rounded-full animate-pulse" style="background:#7c3aed;"></div>
+            <div class="w-3 h-3 rounded-full animate-pulse animation-delay-200" style="background:#06b6d4;"></div>
+            <div class="w-3 h-3 rounded-full animate-pulse animation-delay-400" style="background:#f59e0b;"></div>
+        </div>
+    </div>
+
+
+    <div id="status-message"
+        class="fixed top-6 right-6 z-50 transition-all duration-300 transform opacity-0 translate-y-[-20px] pointer-events-none">
+    </div>
+
+
+    <div id="notification-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeNotificationModal()"></div>
+
+        <div
+            class="relative admin-card w-full max-w-lg max-h-[80vh] overflow-hidden animate__animated animate__fadeInUp">
+
+            <div class="p-6 border-b border-slate-800/50 flex items-center justify-between bg-gradient-to-r /80 /80">
+                <div class="flex items-center">
+                    <div id="modal-notification-icon"
+                        class="w-12 h-12 rounded-full bg-gradient-speed flex items-center justify-center mr-4 shadow-neon">
+                        <i id="modal-icon" class="fas fa-bell text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-notification-title" class="text-xl font-bold text-white">Thông báo</h3>
+                        <div id="modal-notification-time" class="text-sm text-slate-400 mt-1">Vừa xong</div>
+                    </div>
+                </div>
+                <button onclick="closeNotificationModal()"
+                    class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/50 transition-all-smooth">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+
+            <div class="p-6 overflow-y-auto max-h-[50vh]">
+                <div id="modal-notification-message" class="text-slate-300 text-lg leading-relaxed">
+                    Nội dung thông báo sẽ hiển thị ở đây...
+                </div>
+
+
+                <div id="modal-notification-extra"
+                    class="mt-6 p-4 bg-slate-800/30 rounded-lg border border-slate-700/50 hidden">
+                    <h4 class="font-bold text-slate-300 mb-2">Thông tin chi tiết:</h4>
+                    <div id="modal-extra-content" class="text-sm text-slate-400 space-y-1"></div>
+                </div>
+            </div>
+
+
+            <div class="p-6 border-t border-slate-800/50 bg-slate-900/30 flex justify-between items-center">
+                <div class="text-sm text-slate-500">
+                    <i class="fas fa-user mr-2"></i>
+                    <span id="modal-sender">Hệ thống</span>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="closeNotificationModal()" class="btn-admin px-6 py-2">
+                        <i class="fas fa-times mr-2"></i> Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="app" class="min-h-screen flex hidden w-full">
+
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+
+        <aside class="sidebar-admin w-72 fixed top-0 bottom-0 overflow-y-auto z-20">
+            <div class="p-6 h-full flex flex-col">
+                <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-800/50">
+                    <div class="flex items-center space-x-3 cursor-pointer group" onclick="location.reload();">
+                        <div class="relative">
+                            <div
+                                class="absolute -inset-1 bg-gradient-speed rounded-full blur opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+                            </div>
+                            <img class="h-10 w-10 rounded-full object-cover border-2 border-cyan-500 relative group-hover:border-cyan-400 transition-all-smooth group-hover:scale-110"
+                                src="assets/images/logows.png" alt="Logo">
+                            <div
+                                class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-dark-bg animate-pulse">
+                            </div>
+                        </div>
+                        <div class="sidebar-text">
+                            <span class="text-xl font-bold admin-title block">WESTAR</span>
+                            <div class="text-[10px] text-accent font-semibold tracking-wider">Westar Team</div>
+                        </div>
+                    </div>
+                    <button id="sidebar-toggle-in"
+                        class="text-slate-400 p-2 rounded-lg hover:bg-white/5 transition-all-smooth"
+                        onclick="toggleSidebar()">
+                        <i class="fas fa-chevron-left text-lg"></i>
+                    </button>
+                </div>
+
+                <nav class="space-y-1 flex-1">
+                    <a href="#overview" class="sidebar-link active">
+                        <i class="fas fa-tachometer-alt-fast w-5 h-5 mr-3 text-accent"></i>
+                        <span>Tổng quan & Xếp hạng</span>
+                        <span class="neon-badge ml-auto">Live</span>
+                    </a>
+                    <a href="#config" class="sidebar-link">
+                        <i class="fas fa-cogs w-5 h-5 mr-3 text-blue-400"></i>
+                        <span>Cấu hình Tay Đua & Map</span>
+                    </a>
+                    <a href="#data-entry" class="sidebar-link">
+                        <i class="fas fa-stopwatch w-5 h-5 mr-3 text-success"></i>
+                        <span>Nhập thời gian & Xe/Pet</span>
+                    </a>
+                    <a href="#scoreboard" class="sidebar-link">
+                        <i class="fas fa-chart-bar w-5 h-5 mr-3 text-accent"></i>
+                        <span>Bảng điểm chi tiết</span>
+                    </a>
+                    <a href="./map-detail.html" class="sidebar-link">
+                        <i class="fas fa-chart-line w-5 h-5 mr-3 text-accent"></i>
+                        <span>Diễn biến chi tiết</span>
+                    </a>
+                    <a href="./discuss.html" class="sidebar-link">
+                        <i class="fas fa-comments w-5 h-5 mr-3 text-purple-400"></i>
+                        <span>Diễn Đàn</span>
+                        <span class="ml-auto text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">Mới</span>
+                    </a>
+                    <a href="./configdata.html" id="configdata-link" class="sidebar-link">
+                        <i class="fas fa-database w-5 h-5 mr-3 text-warning"></i>
+                        <span>Quản lý Dữ liệu</span>
+                    </a>
+                    <button onclick="openBxhModal(); toggleSidebar()" class="sidebar-link w-full text-left md:hidden">
+                        <i class="fas fa-trophy w-5 h-5 mr-3 text-amber-400"></i>
+                        <span>BXH Vinh Danh</span>
+                    </button>
+                    <a href="scoreboard.html" class="sidebar-link md:hidden">
+                        <i class="fas fa-table-list w-5 h-5 mr-3 text-white"></i>
+                        <span>Xem Bảng Điểm</span>
+                    </a>
+                    <button onclick="if(window.userProfileManager) window.userProfileManager.createProfilePage()"
+                        class="sidebar-link w-full text-left">
+                        <i class="fas fa-user-circle w-5 h-5 mr-3 text-pink-400"></i>
+                        <span>Hồ Sơ Cá Nhân</span>
+                    </button>
+                </nav>
+
+                <div class="space-y-3 pt-6 border-t border-slate-800/50">
+                    <div class="flex flex-col space-y-3 w-full">
+                        <button id="refresh-data-btn" onclick="handleDataRefresh()"
+                            class="btn-admin w-full flex items-center justify-start px-4">
+                            <div class="flex items-center w-full">
+                                <i class="fas fa-sync-alt mr-3 text-accent animate-spin hidden" id="refresh-icon"></i>
+                                <i class="fas fa-sync-alt mr-3 text-accent" id="refresh-icon-static"></i>
+                                <span class="flex-1 text-left truncate">Làm Mới Dữ Liệu</span>
+                            </div>
+                        </button>
+                        <button id="export-excel-btn" onclick="exportToExcel()"
+                            class="btn-admin w-full flex items-center justify-start px-4">
+                            <div class="flex items-center w-full">
+                                <i class="fas fa-file-export mr-3 text-indigo-400"></i>
+                                <span class="flex-1 text-left truncate">Xuất Bảng Điểm</span>
+                            </div>
+                        </button>
+                        <button id="logout-btn" onclick="handleLogout()"
+                            class="btn-admin w-full flex items-center justify-start px-4">
+                            <div class="flex items-center w-full">
+                                <i class="fas fa-sign-out-alt mr-3 text-slate-400"></i>
+                                <span class="flex-1 text-left truncate">Đăng Xuất</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center text-xs text-slate-500 pt-4 border-t border-slate-800/50">
+                    <p class="sidebar-footer-text">WeStar Team © 2026</p>
+                    <p class="mt-1 sidebar-footer-text">ZingSpeed Mobile Vietnam</p>
+                    <div class="mt-2 flex justify-center space-x-2">
+                        <div class="w-1 h-1 bg-cyan-500 rounded-full"></div>
+                        <div class="w-1 h-1 bg-blue-500 rounded-full"></div>
+                        <div class="w-1 h-1 bg-purple-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+
+        <div class="main-content flex-1 min-w-0 lg:ml-72 flex flex-col">
+
+            <header class="sticky top-0 z-40 admin-header relative">
+                <div class="flex items-center justify-between p-2 px-4 md:p-3 md:px-6">
+                    <div class="flex items-center gap-2 md:gap-6">
+                        <button id="sidebar-toggle"
+                            class="text-slate-300 p-2 rounded-xl bg-white/5 border border-slate-700 hover:bg-white/10 hover:text-accent transition-all-smooth"
+                            onclick="toggleSidebar()">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <div class="min-w-0">
+                            <h1 class="text-lg md:text-xl font-extrabold admin-title tracking-tight whitespace-nowrap truncate">
+                                <span class="text-accent">Quản Lý Điểm</span>
+                            </h1>
+                            <div class="flex items-center mt-0.5">
+                                <div class="header-status-pill scale-75 origin-left hidden sm:flex">
+                                    <span class="h-1.5 w-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                    <span class="text-[10px] text-success font-bold uppercase tracking-wider">Hoạt
+                                        động</span>
+                                    <span class="w-px h-2 bg-slate-700 mx-1"></span>
+                                    <span class="text-[10px] text-slate-500 font-medium" id="last-update">Vừa
+                                        xong</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="relative hidden md:block w-40 md:w-56 lg:w-64 mx-4" id="header-search-container">
+                        <div class="relative">
+                            <input type="text" id="header-search-input" placeholder="Tìm kiếm tay đua, bản đồ..."
+                                class="w-full bg-slate-900/55 hover:bg-slate-900/80 focus:bg-slate-900 border border-slate-700/80 hover:border-slate-600 focus:border-cyan-500 rounded-xl py-1.5 pl-9 pr-8 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-all duration-300">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-slate-400 text-xs"></i>
+                            </div>
+
+                            <button id="header-search-clear"
+                                class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors hidden">
+                                <i class="fas fa-times-circle text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div id="header-search-suggestions"
+                            class="absolute top-full left-0 right-0 mt-2 bg-slate-950 border border-slate-800 rounded-xl z-[9999] hidden overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-72 overflow-y-auto divide-y divide-slate-800">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-1.5 md:space-x-6">
+
+                        <button id="mobile-search-toggle"
+                            class="p-2.5 rounded-xl bg-white/5 border border-slate-700 hover:bg-white/10 text-slate-300 md:hidden transition-all duration-300"
+                            title="Tìm kiếm">
+                            <i class="fas fa-search text-base"></i>
+                        </button>
+
+                        <button onclick="openBxhModal()" class="header-btn-modern hidden md:flex items-center">
+                            <i class="fas fa-trophy text-amber-400"></i>
+                            <span class="hidden md:inline ml-2">BXH Vinh Danh</span>
+                        </button>
+                        <a href="scoreboard.html" class="header-btn-modern hidden md:flex items-center">
+                            <i class="fas fa-table-list"></i>
+                            <span class="hidden md:inline ml-2">Xem Bảng Điểm</span>
+                        </a>
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="relative">
+                                <button id="notification-bell"
+                                    class="relative p-2.5 rounded-xl bg-white/5 border border-slate-700 hover:bg-white/10 transition-all duration-300">
+                                    <i class="fas fa-bell text-lg text-slate-300"></i>
+                                    <span id="notification-count"
+                                        class="absolute -top-1 -right-1 h-5 w-5 from-red-500 to-pink-600 text-white text-[10px] rounded-full flex items-center justify-center font-black hidden shadow-lg animate-bounce">
+                                        0
+                                    </span>
+                                </button>
+
+                                <div id="notification-dropdown"
+                                    class="fixed md:absolute left-1/2 -translate-x-1/2 top-20 md:top-auto md:mt-3 w-[calc(100vw-32px)] md:w-80 admin-card z-50 md:z-30 hidden overflow-hidden shadow-2xl">
+                                    <div
+                                        class="p-4 border-b border-slate-700 flex justify-between items-center bg-white/5">
+                                        <h3 class="font-bold text-white text-sm">Thông báo</h3>
+                                        <div class="flex items-center gap-3">
+                                            <button id="mark-all-read"
+                                                class="text-[10px] text-accent hover:text-cyan-300 transition-colors uppercase font-bold tracking-wider">Đọc
+                                                hết</button>
+                                            <button id="delete-all-notifications"
+                                                class="text-[10px] text-danger hover:text-red-300 transition-colors uppercase font-bold tracking-wider">Xoá
+                                                hết</button>
+                                        </div>
+                                    </div>
+                                    <div id="notification-list" class="max-h-96 overflow-y-auto">
+                                        <div class="p-8 text-center text-slate-500">
+                                            <i class="fas fa-bell-slash text-3xl mb-4 opacity-50"></i>
+                                            <p class="text-xs">Không có thông báo nào</p>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 border-t border-slate-700 text-center bg-white/5">
+                                        <a href="#"
+                                            class="text-xs text-accent hover:text-cyan-300 font-bold transition-colors"
+                                            onclick="showAllNotifications()">
+                                            Xem tất cả
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-px h-8 bg-white/10 mx-1"></div>
+
+                            <div class="profile-trigger flex-shrink-0 flex items-center gap-3 cursor-pointer group"
+                                onclick="openUserProfileModal()">
+                                <div class="text-right hidden md:block">
+                                    <div id="user-display-name"
+                                        class="text-sm font-bold text-white flex items-center justify-end gap-2">
+                                        Admin
+                                    </div>
+                                    <div id="user-role-label"
+                                        class="text-[9px] text-slate-500 uppercase font-black tracking-widest mt-0.5">
+                                        Quản trị viên
+                                    </div>
+                                </div>
+
+                                <div class="relative flex-shrink-0">
+                                    <div
+                                        class="absolute -inset-1 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-full opacity-20 group-hover:opacity-40 blur-sm transition-opacity">
+                                    </div>
+                                    <img id="user-avatar"
+                                        class="h-10 w-10 flex-shrink-0 rounded-full object-cover border-2 border-white/10 relative transition-all duration-500 group-hover:border-cyan-500/50 group-hover:scale-105 shadow-xl"
+                                        src="assets/images/logows.png" alt="User Avatar">
+                                    <div
+                                        class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 bg-green-500 rounded-full border-2 border-[#12121e]">
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-cyan-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+                                        <i class="fas fa-camera text-white text-[10px]"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="mobile-search-container"
+                    class="absolute inset-0 bg-slate-950 px-4 flex items-center justify-between z-45 hidden animate__animated animate__fadeIn animate__faster">
+                    <div class="relative flex-1 mr-3">
+                        <input type="text" id="mobile-search-input" placeholder="Tìm kiếm tay đua, bản đồ..."
+                            class="w-full bg-slate-900/80 focus:bg-slate-900 border border-slate-700/80 hover:border-slate-600 focus:border-cyan-500 rounded-xl py-2 pl-10 pr-10 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-all duration-300">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-slate-400 text-xs"></i>
+                        </div>
+
+                        <button id="mobile-search-clear"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors hidden">
+                            <i class="fas fa-times-circle text-xs"></i>
+                        </button>
+                    </div>
+                    <button id="mobile-search-close"
+                        class="p-2 px-3 text-xs font-black rounded-xl bg-white/5 border border-slate-800 text-slate-400 hover:text-white transition-all duration-300 uppercase tracking-wide">
+                        HỦY
+                    </button>
+
+                    <div id="mobile-search-suggestions"
+                        class="absolute top-[100%] left-4 right-4 mt-2 bg-slate-950 border border-slate-800 rounded-xl z-[9999] hidden overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-[60vh] overflow-y-auto divide-y divide-slate-800">
+                    </div>
+                </div>
+            </header>
+
+
+
+
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 lg:p-8 space-y-8">
+
+                <!-- Auto-sliding banner carousel -->
+                <div id="banner-carousel-container" class="relative w-full rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.15)] border border-slate-800 bg-slate-950/40 mb-8 hidden group" style="z-index: 0;">
+                    <div id="banner-slides" class="relative w-full h-[260px] sm:h-[360px] md:h-[430px] lg:h-[520px] overflow-hidden">
+                        <!-- Slides will be loaded dynamically -->
+                    </div>
+                    <!-- Prev/Next navigation -->
+                    <button id="carousel-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="carousel-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <!-- Indicators -->
+                    <div id="carousel-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
+                        <!-- Indicators will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+
+                    <div class="lg:col-span-2 space-y-8">
+                        <section id="overview" class="admin-card p-8">
+                            <div class="flex items-center justify-between mb-8">
+                                <div class="flex items-center">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mr-4 border border-white/10">
+                                        <i class="fas fa-trophy text-amber-400 text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-lg md:text-xl font-bold text-white tracking-tight">Bảng Xếp Hạng
+                                            Chung Cuộc
+                                        </h2>
+                                        <p class="text-slate-500 text-xs mt-0.5">Dữ liệu thi đấu thời gian thực</p>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <div
+                                        class="neon-badge px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold text-slate-400">
+                                        <i class="fas fa-users mr-1.5 opacity-50"></i>4 TAY ĐUA
+                                    </div>
+                                    <div
+                                        class="neon-badge px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold text-slate-400">
+                                        <i class="fas fa-map mr-1.5 opacity-50"></i><span id="map-count">0</span> BẢN ĐỒ
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div id="team-ranking-container" class="hidden mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div id="team1-score-card"
+                                    class="neon-card p-4 rounded-xl border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.15)] flex flex-col items-center justify-center relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-red-900/20 to-transparent">
+                                    </div>
+                                    <h3 id="team1-name-display"
+                                        class="text-sm font-bold text-red-400 uppercase tracking-wider z-10">Đội 1</h3>
+                                    <div class="flex items-end gap-2 z-10 mt-2">
+                                        <span id="team1-total-score" class="text-3xl font-black text-white">0</span>
+                                        <span class="text-xs text-slate-400 mb-1">điểm</span>
+                                    </div>
+                                    <p id="team1-members" class="text-[10px] text-slate-400 mt-2 z-10 text-center"></p>
+                                </div>
+                                <div id="team2-score-card"
+                                    class="neon-card p-4 rounded-xl border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)] flex flex-col items-center justify-center relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent">
+                                    </div>
+                                    <h3 id="team2-name-display"
+                                        class="text-sm font-bold text-blue-400 uppercase tracking-wider z-10">Đội 2</h3>
+                                    <div class="flex items-end gap-2 z-10 mt-2">
+                                        <span id="team2-total-score" class="text-3xl font-black text-white">0</span>
+                                        <span class="text-xs text-slate-400 mb-1">điểm</span>
+                                    </div>
+                                    <p id="team2-members" class="text-[10px] text-slate-400 mt-2 z-10 text-center"></p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="admin-table overflow-x-auto rounded-2xl border border-slate-800/50 custom-scrollbar">
+                                <table class="min-w-full table-center">
+                                    <thead>
+                                        <tr class="bg-slate-900/80">
+                                            <th class="px-6 py-4 text-center">Hạng</th>
+                                            <th class="px-6 py-4 text-left">Tay Đua</th>
+                                            <th class="px-6 py-4 text-center">Tổng Điểm</th>
+                                            <th class="px-6 py-4 text-center">Xu Hướng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ranking-table-body" class="divide-y divide-slate-800/50 bg-slate-900/20">
+                                        <tr>
+                                            <td colspan="4" class="text-center py-12 text-slate-500">
+                                                <div class="flex flex-col items-center justify-center space-y-4">
+                                                    <div class="speed-loader h-12 w-12 mx-auto"></div>
+                                                    <span>Đang tải dữ liệu...</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+
+
+                    <div class="space-y-8">
+
+                        <div class="admin-card p-6 h-full flex flex-col justify-between">
+                            <h3
+                                class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <i class="fas fa-satellite-dish mr-3 text-red-500/80"></i>
+                                    Bản Đồ Đang Đua
+                                </span>
+                                <span
+                                    class="text-[9px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full border border-red-500/20 font-black">LIVE</span>
+                            </h3>
+
+                            <div class="space-y-6 flex-1">
+                                <div id="next-map-image-container" class="relative group">
+                                    <div id="next-map-image"
+                                        class="w-full aspect-[16/10] rounded-xl overflow-hidden border-2 border-slate-700 group-hover:border-white/20 transition-all duration-500 bg-slate-900">
+                                        <img src="" alt="" class="w-full h-full object-cover"
+                                            id="next-map-image-content" style="display: none;">
+                                        <div id="next-map-placeholder"
+                                            class="w-full h-full flex flex-col items-center justify-center">
+                                            <i class="fas fa-map-marked-alt text-4xl text-slate-700 mb-3"></i>
+                                            <span class="text-xs text-slate-500">Đang tải map...</span>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-3 left-3 z-20 flex gap-1.5" id="next-map-difficulty">
+                                        <span id="difficulty-text" class="text-xs text-slate-400">N/A</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="text-xs text-slate-500 uppercase font-bold tracking-widest mb-1">Tên
+                                            Bản Đồ</div>
+                                        <div id="current-running-map"
+                                            class="text-lg md:text-xl font-bold text-white truncate">Chưa
+                                            có</div>
+                                    </div>
+
+                                    <div class="p-4 bg-white/5 rounded-xl border border-slate-700">
+                                        <div
+                                            class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">
+                                            Kỷ Lục Hiện Tại</div>
+                                        <div class="flex items-center justify-between">
+                                            <div id="current-best-time-value"
+                                                class="text-2xl font-black text-white tracking-tighter">--'--'--
+                                            </div>
+                                            <div id="current-best-racer" class="text-right min-w-0">
+                                                <div class="text-xs font-bold text-slate-300 truncate">-</div>
+                                                <div class="text-[9px] text-slate-500 uppercase tracking-widest">Holder
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pt-4 border-t border-slate-800 space-y-3">
+                                    <div class="flex space-x-2">
+                                        <span class="text-[10px] text-slate-500 uppercase font-bold">Trang bị:</span>
+                                        <div id="current-best-equipment"
+                                            class="flex space-x-3 text-[10px] text-slate-400">
+                                            <div id="current-best-car"><i class="fas fa-car mr-1 text-cyan-500"></i> -
+                                            </div>
+                                            <div id="current-best-pet"><i class="fas fa-paw mr-1 text-pink-500"></i> -
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="stats-card p-6 border-slate-700 hover:border-white/10">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-slate-500 font-bold uppercase text-[9px] tracking-[0.2em]">Tiến độ giải đấu
+                            </div>
+                            <i class="fas fa-tasks text-accent-blue opacity-50"></i>
+                        </div>
+                        <div class="flex items-end justify-between">
+                            <div id="completed-maps-count" class="text-4xl font-black text-white tracking-tighter">0
+                            </div>
+                            <div class="text-right">
+                                <div class="text-slate-300 font-bold text-xs uppercase tracking-widest">Maps</div>
+                                <div class="text-[9px] text-slate-500 uppercase tracking-widest">Completed</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                            <div class="h-full bg-accent-blue" id="race-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card p-6 border-slate-700 hover:border-white/10">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-slate-500 font-bold uppercase text-[9px] tracking-[0.2em]">Vừa hoàn thành
+                            </div>
+                            <i class="fas fa-check-circle text-emerald-500 opacity-50"></i>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div id="latest-completed-map-image"
+                                class="w-14 h-14 rounded-xl border border-slate-700 bg-black/40 flex-shrink-0 overflow-hidden">
+                                <img src="" alt=""
+                                    class="w-full h-full object-cover grayscale-[0.5] hover:grayscale-0 transition-all duration-300"
+                                    id="latest-map-image" style="display: none;">
+                                <div id="latest-map-placeholder"
+                                    class="w-full h-full flex items-center justify-center opacity-20"><i
+                                        class="fas fa-map text-sm"></i></div>
+                            </div>
+                            <div class="min-w-0">
+                                <div id="latest-completed-map-name"
+                                    class="text-white font-black text-base truncate leading-tight tracking-tight uppercase">
+                                    Chưa có</div>
+                                <div id="latest-map-description"
+                                    class="text-[9px] text-slate-500 truncate mt-1 uppercase tracking-widest font-bold">
+                                    Updated</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-card p-6 border-slate-700 hover:border-white/10">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="text-slate-500 font-bold uppercase text-[9px] tracking-[0.2em]">Kỷ lục nhanh
+                                nhất</div>
+                            <i class="fas fa-stopwatch text-amber-500 opacity-50"></i>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div id="best-time" class="text-2xl font-black text-white tracking-tighter">--'--'--
+                            </div>
+                            <div class="text-right min-w-0 pl-2">
+                                <div id="best-time-racer" class="text-slate-300 font-bold truncate text-xs uppercase">-
+                                </div>
+                                <div
+                                    class="flex space-x-2 text-[9px] text-slate-500 justify-end uppercase mt-1 tracking-widest font-bold">
+                                    <span id="best-time-car">-</span>
+                                    <span class="opacity-30">•</span>
+                                    <span id="best-time-pet">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-slate-800/50 mb-12">
+                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                        <div class="flex items-center space-x-4">
+                            <a href="https://www.facebook.com/ng.nambac/" target="_blank"
+                                class="text-xs text-slate-500 hover:text-accent transition-colors flex items-center">
+                                <i class="fab fa-facebook mr-2"></i> Liên hệ Dev
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <section id="config" class="admin-card p-8 mt-8">
+                    <div class="flex items-center mb-8">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gradient-speed flex items-center justify-center mr-4 shadow-neon">
+                            <span class="text-xl font-bold text-white">1</span>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Cấu hình Tay Đua, King Map & Map BTC</h2>
+                            <p class="text-slate-400 text-sm mt-2">Thiết lập thông tin cơ bản cho giải đấu</p>
+                        </div>
+                    </div>
+
+
+
+                    <div class="mb-10 p-8 border border-slate-700 bg-white/[0.02] rounded-3xl backdrop-blur-md">
+                        <label
+                            class="block text-sm font-black text-slate-400 mb-8 uppercase tracking-[0.3em] flex items-center">
+                            <i class="fas fa-bullseye-arrow mr-3 text-accent-blue"></i>
+                            Bản đồ đầu tiên (Map BTC)
+                        </label>
+
+                        <div class="flex flex-col lg:flex-row items-center lg:items-start gap-12">
+
+                            <div id="btc-wheel-container" class="relative group">
+                                <div class="relative">
+                                    <canvas id="btc-wheel-canvas" width="400" height="400"
+                                        class="rounded-full shadow-[0_0_50px_rgba(0,0,0,0.5)] border-4 border-slate-700"></canvas>
+
+
+                                    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 z-10">
+                                        <div
+                                            class="w-8 h-8 bg-accent-blue rotate-45 rounded-sm shadow-[0_0_15px_rgba(59,130,246,0.5)] border-2 border-white/10">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="flex-1 w-full space-y-8">
+                                <div class="space-y-4">
+                                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Thiết lập
+                                        trực tiếp</h3>
+                                    <input type="text" id="btc-map-name" class="input-admin w-full"
+                                        placeholder="Nhập tên Map BTC..." list="map-suggestions"
+                                        onchange="handleBtcMapChange(this.value)" />
+                                </div>
+
+                                <div id="selected-btc-map"
+                                    class="p-6 bg-white/5 rounded-2xl border border-slate-700 hidden animate__animated animate__fadeIn">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="w-12 h-12 rounded-xl bg-accent-blue/10 flex items-center justify-center mr-4 border border-accent-blue/20">
+                                                <i class="fas fa-flag-checkered text-accent-blue text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <div
+                                                    class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">
+                                                    Map được chọn</div>
+                                                <div id="btc-map-display"
+                                                    class="text-xl font-black text-white uppercase tracking-tight">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button onclick="resetBtcMap()"
+                                            class="w-10 h-10 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all flex items-center justify-center border border-red-500/20">
+                                            <i class="fas fa-redo"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <button id="spin-wheel-btn" onclick="spinWheel()"
+                                        class="w-full py-5 bg-gradient-speed text-white font-black text-lg rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center uppercase tracking-widest">
+                                        <i class="fas fa-sync-alt mr-3"></i>
+                                        Quay ngẫu nhiên
+                                    </button>
+
+                                    <div class="flex items-start p-4 bg-slate-400/5 rounded-xl border border-slate-700">
+                                        <i class="fas fa-info-circle text-slate-500 mt-1 mr-3"></i>
+                                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                                            Hệ thống sẽ tự động chọn ngẫu nhiên một bản đồ từ danh sách các bản đồ đã
+                                            được cấu hình trong hệ thống (ALL MAPS).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-6 neon-card p-5 border-l-4 border-l-purple-500 rounded-xl" id="team-mode-container">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-white uppercase tracking-wider flex items-center">
+                                    <i class="fas fa-users mr-2 text-purple-400"></i> Chế độ Team 2vs2
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Ghép cặp Tay đua 1 & 3 thành Đội 1; Tay đua 2 & 4
+                                    thành Đội 2</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="team-mode-toggle" class="sr-only peer"
+                                    onchange="window.toggleTeamMode(this.checked)">
+                                <div
+                                    class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600">
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="team-names-config"
+                            class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden transition-all duration-300">
+                            <div>
+                                <label class="block text-xs font-bold text-red-400 mb-1">Tên Đội 1 (TĐ 1 & 3)</label>
+                                <input type="text" id="team1-name-input"
+                                    class="speed-input w-full text-center border-red-500/30 focus:border-red-500"
+                                    placeholder="Nhập tên Đội 1..."
+                                    onchange="window.handleTeamNameChange(0, this.value)">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-blue-400 mb-1">Tên Đội 2 (TĐ 2 & 4)</label>
+                                <input type="text" id="team2-name-input"
+                                    class="speed-input w-full text-center border-blue-500/30 focus:border-blue-500"
+                                    placeholder="Nhập tên Đội 2..."
+                                    onchange="window.handleTeamNameChange(1, this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chế độ 1vs1 Mode -->
+                    <div class="mb-6 neon-card p-5 border-l-4 border-l-cyan-500 rounded-xl" id="1vs1-mode-container">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-white uppercase tracking-wider flex items-center">
+                                    <i class="fas fa-user-friends mr-2 text-cyan-400"></i> Chế độ 1vs1
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1" id="1vs1-format-desc">Đua 1vs1 giữa 2 tay đua (BO3 lớn: BO1 & BO2 chạm
+                                    5, BO3 chạm 5 cách biệt 2)</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="1vs1-mode-toggle" class="sr-only peer"
+                                    onchange="window.toggle1vs1Mode(this.checked)">
+                                <div
+                                    class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600">
+                                </div>
+                            </label>
+                        </div>
+                        <!-- BO7 / BO9 Format Selector (hiển sau khi bật 1vs1) -->
+                        <div id="bo-format-selector" class="mt-4 hidden">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400 font-semibold mr-1">Thể thức:</span>
+                                <button id="bo9-btn"
+                                    onclick="window.toggle1vs1BOFormat('BO9')"
+                                    class="bo-format-btn active px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
+                                    BO9 (chạm 5)
+                                </button>
+                                <button id="bo7-btn"
+                                    onclick="window.toggle1vs1BOFormat('BO7')"
+                                    class="bo-format-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
+                                    BO7 (chạm 4)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="racer-names" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <div class="text-center py-12 text-slate-500">
+                            <div class="flex flex-col items-center justify-center space-y-4">
+                                <div class="speed-loader h-12 w-12"></div>
+                                <span>Đang tải cấu hình tay đua...</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="error-message"
+                        class="mt-8 hidden p-5 rounded-xl border border-red-500/40 bg-gradient-to-r from-red-900/20 to-transparent backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div
+                                class="w-12 h-12 rounded-full from-red-500 to-pink-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-red-300">Cần hoàn thiện cấu hình</h4>
+                                <p class="text-sm text-danger/80 mt-1" id="error-details"></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <section id="data-entry" class="admin-card p-8 mt-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center">
+                            <div
+                                class="w-12 h-12 rounded-full from-green-500 to-teal-600 flex items-center justify-center mr-4 shadow-neon">
+                                <span class="text-xl font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Nhập Thời Gian Map Đấu, Xe và Pet sử dụng</h2>
+                                <p class="text-slate-400 text-sm mt-2">Cập nhật kết quả đua theo thời gian thực</p>
+                            </div>
+                        </div>
+                        <button id="add-map-btn"
+                            class="btn-admin px-6 py-3 bg-gradient-speed border-0 hover:opacity-90">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span>Thêm Map Đấu Tự Do</span>
+                        </button>
+                    </div>
+
+
+                    <div
+                        class="mb-8 p-5 bg-gradient-to-r from-cyan-900/20 to-blue-900/20 rounded-2xl border border-cyan-500/30 backdrop-blur-sm">
+                        <div class="flex items-start">
+                            <div
+                                class="w-10 h-10 rounded-full from-cyan-500/20 to-blue-500/20 flex items-center justify-center mr-4 mt-1">
+                                <i class="fas fa-info-circle text-accent"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-cyan-300 mb-2">Quy tắc tính điểm:</h4>
+                                <p id="point-rule-text" class="text-sm text-slate-300">
+                                    Tay đua nhanh nhất được 11 điểm (hoặc 12 điểm nếu là King Map Owner).
+                                    Các tay đua sau bị trừ 1 điểm cho mỗi giây trễ so với người nhanh nhất.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- BO Tab Bar (hiển thị khi 1vs1 mode và có nhiều hơn 1 BO) -->
+                    <div id="bo-tab-container" class="hidden mb-6">
+                        <div
+                            class="flex items-center gap-1 p-1 bg-slate-900/70 rounded-xl border border-slate-700/50 w-fit">
+                            <button id="bo-tab-btn-1" onclick="window.switchBOTab(1)"
+                                class="bo-tab-btn active px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2">
+                                <span class="bo-tab-indicator w-2 h-2 rounded-full"></span>
+                                BO 1
+                            </button>
+                            <button id="bo-tab-btn-2" onclick="window.switchBOTab(2)"
+                                class="bo-tab-btn hidden px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2">
+                                <span class="bo-tab-indicator w-2 h-2 rounded-full"></span>
+                                BO 2
+                            </button>
+                            <button id="bo-tab-btn-3" onclick="window.switchBOTab(3)"
+                                class="bo-tab-btn hidden px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2">
+                                <span class="bo-tab-indicator w-2 h-2 rounded-full"></span>
+                                BO 3
+                            </button>
+                        </div>
+                        <div id="bo-tab-status-text" class="text-xs text-slate-500 mt-2 ml-1"></div>
+                    </div>
+
+                    <style>
+                        .bo-tab-btn {
+                            color: #64748b;
+                            background: transparent;
+                        }
+
+                        .bo-tab-btn:hover {
+                            color: #e2e8f0;
+                            background: rgba(255, 255, 255, 0.05);
+                        }
+
+                        .bo-tab-btn.active {
+                            color: #ffffff;
+                            background: rgba(6, 182, 212, 0.15);
+                            border: 1px solid rgba(6, 182, 212, 0.4);
+                            box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+                        }
+
+                        .bo-tab-btn.active .bo-tab-indicator {
+                            background: #06b6d4;
+                            box-shadow: 0 0 6px rgba(6, 182, 212, 0.8);
+                        }
+
+                        .bo-tab-btn:not(.active) .bo-tab-indicator {
+                            background: #475569;
+                        }
+
+                        .bo-tab-btn.finished {
+                            color: #94a3b8;
+                        }
+
+                        .bo-tab-btn.finished .bo-tab-indicator {
+                            background: #4ade80;
+                        }
+
+                        .bo-tab-btn.winner-highlight {
+                            background: rgba(251, 191, 36, 0.1);
+                            border: 1px solid rgba(251, 191, 36, 0.35);
+                            color: #fbbf24;
+                        }
+                    </style>
+
+                    <div class="mb-12">
+                        <h3 class="text-xl font-bold text-cyan-300 mb-6 flex items-center">
+                            <i class="fas fa-car mr-3"></i>
+                            Bảng Xe và Pet sử dụng
+                        </h3>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-800/50 backdrop-blur-sm">
+                            <table class="min-w-full divide-y divide-slate-800/50 table-center mobile-entry-table">
+                                <thead class="bg-slate-900/80">
+                                    <tr>
+                                        <th class="px-5 py-4 text-center text-xs font-bold text-accent uppercase">#
+                                        </th>
+                                        <th
+                                            class="px-5 py-4 text-center text-xs font-bold text-accent uppercase min-w-[240px]">
+                                            Tên Map</th>
+                                        <th id="racer-car-header-2" colspan="4"
+                                            class="px-5 py-4 text-center text-xs font-bold text-accent uppercase border-l border-slate-700/50">
+                                            Xe (Không được trùng)</th>
+                                        <th id="racer-pet-header-2" colspan="4"
+                                            class="px-5 py-4 text-center text-xs font-bold text-accent uppercase border-l border-slate-700/50">
+                                            Pet</th>
+                                        <th class="px-5 py-4"></th>
+                                    </tr>
+                                    <tr id="racer-sub-header-car-pet" class="bg-slate-900/60"></tr>
+                                </thead>
+                                <tbody id="map-car-pet-body" class="divide-y divide-slate-800/50">
+                                    <tr>
+                                        <td colspan="100%" class="text-center py-12 text-slate-500">
+                                            <div class="flex flex-col items-center justify-center space-y-4">
+                                                <div class="speed-loader h-12 w-12"></div>
+                                                <span>Đang tải dữ liệu xe và pet...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-cyan-300 mb-6 flex items-center">
+                            <i class="fas fa-stopwatch mr-3"></i>
+                            Bảng Thời Gian và Điểm Số
+                        </h3>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-800/50 backdrop-blur-sm">
+                            <table class="min-w-full divide-y divide-slate-800/50 table-center mobile-entry-table">
+                                <thead class="bg-slate-900/80">
+                                    <tr>
+                                        <th class="px-5 py-4 text-center text-xs font-bold text-accent uppercase">#
+                                        </th>
+                                        <th
+                                            class="px-5 py-4 text-center text-xs font-bold text-accent uppercase min-w-[240px]">
+                                            Tên Map</th>
+                                        <th id="racer-time-header" colspan="4"
+                                            class="px-5 py-4 text-center text-xs font-bold text-accent uppercase border-l border-slate-700/50">
+                                            Thời Gian (MM'SS'MS)</th>
+                                        <th class="px-5 py-4 text-center text-xs font-bold text-accent uppercase">Hành
+                                            động</th>
+                                    </tr>
+                                    <tr id="racer-sub-header-time-points" class="bg-slate-900/60"></tr>
+                                </thead>
+                                <tbody id="map-time-points-body" class="divide-y divide-slate-800/50">
+                                    <tr>
+                                        <td colspan="100%" class="text-center py-12 text-slate-500">
+                                            <div class="flex flex-col items-center justify-center space-y-4">
+                                                <div class="speed-loader h-12 w-12"></div>
+                                                <span>Đang tải dữ liệu thời gian...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <p class="mt-6 text-sm text-slate-400 italic text-center">
+                        <i class="fas fa-keyboard mr-2"></i>
+                        * Nhập thời gian về đích theo format:
+                        <span class="text-accent font-mono font-bold">MM'SS'MS</span> (ví dụ: `01'04'23`)
+                        hoặc <span class="text-accent font-mono font-bold">10423</span> (1 phút 4 giây 23).
+                    </p>
+                </section>
+
+
+                <section id="scoreboard" class="admin-card p-8 mt-8">
+                    <div class="flex items-center mb-8">
+                        <div
+                            class="w-12 h-12 rounded-full from-purple-500 to-pink-600 flex items-center justify-center mr-4 shadow-neon">
+                            <span class="text-xl font-bold text-white">3</span>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Bảng Tổng Kết Điểm Số Chi Tiết Theo Map</h2>
+                            <p class="text-slate-400 text-sm mt-2">Phân tích chi tiết kết quả từng trận đấu</p>
+                        </div>
+                    </div>
+
+                    <!-- BO Tab Bar (1vs1 Mode only) -->
+                    <div id="scoreboard-bo-tab-container" class="hidden mb-4 flex items-center gap-3">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <div class="overflow-x-auto rounded-2xl backdrop-blur-sm">
+                        <table id="detailed-scoreboard-table" class="min-w-full table-center">
+                            <thead id="detailed-scoreboard-header" class="bg-slate-900/80"></thead>
+                            <tbody id="detailed-scoreboard-body">
+                                <tr>
+                                    <td colspan="100%" class="text-center py-12 text-slate-500">
+                                        <div class="flex flex-col items-center justify-center space-y-4">
+                                            <div class="speed-loader h-12 w-12"></div>
+                                            <span>Đang tải bảng điểm chi tiết...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div id="detailed-scoreboard-1vs1-container" class="hidden"></div>
+                    </div>
+
+
+                    <div id="scoreboard-summary-bar-container" class="mt-8 hidden"></div>
+
+
+                    <div id="team-summary-container" class="hidden mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    </div>
+                </section>
+
+
+
+
+                <footer class="text-center py-12 mt-8">
+                    <div class="mb-8 relative">
+                        <div
+                            class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent">
+                        </div>
+                        <div class="relative inline-block bg-dark-bg px-8 py-4 rounded-2xl admin-header">
+                            <img src="assets/images/logows.png" alt="Logo WeStar Team"
+                                class="h-16 w-auto mx-auto hover-lift transition-all-smooth">
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-lg">Project by Nguyen Nam Bac - WeStar Team</p>
+                    <p class="text-sm text-slate-500 mt-3">Hệ thống được phát triển để phục vụ cộng đồng ZingSpeed
+                        Mobile Việt Nam.</p>
+                    <div class="flex justify-center space-x-6 mt-6">
+                        <a href="#" class="text-slate-500 hover:text-accent transition-all-smooth text-xl"><i
+                                class="fab fa-github"></i></a>
+                        <a href="https://www.facebook.com/ng.nambac/"
+                            class="text-slate-500 hover:text-blue-400 transition-all-smooth text-xl"><i
+                                class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-slate-500 hover:text-danger transition-all-smooth text-xl"><i
+                                class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-slate-500 hover:text-accent transition-all-smooth text-xl"><i
+                                class="fab fa-discord"></i></a>
+                    </div>
+                    <div class="mt-6 flex justify-center space-x-4">
+                        <span class="text-xs text-slate-600">v1.0.0</span>
+                        <span class="text-xs text-slate-600">•</span>
+                        <span class="text-xs text-slate-600">Performance Optimized</span>
+                        <span class="text-xs text-slate-600">•</span>
+                        <span class="text-xs text-slate-600">Real-time Updates</span>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <datalist id="map-suggestions"></datalist>
+    <datalist id="car-suggestions"></datalist>
+    <datalist id="pet-suggestions"></datalist>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+
+    <script>
+
+        function initParticles() {
+            const container = document.getElementById('particles-container');
+            if (!container) return;
+
+
+            const particleCount = window.innerWidth < 768 ? 8 : 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.width = `${Math.random() * 3 + 1}px`;
+                particle.style.height = particle.style.width;
+                particle.style.opacity = Math.random() * 0.3 + 0.1;
+                particle.style.animation = `float ${Math.random() * 15 + 15}s infinite ease-in-out`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(particle);
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            initParticles();
+
+
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                setTimeout(() => {
+                    gsap.to(loadingScreen, {
+                        opacity: 0,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        onComplete: () => {
+                            loadingScreen.style.display = 'none';
+                            document.getElementById('app').classList.remove('hidden');
+
+
+                            gsap.from('#app', {
+                                opacity: 0,
+                                duration: 1,
+                                ease: "power2.out"
+                            });
+
+
+                            gsap.utils.toArray('section').forEach((section, i) => {
+                                gsap.from(section, {
+                                    scrollTrigger: {
+                                        trigger: section,
+                                        start: "top 90%",
+                                        once: true
+                                    },
+                                    y: 30,
+                                    opacity: 0,
+                                    duration: 0.6,
+                                    ease: "power1.out"
+                                });
+                            });
+                        }
+                    });
+                }, 2000);
+            }
+
+
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('mouseenter', () => {
+                    gsap.to(link, {
+                        scale: 1.03,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+                link.addEventListener('mouseleave', () => {
+                    gsap.to(link, {
+                        scale: 1,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+
+
+                link.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href && href.startsWith('#')) {
+                        e.preventDefault();
+                        const targetId = href;
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+
+                            document.querySelectorAll('.sidebar-link').forEach(l => {
+                                l.classList.remove('active');
+                            });
+
+                            this.classList.add('active');
+
+
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+
+
+            document.querySelectorAll('.btn-admin').forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    gsap.to(button, {
+                        scale: 1.05,
+                        duration: 0.2,
+                        ease: "power2.out"
+                    });
+                });
+                button.addEventListener('mouseleave', () => {
+                    gsap.to(button, {
+                        scale: 1,
+                        duration: 0.2,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+
+            document.querySelectorAll('.admin-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, {
+                        y: -10,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                });
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        y: 0,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+
+            gsap.registerPlugin(ScrollTrigger);
+
+
+            gsap.utils.toArray('.stats-card').forEach(card => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power2.out"
+                });
+            });
+
+
+            function updateLastUpdateTime() {
+                const lastUpdateEl = document.getElementById('last-update');
+                if (lastUpdateEl) {
+                    lastUpdateEl.textContent = 'Vừa xong';
+                    setTimeout(() => {
+                        lastUpdateEl.textContent = '1 phút trước';
+                        setTimeout(() => {
+                            lastUpdateEl.textContent = '2 phút trước';
+                        }, 60000);
+                    }, 60000);
+                }
+            }
+
+            setInterval(updateLastUpdateTime, 60000);
+        });
+
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeNotificationModal();
+                closeUserProfileModal();
+            }
+        });
+
+
+
+        function showStatusMessage(message, isError = false) {
+            const container = document.getElementById('status-message');
+
+
+            container.innerHTML = '';
+
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-center justify-center p-4 rounded-xl backdrop-blur-sm shadow-2xl ${isError
+                ? 'bg-gradient-to-r from-red-600/90 to-red-700/90 text-white'
+                : 'bg-gradient-to-r from-cyan-600/90 to-blue-600/90 text-white'
+                }`;
+
+            messageDiv.innerHTML = `
+        <i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'} mr-3 text-xl"></i>
+        <span class="font-medium">${message}</span>
+    `;
+
+            container.appendChild(messageDiv);
+
+
+            container.className = 'fixed top-6 right-6 z-50 transition-all duration-300 transform opacity-0 translate-y-[-20px] pointer-events-none';
+
+
+            void container.offsetWidth;
+
+
+            container.classList.remove('opacity-0', 'translate-y-[-20px]');
+            container.classList.add('opacity-100', 'translate-y-0');
+
+
+            setTimeout(() => {
+                container.classList.remove('opacity-100', 'translate-y-0');
+                container.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 4000);
+        }
+
+
+
+        function handleDataRefresh() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            const staticIcon = document.getElementById('refresh-icon-static');
+
+            if (refreshIcon && staticIcon) {
+                staticIcon.classList.add('hidden');
+                refreshIcon.classList.remove('hidden');
+
+
+                setTimeout(() => {
+                    refreshIcon.classList.add('hidden');
+                    staticIcon.classList.remove('hidden');
+                    showStatusMessage('Dữ liệu đã được làm mới thành công!');
+                }, 1500);
+            }
+        }
+
+
+        function handleBtcMapChange(value) {
+            if (value.trim()) {
+                showStatusMessage(`Map BTC đã được đặt thành: ${value}`);
+            }
+        }
+        (function () {
+            let scrollTimeout;
+            window.addEventListener('scroll', function () {
+                if (!document.body.classList.contains('is-scrolling')) {
+                    document.body.classList.add('is-scrolling');
+                }
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function () {
+                    document.body.classList.remove('is-scrolling');
+                }, 100);
+            }, { passive: true });
+        })();
+    </script>
+
+
+
+
+    <div id="user-profile-modal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 backdrop-blur-md">
+        <div class="absolute inset-0 bg-black/80" onclick="closeUserProfileModal()"></div>
+
+        <div
+            class="relative admin-card w-full max-w-md overflow-hidden animate__animated animate__fadeInUp animate__faster shadow-2xl">
+
+            <div class="relative p-6 border-b border-slate-700 via-slate-900 to-blue-900/30">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-speed"></div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-speed flex items-center justify-center mr-4 shadow-lg shadow-cyan-500/20">
+                            <i class="fas fa-user-edit text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-black text-white uppercase tracking-tight">Hồ Sơ Cá Nhân
+                            </h3>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">Cập nhật
+                                danh tính của bạn</p>
+                        </div>
+                    </div>
+                    <button onclick="closeUserProfileModal()"
+                        class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-all-smooth border border-transparent hover:border-white/10">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8 space-y-8 bg-slate-800">
+
+                <div class="flex flex-col items-center">
+                    <div class="relative group">
+                        <div
+                            class="absolute -inset-2 bg-gradient-speed rounded-full opacity-20 blur-md group-hover:opacity-40 transition-opacity">
+                        </div>
+                        <div
+                            class="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl transition-transform duration-500 group-hover:scale-105">
+                            <img id="profile-preview-avatar" src="assets/images/logows.png" alt="Avatar"
+                                class="w-full h-full object-cover">
+
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                                onclick="document.getElementById('avatar-upload-input').click()">
+                                <i class="fas fa-camera text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <label for="avatar-upload-input"
+                            class="absolute bottom-1 right-1 w-8 h-8 md:w-10 md:h-10 bg-gradient-speed rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-xl border-2 border-[#12121e] z-10">
+                            <i class="fas fa-cloud-upload-alt text-white text-xs md:text-sm"></i>
+                            <input type="file" id="avatar-upload-input" accept="image/*" class="hidden"
+                                onchange="handleProfileImageChange(event)">
+                        </label>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ảnh đại diện</p>
+                        <p class="text-[9px] text-slate-500 mt-1 uppercase">Định dạng: JPG, PNG • Max: 2MB</p>
+                    </div>
+                </div>
+
+
+                <div class="space-y-6">
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">
+                            <i class="fas fa-id-card-alt mr-2 text-cyan-500"></i> Tên hiển thị
+                        </label>
+                        <div class="relative group">
+                            <input type="text" id="profile-displayName"
+                                class="input-admin w-full pl-12 pr-4 py-4 md:py-5 bg-white/[0.03] border-white/10 focus:border-cyan-500/50 rounded-2xl text-white font-bold transition-all"
+                                placeholder="Nhập tên hiển thị của bạn...">
+                            <div
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-cyan-500 transition-colors">
+                                <i class="fas fa-user-tag"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">
+                            <i class="fas fa-signature mr-2 text-blue-500"></i> Biệt danh / Status
+                        </label>
+                        <div class="relative group">
+                            <input type="text" id="profile-nickname"
+                                class="input-admin w-full pl-12 pr-4 py-4 md:py-5 bg-white/[0.03] border-white/10 focus:border-blue-500/50 rounded-2xl text-white font-bold transition-all"
+                                placeholder="Nhập biệt danh hoặc trạng thái...">
+                            <div
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-500 transition-colors">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="flex gap-4 pt-4">
+                    <button onclick="closeUserProfileModal()"
+                        class="flex-1 px-6 py-4 bg-white/5 text-slate-400 rounded-2xl hover:bg-white/10 hover:text-white transition-all font-black uppercase text-[10px] tracking-widest border border-slate-700">
+                        <i class="fas fa-times mr-2"></i> Hủy bỏ
+                    </button>
+                    <button onclick="saveUserProfile()" id="save-profile-btn"
+                        class="flex-2 px-8 py-4 bg-gradient-speed text-white rounded-2xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all font-black uppercase text-[10px] tracking-widest flex items-center justify-center">
+                        <i class="fas fa-check-circle mr-2 text-sm"></i> Cập nhật ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function openUserProfileModal() {
+            const modal = document.getElementById('user-profile-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                gsap.from(modal.querySelector('.admin-card'), {
+                    scale: 0.9,
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "back.out(1.7)"
+                });
+            }
+        }
+
+        function closeUserProfileModal() {
+            const modal = document.getElementById('user-profile-modal');
+            if (modal) {
+                gsap.to(modal.querySelector('.admin-card'), {
+                    scale: 0.9,
+                    opacity: 0,
+                    duration: 0.2,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        function closeNotificationModal() {
+            const modal = document.getElementById('notification-modal');
+            if (modal) {
+                gsap.to(modal.querySelector('.admin-card'), {
+                    scale: 0.9,
+                    opacity: 0,
+                    duration: 0.2,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        function handleProfileImageChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('profile-preview-avatar');
+                    if (preview) {
+                        preview.src = e.target.result;
+                        gsap.from(preview, {
+                            scale: 0.8,
+                            opacity: 0,
+                            duration: 0.4,
+                            ease: "power2.out"
+                        });
+                    }
+
+
+                    const cropModal = document.getElementById('crop-image-modal');
+                    if (cropModal) {
+                        cropModal.classList.remove('hidden');
+                        cropModal.classList.add('flex');
+
+
+                        cropModal.style.pointerEvents = 'auto';
+                        cropModal.style.display = 'flex';
+
+
+                        const cropImageElement = document.getElementById('crop-image');
+                        if (cropImageElement) {
+                            cropImageElement.src = e.target.result;
+
+
+                            if (window.cropperInstance instanceof Cropper) {
+                                window.cropperInstance.destroy();
+                            }
+
+
+                            window.cropperInstance = new Cropper(cropImageElement, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                autoCropArea: 1,
+                                responsive: true,
+                                restore: true,
+                                guides: true,
+                                center: true,
+                                highlight: true,
+                                cropBoxMovable: true,
+                                cropBoxResizable: true,
+                                toggleDragModeOnDblclick: true,
+                            });
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveUserProfile() {
+            const displayName = document.getElementById('profile-displayName').value;
+            const nickname = document.getElementById('profile-nickname').value;
+
+            if (displayName.trim()) {
+                document.getElementById('user-display-name').textContent = displayName;
+                showStatusMessage('Thông tin đã được cập nhật thành công!');
+                closeUserProfileModal();
+            } else {
+                showStatusMessage('Vui lòng nhập tên hiển thị!', true);
+            }
+        }
+    </script>
+
+
+    <div id="record-holder-detail-modal"
+        class="fixed inset-0 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="absolute inset-0 bg-black/70" onclick="closeRecordHolderModal()"></div>
+
+        <div
+            class="relative admin-card w-full max-w-3xl max-h-[85vh] overflow-hidden animate__animated animate__fadeIn">
+
+            <div class="p-6 border-b border-slate-700 bg-white/5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mr-4 border border-white/10">
+                            <i class="fas fa-crown text-amber-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 id="record-holder-name" class="text-2xl font-bold text-white">Tay Đua</h3>
+                            <div class="flex items-center mt-2 space-x-4">
+                                <div class="text-sm text-amber-300 font-semibold">
+                                    <i class="fas fa-trophy mr-1"></i>
+                                    <span id="record-holder-count">0</span> Record(s)
+                                </div>
+                                <div class="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded">
+                                    TOP RECORD HOLDER
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeRecordHolderModal()"
+                        class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/50 transition-all-smooth hover:scale-110"
+                        title="Đóng">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+                <div class="mb-4">
+                    <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                        <i class="fas fa-list-ul mr-2 text-accent-blue opacity-50"></i>
+                        Danh Sách Record
+                    </h4>
+                </div>
+
+                <div id="record-holder-maps-list" class="space-y-3">
+
+                    <div class="flex items-center justify-center py-8">
+                        <div class="speed-loader h-12 w-12"></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="p-4 border-t border-slate-800/50 bg-slate-900/30 flex justify-between items-center">
+                <div class="text-sm text-slate-400">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Click vào bản đồ để xem thêm thông tin
+                </div>
+                <button onclick="closeRecordHolderModal()" class="btn-admin px-6 py-2">
+                    <i class="fas fa-times mr-2"></i> Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="racer-matches-detail-modal"
+        class="fixed inset-0 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="absolute inset-0 bg-black/70" onclick="closeRacerMatchesModal()"></div>
+
+        <div class="relative admin-card w-full max-w-4xl max-h-[85vh] overflow-hidden animate__animated animate__fadeIn flex flex-col"
+            style="background: rgba(8, 8, 24, 0.98); border: 1px solid rgba(0, 243, 255, 0.25); border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+
+
+            <div class="p-6 border-b border-slate-700 bg-white/5 flex-shrink-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mr-4 border border-white/10">
+                            <i class="fas fa-stopwatch text-cyan-400 text-xl animate-pulse"></i>
+                        </div>
+                        <div>
+                            <h3 id="racer-matches-title-name" class="text-2xl font-bold text-white">Thống Kê Tay Đua
+                            </h3>
+                            <div class="flex flex-wrap items-center mt-2 gap-4">
+                                <div class="text-sm text-cyan-300 font-semibold">
+                                    <i class="fas fa-flag-checkered mr-1"></i>
+                                    <span id="racer-matches-played-count">0</span> Trận Đấu
+                                </div>
+                                <div class="text-sm text-amber-300 font-semibold">
+                                    <i class="fas fa-trophy mr-1"></i>
+                                    <span id="racer-matches-total-score">0</span> Điểm
+                                </div>
+                                <div class="text-xs bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded"
+                                    id="racer-matches-stats-summary">
+                                    Tỷ lệ: --% Top 1
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeRacerMatchesModal()"
+                        class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800/50 transition-all-smooth hover:scale-110"
+                        title="Đóng">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="p-6 overflow-y-auto max-h-[60vh] flex-1 custom-scrollbar">
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-black/35 p-4 rounded-xl border border-slate-800">
+                        <div class="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">Hạng Trung Bình
+                        </div>
+                        <div class="text-xl text-white font-bold" id="racer-avg-rank">#0.0</div>
+                    </div>
+                    <div class="bg-black/35 p-4 rounded-xl border border-slate-800">
+                        <div class="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">Số trận về Nhất
+                        </div>
+                        <div class="text-xl text-amber-400 font-bold" id="racer-win-count">0 trận</div>
+                    </div>
+                    <div class="bg-black/35 p-4 rounded-xl border border-slate-800">
+                        <div class="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">Tỷ lệ Top 1
+                        </div>
+                        <div class="text-xl text-cyan-400 font-bold" id="racer-top1-rate">0%</div>
+                    </div>
+                    <div class="bg-black/35 p-4 rounded-xl border border-slate-800">
+                        <div class="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">Điểm Trung Bình
+                        </div>
+                        <div class="text-xl text-emerald-400 font-bold" id="racer-avg-score">0.0</div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                        <i class="fas fa-list-ul mr-2 text-accent-blue opacity-50"></i>
+                        Diễn biến các trận đấu trong giải
+                    </h4>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-800/80 bg-slate-900/10">
+                    <table class="min-w-full divide-y divide-slate-800 text-center">
+                        <thead class="bg-slate-900/60 text-xs font-bold text-cyan-400 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-4 py-3 text-left"># Trận</th>
+                                <th class="px-4 py-3 text-left">Bản Đồ</th>
+                                <th class="px-4 py-3">Thời Gian</th>
+                                <th class="px-4 py-3">Hạng Trận</th>
+                                <th class="px-4 py-3">Điểm Đạt Được</th>
+                                <th class="px-4 py-3">Xe Sử Dụng</th>
+                                <th class="px-4 py-3">Pet Sử Dụng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="racer-matches-list-body" class="divide-y divide-slate-800/50 text-sm text-slate-300">
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div id="racer-matches-pagination" class="flex items-center justify-between mt-4 px-2">
+                    <div class="text-xs text-slate-500">
+                        Hiển thị <span id="racer-matches-show-start" class="font-bold text-slate-300">0</span>-<span
+                            id="racer-matches-show-end" class="font-bold text-slate-300">0</span> trên tổng số <span
+                            id="racer-matches-show-total" class="font-bold text-slate-300">0</span> trận
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="racer-matches-prev-page" onclick="changeRacerMatchesPage(-1)"
+                            class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition-all disabled:opacity-30 disabled:pointer-events-none">
+                            <i class="fas fa-chevron-left mr-1"></i> Trước
+                        </button>
+                        <span class="text-xs text-slate-400 font-bold px-2" id="racer-matches-page-number">Trang
+                            1/1</span>
+                        <button id="racer-matches-next-page" onclick="changeRacerMatchesPage(1)"
+                            class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition-all disabled:opacity-30 disabled:pointer-events-none">
+                            Sau <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="p-4 border-t border-slate-800/50 bg-slate-900/30 flex justify-end items-center flex-shrink-0">
+                <button onclick="closeRacerMatchesModal()" class="btn-admin px-6 py-2">
+                    <i class="fas fa-times mr-2"></i> Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="bxh-floating-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+
+        <div class="absolute inset-0 bg-black/80" onclick="closeBxhModal()"></div>
+
+        <div class="relative admin-card w-full max-w-7xl max-h-[90vh] overflow-hidden animate__animated animate__fadeIn flex flex-col"
+            style="background: rgba(8, 8, 24, 0.95); border: 1px solid rgba(124, 58, 237, 0.25); border-radius: 28px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);">
+
+
+            <div class="p-6 border-b border-slate-800/80 bg-white/5 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-speed flex items-center justify-center mr-4 shadow-neon">
+                        <i class="fas fa-trophy text-amber-400 text-xl animate-bounce"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white tracking-tight uppercase font-orbitron">Bảng Vinh Danh
+                            & Xếp Hạng</h3>
+                        <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">Top tay đua,
+                            record holders và combo hot</p>
+                    </div>
+                </div>
+                <button onclick="closeBxhModal()"
+                    class="text-slate-400 hover:text-white p-2.5 rounded-xl hover:bg-slate-800/50 transition-all-smooth hover:scale-110"
+                    title="Đóng">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <div
+                        class="admin-card fame-card active-racers-card p-6 border-slate-700 hover:border-white/10 transition-all">
+                        <h4
+                            class="font-black mb-6 flex items-center justify-center uppercase text-[11px] tracking-widest fame-glow-text-gold">
+                            <i class="fas fa-medal mr-2.5 text-xs text-amber-500 animate-pulse"></i> Tay Đua Tích Cực
+                        </h4>
+                        <div id="top-racers-list" class="space-y-4">
+
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="admin-card fame-card records-card p-6 border-slate-700 hover:border-white/10 transition-all">
+                        <h4
+                            class="font-black mb-6 flex items-center justify-center uppercase text-[11px] tracking-widest fame-glow-text-cyan">
+                            <i class="fas fa-crown mr-2.5 text-xs text-accent-cyan animate-pulse"></i> Top Giữ Record
+                        </h4>
+                        <div id="top-record-holders-list" class="space-y-4">
+
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="admin-card fame-card combos-card p-6 border-slate-700 hover:border-white/10 transition-all">
+                        <h4
+                            class="font-black mb-6 flex items-center justify-center uppercase text-[11px] tracking-widest fame-glow-text-danger">
+                            <i class="fas fa-fire mr-2.5 text-xs text-danger animate-pulse"></i> Combo Xe/Pet Hot
+                        </h4>
+                        <div id="top-combos-list" class="space-y-4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="p-4 border-t border-slate-800/50 bg-slate-900/30 flex justify-end items-center flex-shrink-0">
+                <button onclick="closeBxhModal()"
+                    class="btn-admin px-8 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">
+                    <i class="fas fa-times mr-2"></i> Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="crop-image-modal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 backdrop-blur-md">
+        <div class="absolute inset-0 bg-black/80" onclick="closeCropModal()"></div>
+
+        <div
+            class="relative admin-card w-full max-w-2xl overflow-hidden animate__animated animate__fadeIn shadow-2xl max-h-[95vh] flex flex-col">
+
+            <div class="relative p-6 border-b border-slate-700 via-slate-900 to-cyan-900/20 flex-shrink-0">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-speed"></div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mr-4 shadow-lg">
+                            <i class="fas fa-crop-alt text-accent text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-black text-white uppercase tracking-tight">Cắt hình ảnh</h3>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">Điều chỉnh
+                                khung hình phù hợp</p>
+                        </div>
+                    </div>
+                    <button onclick="closeCropModal()"
+                        class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-all-smooth">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-800">
+
+                <div
+                    class="relative flex justify-center bg-black/40 rounded-3xl p-4 md:p-8 border border-slate-700 shadow-inner min-h-[300px]">
+                    <img id="crop-image" src="" alt="Crop" class="max-w-full" style="max-height: 50vh;">
+                </div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <div class="space-y-4">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                            <i class="fas fa-magic mr-2 text-cyan-500"></i> Công cụ xoay & lật
+                        </label>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="rotateCropImage()"
+                                class="flex-1 px-4 py-3 bg-white/5 hover:bg-cyan-500/20 text-white rounded-xl transition-all-smooth border border-slate-700 hover:border-cyan-500/30 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                <i class="fas fa-rotate-right text-accent"></i> Xoay
+                            </button>
+                            <button onclick="flipCropImageH()"
+                                class="flex-1 px-4 py-3 bg-white/5 hover:bg-blue-500/20 text-white rounded-xl transition-all-smooth border border-slate-700 hover:border-blue-500/30 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                <i class="fas fa-arrows-left-right text-blue-400"></i> Ngang
+                            </button>
+                            <button onclick="flipCropImageV()"
+                                class="flex-1 px-4 py-3 bg-white/5 hover:bg-purple-500/20 text-white rounded-xl transition-all-smooth border border-slate-700 hover:border-purple-500/30 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest">
+                                <i class="fas fa-arrows-up-down text-accent"></i> Dọc
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="space-y-4">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                            <i class="fas fa-expand-arrows-alt mr-2 text-blue-500"></i> Tỷ lệ khung hình
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setCropAspectRatio(1)"
+                                class="px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl transition-all-smooth border border-slate-700 text-[10px] font-black uppercase tracking-widest">
+                                1:1 (Vuông)
+                            </button>
+                            <button onclick="setCropAspectRatio(16/9)"
+                                class="px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl transition-all-smooth border border-slate-700 text-[10px] font-black uppercase tracking-widest">
+                                16:9 HD
+                            </button>
+                            <button onclick="setCropAspectRatio(4/3)"
+                                class="px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl transition-all-smooth border border-slate-700 text-[10px] font-black uppercase tracking-widest">
+                                4:3 SD
+                            </button>
+                            <button onclick="setCropAspectRatio(NaN)"
+                                class="px-4 py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl transition-all-smooth border border-slate-700 text-[10px] font-black uppercase tracking-widest">
+                                Tự do
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div
+                class="p-6 border-t border-slate-700 bg-slate-900/80 flex flex-col sm:flex-row gap-3 justify-end flex-shrink-0">
+                <button onclick="closeCropModal()"
+                    class="order-2 sm:order-1 px-8 py-4 bg-white/5 text-slate-400 rounded-2xl hover:bg-white/10 hover:text-white transition-all font-black uppercase text-[10px] tracking-widest border border-slate-700">
+                    Hủy bỏ
+                </button>
+                <button onclick="applyCrop()"
+                    class="order-1 sm:order-2 px-10 py-4 bg-gradient-speed text-white rounded-2xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all font-black uppercase text-[10px] tracking-widest flex items-center justify-center">
+                    <i class="fas fa-check-circle mr-2 text-sm"></i> Chấp nhận
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="js/modules/notification-system.js"></script>
+
+    <script src="js/modules/user-profile.js"></script>
+    <script src="js/modules/data-export-import.js"></script>
+    <script src="js/modules/analytics-dashboard.js"></script>
+    <script src="js/modules/mobile-app-ux.js"></script>
+    <script src="js/modules/permission-system.js"></script>
+
+
+    <script type="module" src="./index.js"></script>
+    <script type="module">
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+    <script>
+
+
+
+        window.showRecordHonorPopup = (racer, time, mapName, car, pet, racerAvatar, mapImageUrl, carImageUrl, petImageUrl) => {
+            const popup = document.getElementById('record-honor-popup');
+            if (!popup) return;
+
+            const popupBox = popup.querySelector('.animate__animated');
+            document.getElementById('record-racer-name').textContent = racer;
+            document.getElementById('record-time').textContent = time;
+            document.getElementById('record-map-name').textContent = mapName;
+            document.getElementById('record-car-name').textContent = car || "-";
+            document.getElementById('record-pet-name').textContent = pet || "-";
+
+
+            const rImg = document.getElementById('record-racer-img');
+            rImg.src = 'assets/images/logows.png';
+            if (racerAvatar) {
+                rImg.src = racerAvatar;
+            } else if (window.db && window.firestoreGetDocs && window.firestoreCollection) {
+                window.firestoreGetDocs(window.firestoreCollection(window.db, 'users')).then(snap => {
+                    const nameLC = (racer || '').trim().toLowerCase();
+                    const matched = snap.docs.find(d => {
+                        const uData = d.data();
+                        return (
+                            (uData.nickname || '').trim().toLowerCase() === nameLC ||
+                            (uData.displayName || '').trim().toLowerCase() === nameLC
+                        );
+                    });
+                    if (matched) {
+                        const uData = matched.data();
+                        const avatar = uData.photoBase64 || uData.photoURL;
+                        if (avatar) rImg.src = avatar;
+                    }
+                }).catch(() => { });
+            }
+
+
+            const mapImg = document.getElementById('record-map-img');
+            mapImg.src = mapImageUrl || "assets/images/banner.jpg";
+
+
+            const carImg = document.getElementById('record-car-img');
+            const carIcon = document.getElementById('record-car-icon');
+            if (carImageUrl) {
+                carImg.src = carImageUrl;
+                carImg.classList.remove('hidden');
+                if (carIcon) carIcon.classList.add('hidden');
+            } else {
+                carImg.classList.add('hidden');
+                if (carIcon) carIcon.classList.remove('hidden');
+            }
+
+
+            const petImg = document.getElementById('record-pet-img');
+            const petIcon = document.getElementById('record-pet-icon');
+            if (petImageUrl) {
+                petImg.src = petImageUrl;
+                petImg.classList.remove('hidden');
+                if (petIcon) petIcon.classList.add('hidden');
+            } else {
+                petImg.classList.add('hidden');
+                if (petIcon) petIcon.classList.remove('hidden');
+            }
+
+            popup.classList.remove('hidden');
+            popupBox.classList.remove('animate__zoomOut');
+            popupBox.classList.add('animate__zoomIn');
+
+            setTimeout(() => {
+                popup.classList.remove('opacity-0');
+                popup.classList.add('opacity-100');
+            }, 50);
+
+            const autoClose = setTimeout(() => {
+                closeRecordPopup();
+            }, 8000);
+
+            document.getElementById('close-record-popup').onclick = () => {
+                clearTimeout(autoClose);
+                closeRecordPopup();
+            };
+
+            function closeRecordPopup() {
+                popupBox.classList.remove('animate__zoomIn');
+                popupBox.classList.add('animate__zoomOut');
+                popup.classList.remove('opacity-100');
+                popup.classList.add('opacity-0');
+                setTimeout(() => {
+                    popup.classList.add('hidden');
+                    popupBox.classList.remove('animate__zoomOut');
+                }, 500);
+            }
+        };
+    </script>
+
+    <!-- Map Detail Modal -->
+    <div id="map-detail-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm p-4">
+        <div id="map-detail-box" class="relative w-full max-w-2xl max-h-[90vh] bg-slate-900 border border-slate-700/50 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(6,182,212,0.2)] flex flex-col animate__animated">
+            <!-- Play Video button top-left -->
+            <button id="map-detail-video-btn" onclick="playMapVideo()" class="absolute top-3 left-3 z-20 px-3 py-1.5 rounded-full bg-red-600/90 hover:bg-red-500 border border-white/20 text-white flex items-center gap-1.5 text-xs font-bold transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)] backdrop-blur-md hidden">
+                <i class="fas fa-play text-[10px]"></i>
+                <span>Xem Video Record</span>
+            </button>
+
+            <!-- Close button -->
+            <button onclick="closeMapDetailModal()" class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+
+            <!-- Map Header with bg image -->
+            <div id="map-detail-header" class="relative w-full h-40 sm:h-48 flex-shrink-0 overflow-hidden">
+                <img id="map-detail-img" src="" alt="" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                <div class="absolute bottom-4 left-5 right-12">
+                    <span id="map-detail-difficulty" class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border mb-2 inline-block"></span>
+                    <h2 id="map-detail-name" class="text-xl sm:text-2xl font-black text-white drop-shadow-lg leading-tight"></h2>
+                </div>
+            </div>
+
+            <!-- Records list -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fas fa-trophy text-amber-400 text-sm"></i>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wide">Top 10 Kỷ lục</h3>
+                </div>
+                <div id="map-detail-records" class="space-y-2">
+                    <!-- Records will be rendered dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="map-video-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 hidden opacity-0 transition-opacity duration-300 backdrop-blur-xl p-0 sm:p-5">
+        <div id="map-video-box" class="relative w-full max-w-4xl bg-slate-950 border-0 sm:border border-cyan-500/30 rounded-none sm:rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.25),0_25px_60px_rgba(0,0,0,0.95)] flex flex-col transform transition-all">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-3.5 sm:px-5 py-3 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800/80 gap-2">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+                        <i class="fas fa-play text-red-400 text-xs"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">BEST RECORD</span>
+                        </div>
+                        <h3 id="map-video-title" class="text-xs sm:text-base font-extrabold text-white truncate tracking-wide">Video Best Record</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <button onclick="openCurrentMapVideoExternal()" title="Mở link gốc (Tab mới / App)"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800/80 hover:bg-cyan-600/30 text-slate-300 hover:text-cyan-400 transition-all duration-200 border border-slate-700/60 shadow-md">
+                        <i class="fas fa-external-link-alt text-xs"></i>
+                    </button>
+                    <button onclick="toggleMapVideoFullscreen()" title="Xem toàn màn hình"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800/80 hover:bg-cyan-600/30 text-slate-300 hover:text-cyan-400 transition-all duration-200 border border-slate-700/60 shadow-md">
+                        <i class="fas fa-expand text-xs"></i>
+                    </button>
+                    <button onclick="closeMapVideoModal()" title="Đóng" class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-red-600 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 border border-slate-700/60 hover:border-red-500/50 hover:scale-105 active:scale-95 shadow-md flex-shrink-0 ml-1">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Player Container -->
+            <div class="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden" id="map-video-container">
+                <div id="map-video-loading" class="absolute inset-0 z-20 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center gap-4 text-cyan-400">
+                    <div class="relative flex items-center justify-center">
+                        <div class="w-14 h-14 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
+                        <i class="fas fa-gamepad text-cyan-400 text-lg absolute animate-pulse"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs font-bold text-slate-200 uppercase tracking-widest">Đang kết nối Video Best Record...</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Vui lòng chờ trong giây lát</p>
+                    </div>
+                </div>
+                <div id="map-video-content" class="w-full h-full"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "WeStar | Hệ Thống Tính Điểm Thành Tích",
+  "short_name": "WeStar",
+  "description": "Nền tảng quản lý kỉ lục và xếp hạng tay đua WeStar.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#050508",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/images/logows.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/logows.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

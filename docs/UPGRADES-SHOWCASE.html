@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeStar v2.0 - Nâng Cấp Hệ Thống</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 50%, #0f0a15 100%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00f3ff, #0066ff, #9d00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .upgrade-card {
+            background: linear-gradient(135deg, rgba(18, 18, 26, 0.8), rgba(30, 30, 46, 0.8));
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .upgrade-card:hover::before {
+            left: 100%;
+        }
+
+        .upgrade-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0, 243, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            color: var(--icon-color);
+        }
+
+        .card-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--icon-color), rgba(0, 243, 255, 0.5));
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--icon-color);
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #cbd5e0;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #cbd5e0;
+        }
+
+        .feature-item i {
+            color: #00ff9d;
+            font-size: 0.8rem;
+        }
+
+        .card-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(0, 102, 255, 0.1));
+            border: 1px solid var(--icon-color);
+            color: var(--icon-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .card-button:hover {
+            background: linear-gradient(135deg, var(--icon-color), rgba(0, 102, 255, 0.2));
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, rgba(18, 18, 26, 0.9), rgba(30, 30, 46, 0.9));
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00f3ff;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #cbd5e0;
+        }
+
+        .installation-section {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1), rgba(157, 0, 255, 0.05));
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .installation-section h3 {
+            color: #00f3ff;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .code-block {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e0;
+            line-height: 1.6;
+        }
+
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .file-item {
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 3px solid #00f3ff;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid rgba(0, 243, 255, 0.1);
+            color: #718096;
+        }
+
+        .upgrade-1 { --icon-color: #00f3ff; }
+        .upgrade-2 { --icon-color: #00ff9d; }
+        .upgrade-3 { --icon-color: #ffcc00; }
+        .upgrade-4 { --icon-color: #ff00cc; }
+        .upgrade-5 { --icon-color: #0066ff; }
+        .upgrade-6 { --icon-color: #ff0066; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upgrade-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .upgrade-card:nth-child(1) { animation-delay: 0.1s; }
+        .upgrade-card:nth-child(2) { animation-delay: 0.2s; }
+        .upgrade-card:nth-child(3) { animation-delay: 0.3s; }
+        .upgrade-card:nth-child(4) { animation-delay: 0.4s; }
+        .upgrade-card:nth-child(5) { animation-delay: 0.5s; }
+        .upgrade-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #00f3ff, #0066ff);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🚀 WeStar v2.0</h1>
+            <p class="subtitle">Nâng Cấp Toàn Diện Hệ Thống Tính Điểm Thành Tích</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-section">
+            <h2 style="color: #00f3ff; margin-bottom: 10px;">📊 Thống Kê Nâng Cấp</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Module mới</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">2000+</div>
+                    <div class="stat-label">Dòng code</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">30+</div>
+                    <div class="stat-label">Tính năng</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Compatible</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upgrade Cards -->
+        <div class="upgrade-grid">
+            <!-- 1. Theme Manager -->
+            <div class="upgrade-card upgrade-1">
+                <div class="card-number">1</div>
+                <div class="card-icon">🎨</div>
+                <div class="card-title">Dark/Light Mode <span class="badge">NEW</span></div>
+                <div class="card-description">
+                    Chuyển đổi giữa chế độ tối/sáng với tự động theo hệ thống
+                </div>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> Auto theme detection</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> LocalStorage persistence</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Dynamic CSS variables</div>
+                </div>
+                <button class="card-button">File: theme-manager.js</button>
+            </div>
+
+            <!-- 2. Export/Import -->
+            <div class="upgrade-card upgrade-2">
+                <div class="card-number">2</div>
+                <div class="card-icon">💾</div>
+                <div class="card-title">Export/Import Data <span class="badge">NEW</span></div>
+                <div class="card-description">
+                    Xuất/nhập dữ liệu sang JSON, CSV, HTML reports
+                </div>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> Multi-format support</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Full DB backup</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Firestore sync</div>
+                </div>
+                <button class="card-button">File: data-export-import.js</button>
+            </div>
+
+            <!-- 3. Notifications -->
+            <div class="upgrade-card upgrade-3">
+                <div class="card-number">3</div>
+                <div class="card-icon">🔔</div>
+                <div class="card-title">Real-time Notifications <span class="badge">NEW</span></div>
+                <div class="card-description">
+                    Toast notifications, bell icon, notification panel
+                </div>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> Toast system</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Unread badge</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Persistent storage</div>
+                </div>
+                <button class="card-button">File: notification-system.js</button>
+            </div>
+
+            <!-- 4. Search & Filters -->
+            <div class="upgrade-card upgrade-4">
+                <div class="card-number">4</div>
+                <div class="card-icon">🔍</div>
+                <div class="card-title">Advanced Search <span class="badge">NEW</span></div>
+                <div class="card-description">
+                    Global search bar với autocomplete và filters nâng cao
+                </div>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> Autocomplete suggestions</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Search history</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Multi-type search</div>
+                </div>
+                <button class="card-button">File: search-filters.js</button>
+            </div>
+
+            <!-- 5. User Profile -->
+            <div class="upgrade-card upgrade-5">
+                <div class="card-number">5</div>
+                <div class="card-icon">👤</div>
+                <div class="card-title">User Profile <span class="badge">NEW</span></div>
+                <div class="card-description">
+                    Profile page, achievements, stats, leaderboard integration
+                </div>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> Achievement badges</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Stats dashboard</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Race history</div>
+                </div>
+                <button class="card-button">File: user-profile.js</button>
+            </div>
+
+            <!-- 6. Performance -->
+            <div class="upgrade-card upgrade-6">
+                <div class="card-number">6</div>
+                <div class="card-icon">⚡</div>
+                <div class="card-title">Performance & Caching <span class="badge">NEW</span></div>
+                <div class="card-description">
+                    IndexedDB caching, lazy loading, analytics tracking
+                </div>
+                <div class="features-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> IndexedDB caching</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Lazy loading images</div>
+                    <div class="feature-item"><i class="fas fa-check"></i> Analytics events</div>
+                </div>
+                <button class="card-button">File: performance-optimizer.js</button>
+            </div>
+        </div>
+
+        <!-- Installation -->
+        <div class="installation-section">
+            <h3>📥 Cách Cài Đặt</h3>
+            
+            <h4 style="color: #cbd5e0; margin-top: 20px; margin-bottom: 10px;">Bước 1: Thêm các file vào thư mục dự án</h4>
+            <div class="file-list">
+                <div class="file-item">theme-manager.js</div>
+                <div class="file-item">data-export-import.js</div>
+                <div class="file-item">notification-system.js</div>
+                <div class="file-item">search-filters.js</div>
+                <div class="file-item">user-profile.js</div>
+                <div class="file-item">performance-optimizer.js</div>
+            </div>
+
+            <h4 style="color: #cbd5e0; margin-top: 20px; margin-bottom: 10px;">Bước 2: Import vào index.html (trước <code>&lt;/body&gt;</code>)</h4>
+            <div class="code-block">
+&lt;script src="theme-manager.js"&gt;&lt;/script&gt;
+&lt;script src="data-export-import.js"&gt;&lt;/script&gt;
+&lt;script src="notification-system.js"&gt;&lt;/script&gt;
+&lt;script src="search-filters.js"&gt;&lt;/script&gt;
+&lt;script src="user-profile.js"&gt;&lt;/script&gt;
+&lt;script src="performance-optimizer.js"&gt;&lt;/script&gt;
+&lt;script src="index.js"&gt;&lt;/script&gt;
+            </div>
+
+            <h4 style="color: #cbd5e0; margin-top: 20px; margin-bottom: 10px;">Bước 3: Sử dụng trong JavaScript</h4>
+            <div class="code-block">
+// Theme
+themeManager.toggleTheme();
+
+// Notifications
+notificationSystem.addNotification({
+    type: 'success',
+    title: 'Success!',
+    message: 'Operation completed'
+});
+
+// Export data
+await dataExportImport.exportToJSON(data);
+
+// Cache data
+await performanceOptimizer.cacheData('key', data);
+
+// Record analytics
+await performanceOptimizer.recordEvent('user_action');
+            </div>
+        </div>
+
+        <!-- Documentation -->
+        <div class="installation-section">
+            <h3>📖 Tài Liệu Chi Tiết</h3>
+            <p style="color: #cbd5e0; margin-bottom: 16px;">
+                Xem file <strong>UPGRADES.md</strong> trong thư mục dự án để có tài liệu đầy đủ với:
+            </p>
+            <div class="features-list">
+                <div class="feature-item"><i class="fas fa-book"></i> API Reference hoàn chỉnh</div>
+                <div class="feature-item"><i class="fas fa-code"></i> Code examples</div>
+                <div class="feature-item"><i class="fas fa-question-circle"></i> Troubleshooting guide</div>
+                <div class="feature-item"><i class="fas fa-roadmap"></i> Roadmap nâng cấp tiếp theo</div>
+            </div>
+        </div>
+
+        <!-- Future Upgrades -->
+        <div class="installation-section" style="background: linear-gradient(135deg, rgba(157, 0, 255, 0.1), rgba(255, 0, 51, 0.05));">
+            <h3>🚀 Nâng Cấp Tiếp Theo (Roadmap)</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;">
+                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border-left: 3px solid #9d00ff;">
+                    <i class="fas fa-mobile-alt" style="color: #9d00ff;"></i> PWA & Mobile App
+                </div>
+                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border-left: 3px solid #ff0066;">
+                    <i class="fas fa-chart-line" style="color: #ff0066;"></i> Advanced Analytics
+                </div>
+                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border-left: 3px solid #00f3ff;">
+                    <i class="fas fa-network-wired" style="color: #00f3ff;"></i> Social Features
+                </div>
+                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border-left: 3px solid #00ff9d;">
+                    <i class="fas fa-video" style="color: #00ff9d;"></i> Video Tutorials
+                </div>
+                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border-left: 3px solid #ffcc00;">
+                    <i class="fas fa-robot" style="color: #ffcc00;"></i> AI Predictions
+                </div>
+                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border-left: 3px solid #0066ff;">
+                    <i class="fas fa-shield-alt" style="color: #0066ff;"></i> Enhanced Security
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>🎯 WeStar Admin v2.0 | Nâng cấp hoàn chỉnh hệ thống tính điểm thành tích</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">© 2026 WeStar Team | All rights reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple scroll animation
+        const cards = document.querySelectorAll('.upgrade-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                }
+            });
+        });
+
+        cards.forEach(card => {
+            card.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>

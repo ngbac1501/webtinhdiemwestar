@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeStar v2.0 - Quick Reference Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #e2e8f0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(18, 18, 26, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #00f3ff;
+            margin-bottom: 10px;
+            font-size: 2em;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .subtitle {
+            color: #cbd5e0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 3px solid #00f3ff;
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #00f3ff;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .code-block {
+            background: #050510;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-size: 0.9em;
+            color: #00ff9d;
+        }
+
+        .key-value {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .key {
+            color: #ffcc00;
+            min-width: 150px;
+        }
+
+        .value {
+            color: #e2e8f0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .feature-box {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85em;
+        }
+
+        .feature-box strong {
+            color: #00f3ff;
+        }
+
+        .checklist {
+            list-style: none;
+            font-size: 0.9em;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: #00f3ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.85em;
+        }
+
+        table th,
+        table td {
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background: rgba(0, 243, 255, 0.1);
+            color: #00f3ff;
+        }
+
+        table tr:hover {
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .alert {
+            background: rgba(255, 204, 0, 0.1);
+            border-left: 3px solid #ffcc00;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            color: #ffcc00;
+            font-size: 0.9em;
+        }
+
+        .success {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 3px solid #00ff9d;
+            color: #00ff9d;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            color: #718096;
+            font-size: 0.85em;
+        }
+
+        print {
+            color: #ff0066;
+        }
+
+        .highlight {
+            background: rgba(255, 0, 102, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ff0066;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 WeStar v2.0 - Quick Reference</h1>
+        <p class="subtitle">Nâng cấp hoàn chỉnh hệ thống tính điểm thành tích</p>
+
+        <!-- Files Overview -->
+        <section>
+            <h2>📁 Files Overview</h2>
+            <table>
+                <tr>
+                    <th>File</th>
+                    <th>Lines</th>
+                    <th>Purpose</th>
+                    <th>Key Class</th>
+                </tr>
+                <tr>
+                    <td><strong>theme-manager.js</strong></td>
+                    <td>200+</td>
+                    <td>Dark/Light mode</td>
+                    <td>ThemeManager</td>
+                </tr>
+                <tr>
+                    <td><strong>data-export-import.js</strong></td>
+                    <td>400+</td>
+                    <td>Export/Import data</td>
+                    <td>DataExportImport</td>
+                </tr>
+                <tr>
+                    <td><strong>notification-system.js</strong></td>
+                    <td>500+</td>
+                    <td>Toast & notifications</td>
+                    <td>NotificationSystem</td>
+                </tr>
+                <tr>
+                    <td><strong>search-filters.js</strong></td>
+                    <td>450+</td>
+                    <td>Global search</td>
+                    <td>SearchFiltersManager</td>
+                </tr>
+                <tr>
+                    <td><strong>user-profile.js</strong></td>
+                    <td>450+</td>
+                    <td>User profiles</td>
+                    <td>UserProfileManager</td>
+                </tr>
+                <tr>
+                    <td><strong>performance-optimizer.js</strong></td>
+                    <td>600+</td>
+                    <td>Caching & analytics</td>
+                    <td>PerformanceOptimizer</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Installation -->
+        <section>
+            <h2>⚡ Installation (3 Steps)</h2>
+            
+            <h3 style="color: #00ff9d; margin-top: 15px;">Step 1: Copy Files</h3>
+            <div class="code-block">
+$ cp theme-manager.js /path/to/WebTinhDiem/
+$ cp data-export-import.js /path/to/WebTinhDiem/
+$ cp notification-system.js /path/to/WebTinhDiem/
+$ cp search-filters.js /path/to/WebTinhDiem/
+$ cp user-profile.js /path/to/WebTinhDiem/
+$ cp performance-optimizer.js /path/to/WebTinhDiem/
+            </div>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">Step 2: Add Scripts to HTML</h3>
+            <div class="code-block">
+&lt;script src="theme-manager.js"&gt;&lt;/script&gt;
+&lt;script src="data-export-import.js"&gt;&lt;/script&gt;
+&lt;script src="notification-system.js"&gt;&lt;/script&gt;
+&lt;script src="search-filters.js"&gt;&lt;/script&gt;
+&lt;script src="user-profile.js"&gt;&lt;/script&gt;
+&lt;script src="performance-optimizer.js"&gt;&lt;/script&gt;
+&lt;script type="module" src="index.js"&gt;&lt;/script&gt;
+            </div>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">Step 3: Use in JavaScript</h3>
+            <div class="code-block">
+// Modules auto-initialize when loaded
+// Use them directly in index.js
+
+themeManager.toggleTheme();
+
+notificationSystem.addNotification({
+    type: 'success',
+    title: 'Hello',
+    message: 'World'
+});
+            </div>
+        </section>
+
+        <!-- API Reference -->
+        <section>
+            <h2>🔌 API Reference</h2>
+
+            <div class="feature-box">
+                <strong>Theme Manager</strong>
+                <div class="code-block">
+themeManager.setTheme('dark')
+themeManager.toggleTheme()
+themeManager.getCurrentTheme()
+themeManager.getSystemTheme()
+themeManager.getThemeStatus()
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <strong>Data Export/Import</strong>
+                <div class="code-block">
+await dataExportImport.exportToJSON(data, filename)
+await dataExportImport.exportToCSV(data, filename)
+await dataExportImport.importFromJSON(file)
+await dataExportImport.importFromCSV(file)
+await dataExportImport.exportFullDatabase(db, collections)
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <strong>Notification System</strong>
+                <div class="code-block">
+notificationSystem.addNotification(options)
+notificationSystem.removeNotification(id)
+notificationSystem.clearAll()
+notificationSystem.on(eventName, callback)
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <strong>Search & Filters</strong>
+                <div class="code-block">
+searchFiltersManager.performSearch(query)
+searchFiltersManager.addToSearchHistory(query)
+searchFiltersManager.clearSearchHistory()
+searchFiltersManager.showFilterPanel()
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <strong>User Profile</strong>
+                <div class="code-block">
+await userProfileManager.createProfilePage()
+userProfileManager.getProfileWidget()
+userProfileManager.loadUserStats()
+userProfileManager.updateProfilePicture(file)
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <strong>Performance Optimizer</strong>
+                <div class="code-block">
+await performanceOptimizer.cacheData(key, data)
+await performanceOptimizer.getCachedData(key)
+performanceOptimizer.setupLazyLoading()
+await performanceOptimizer.recordEvent(name, data)
+performanceOptimizer.getPerformanceMetrics()
+                </div>
+            </div>
+        </section>
+
+        <!-- Common Use Cases -->
+        <section>
+            <h2>💡 Common Use Cases</h2>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">1. Show Success Notification</h3>
+            <div class="code-block">
+notificationSystem.addNotification({
+    type: 'success',
+    title: 'Success!',
+    message: 'Operation completed',
+    duration: 5000
+});
+            </div>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">2. Export Data</h3>
+            <div class="code-block">
+const data = [{id:1, name:'Test'}];
+await dataExportImport.exportToJSON(data, 'backup');
+            </div>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">3. Cache Data</h3>
+            <div class="code-block">
+const data = await fetch('/api/data').then(r => r.json());
+await performanceOptimizer.cacheData('key', data);
+            </div>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">4. Toggle Theme</h3>
+            <div class="code-block">
+// Auto on button with data-theme-toggle attribute
+themeManager.toggleTheme();
+            </div>
+
+            <h3 style="color: #00ff9d; margin-top: 15px;">5. Track Events</h3>
+            <div class="code-block">
+await performanceOptimizer.recordEvent('user_action', {
+    action: 'clicked_button',
+    timestamp: new Date()
+});
+            </div>
+        </section>
+
+        <!-- Debug Commands -->
+        <section>
+            <h2>🔧 Debug Commands (Console)</h2>
+            
+            <div class="code-block">
+// Check all modules
+console.log({themeManager, dataExportImport, notificationSystem, 
+    searchFiltersManager, userProfileManager, performanceOptimizer});
+
+// Test theme
+themeManager.toggleTheme();
+
+// Test notification
+notificationSystem.addNotification({type:'success',title:'Test'});
+
+// Check cache
+await performanceOptimizer.getCacheStats();
+
+// Get analytics
+await performanceOptimizer.getAnalyticsSummary(24);
+
+// Clear cache
+await performanceOptimizer.clearAllCache();
+            </div>
+        </section>
+
+        <!-- File Structure -->
+        <section>
+            <h2>📂 File Structure</h2>
+            <div class="code-block">
+WebTinhDiem/
+├── index.html
+├── index.js
+├── login.html
+├── login.js
+├── configdata.html
+├── configdata.js
+├── map-detail.html
+├── map-detail.js
+├── theme-manager.js ✨
+├── data-export-import.js ✨
+├── notification-system.js ✨
+├── search-filters.js ✨
+├── user-profile.js ✨
+├── performance-optimizer.js ✨
+├── UPGRADES.md
+├── UPGRADES-SHOWCASE.html
+├── IMPLEMENTATION-GUIDE.js
+├── SUMMARY.md
+└── DEPLOYMENT-CHECKLIST.md
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section>
+            <h2>📊 Quick Stats</h2>
+            <div class="feature-grid">
+                <div class="feature-box">
+                    <strong>6</strong><br>New Modules
+                </div>
+                <div class="feature-box">
+                    <strong>2600+</strong><br>Lines of Code
+                </div>
+                <div class="feature-box">
+                    <strong>35+</strong><br>New Features
+                </div>
+                <div class="feature-box">
+                    <strong>0</strong><br>Breaking Changes
+                </div>
+            </div>
+        </section>
+
+        <!-- Important Notes -->
+        <section class="alert success">
+            <strong>✅ Key Points:</strong><br>
+            • All modules auto-initialize on load<br>
+            • No external dependencies required<br>
+            • 100% backwards compatible<br>
+            • Production-ready code<br>
+            • Mobile responsive<br>
+            • Optimized performance
+        </section>
+
+        <!-- Troubleshooting -->
+        <section>
+            <h2>🐛 Troubleshooting</h2>
+            
+            <div class="alert">
+                <strong>⚠️ Theme not changing?</strong><br>
+                localStorage.removeItem('westar-theme-preference');<br>
+                location.reload();
+            </div>
+
+            <div class="alert">
+                <strong>⚠️ Notifications not showing?</strong><br>
+                Check console for errors. Verify notification-system.js loaded first.
+            </div>
+
+            <div class="alert">
+                <strong>⚠️ Cache not working?</strong><br>
+                await performanceOptimizer.clearAllCache();<br>
+                Check IndexedDB in DevTools
+            </div>
+
+            <div class="alert">
+                <strong>⚠️ Search not finding results?</strong><br>
+                Verify window.ALL_MAPS, window.ALL_CARS, window.ALL_PETS are populated
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section>
+            <h2>🎯 Next Steps</h2>
+            <ul class="checklist">
+                <li>Read SUMMARY.md for complete overview</li>
+                <li>Check UPGRADES.md for full API documentation</li>
+                <li>Use IMPLEMENTATION-GUIDE.js for code examples</li>
+                <li>Follow DEPLOYMENT-CHECKLIST.md to deploy</li>
+                <li>Open UPGRADES-SHOWCASE.html in browser</li>
+                <li>Test each module individually</li>
+                <li>Deploy to production</li>
+                <li>Monitor analytics dashboard</li>
+            </ul>
+        </section>
+
+        <div class="footer">
+            <p>WeStar Admin v2.0 | Complete System Upgrade | 2026</p>
+            <p>For detailed documentation, see UPGRADES.md and IMPLEMENTATION-GUIDE.js</p>
+        </div>
+    </div>
+</body>
+</html>
