@@ -592,10 +592,12 @@
             transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
         }
+
         .banner-slide.active {
             opacity: 1;
             z-index: 20;
         }
+
         .carousel-indicator {
             transition: width 0.3s ease, background-color 0.3s ease;
         }
@@ -844,10 +846,10 @@
                         <i class="fas fa-chart-line w-5 h-5 mr-3 text-accent"></i>
                         <span>Diễn biến chi tiết</span>
                     </a>
-                    <a href="./discuss.html" class="sidebar-link">
-                        <i class="fas fa-comments w-5 h-5 mr-3 text-purple-400"></i>
-                        <span>Diễn Đàn</span>
-                        <span class="ml-auto text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">Mới</span>
+                    <a href="./wiki.html" class="sidebar-link">
+                        <i class="fas fa-book-open w-5 h-5 mr-3 text-cyan-400"></i>
+                        <span>WeStar Wiki</span>
+                        <span class="ml-auto text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full">Wiki</span>
                     </a>
                     <a href="./configdata.html" id="configdata-link" class="sidebar-link">
                         <i class="fas fa-database w-5 h-5 mr-3 text-warning"></i>
@@ -919,7 +921,8 @@
                             <i class="fas fa-bars text-lg"></i>
                         </button>
                         <div class="min-w-0">
-                            <h1 class="text-lg md:text-xl font-extrabold admin-title tracking-tight whitespace-nowrap truncate">
+                            <h1
+                                class="text-lg md:text-xl font-extrabold admin-title tracking-tight whitespace-nowrap truncate">
                                 <span class="text-accent">Quản Lý Điểm</span>
                             </h1>
                             <div class="flex items-center mt-0.5">
@@ -1082,19 +1085,25 @@
             <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 lg:p-8 space-y-8">
 
                 <!-- Auto-sliding banner carousel -->
-                <div id="banner-carousel-container" class="relative w-full rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.15)] border border-slate-800 bg-slate-950/40 mb-8 hidden group" style="z-index: 0;">
-                    <div id="banner-slides" class="relative w-full h-[260px] sm:h-[360px] md:h-[430px] lg:h-[520px] overflow-hidden">
+                <div id="banner-carousel-container"
+                    class="relative w-full rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.15)] border border-slate-800 bg-slate-950/40 mb-8 hidden group"
+                    style="z-index: 0;">
+                    <div id="banner-slides"
+                        class="relative w-full h-[260px] sm:h-[360px] md:h-[430px] lg:h-[520px] overflow-hidden">
                         <!-- Slides will be loaded dynamically -->
                     </div>
                     <!-- Prev/Next navigation -->
-                    <button id="carousel-prev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
+                    <button id="carousel-prev"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button id="carousel-next" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
+                    <button id="carousel-next"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     <!-- Indicators -->
-                    <div id="carousel-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
+                    <div id="carousel-indicators"
+                        class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
                         <!-- Indicators will be loaded dynamically -->
                     </div>
                 </div>
@@ -1474,7 +1483,8 @@
                                 <h3 class="text-lg font-bold text-white uppercase tracking-wider flex items-center">
                                     <i class="fas fa-user-friends mr-2 text-cyan-400"></i> Chế độ 1vs1
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-1" id="1vs1-format-desc">Đua 1vs1 giữa 2 tay đua (BO3 lớn: BO1 & BO2 chạm
+                                <p class="text-xs text-slate-400 mt-1" id="1vs1-format-desc">Đua 1vs1 giữa 2 tay đua
+                                    (BO3 lớn: BO1 & BO2 chạm
                                     5, BO3 chạm 5 cách biệt 2)</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
@@ -1489,13 +1499,11 @@
                         <div id="bo-format-selector" class="mt-4 hidden">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs text-slate-400 font-semibold mr-1">Thể thức:</span>
-                                <button id="bo9-btn"
-                                    onclick="window.toggle1vs1BOFormat('BO9')"
+                                <button id="bo9-btn" onclick="window.toggle1vs1BOFormat('BO9')"
                                     class="bo-format-btn active px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
                                     BO9 (chạm 5)
                                 </button>
-                                <button id="bo7-btn"
-                                    onclick="window.toggle1vs1BOFormat('BO7')"
+                                <button id="bo7-btn" onclick="window.toggle1vs1BOFormat('BO7')"
                                     class="bo-format-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
                                     BO7 (chạm 4)
                                 </button>
@@ -2791,16 +2799,20 @@
     </script>
 
     <!-- Map Detail Modal -->
-    <div id="map-detail-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm p-4">
-        <div id="map-detail-box" class="relative w-full max-w-2xl max-h-[90vh] bg-slate-900 border border-slate-700/50 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(6,182,212,0.2)] flex flex-col animate__animated">
+    <div id="map-detail-modal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm p-4">
+        <div id="map-detail-box"
+            class="relative w-full max-w-2xl max-h-[90vh] bg-slate-900 border border-slate-700/50 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(6,182,212,0.2)] flex flex-col animate__animated">
             <!-- Play Video button top-left -->
-            <button id="map-detail-video-btn" onclick="playMapVideo()" class="absolute top-3 left-3 z-20 px-3 py-1.5 rounded-full bg-red-600/90 hover:bg-red-500 border border-white/20 text-white flex items-center gap-1.5 text-xs font-bold transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)] backdrop-blur-md hidden">
+            <button id="map-detail-video-btn" onclick="playMapVideo()"
+                class="absolute top-3 left-3 z-20 px-3 py-1.5 rounded-full bg-red-600/90 hover:bg-red-500 border border-white/20 text-white flex items-center gap-1.5 text-xs font-bold transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)] backdrop-blur-md hidden">
                 <i class="fas fa-play text-[10px]"></i>
                 <span>Xem Video Record</span>
             </button>
 
             <!-- Close button -->
-            <button onclick="closeMapDetailModal()" class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all">
+            <button onclick="closeMapDetailModal()"
+                class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all">
                 <i class="fas fa-times text-xs"></i>
             </button>
 
@@ -2809,8 +2821,10 @@
                 <img id="map-detail-img" src="" alt="" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
                 <div class="absolute bottom-4 left-5 right-12">
-                    <span id="map-detail-difficulty" class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border mb-2 inline-block"></span>
-                    <h2 id="map-detail-name" class="text-xl sm:text-2xl font-black text-white drop-shadow-lg leading-tight"></h2>
+                    <span id="map-detail-difficulty"
+                        class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border mb-2 inline-block"></span>
+                    <h2 id="map-detail-name"
+                        class="text-xl sm:text-2xl font-black text-white drop-shadow-lg leading-tight"></h2>
                 </div>
             </div>
 
@@ -2828,19 +2842,27 @@
     </div>
 
     <!-- Video Player Modal -->
-    <div id="map-video-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 hidden opacity-0 transition-opacity duration-300 backdrop-blur-xl p-0 sm:p-5">
-        <div id="map-video-box" class="relative w-full max-w-4xl bg-slate-950 border-0 sm:border border-cyan-500/30 rounded-none sm:rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.25),0_25px_60px_rgba(0,0,0,0.95)] flex flex-col transform transition-all">
+    <div id="map-video-modal"
+        class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 hidden opacity-0 transition-opacity duration-300 backdrop-blur-xl p-0 sm:p-5">
+        <div id="map-video-box"
+            class="relative w-full max-w-4xl bg-slate-950 border-0 sm:border border-cyan-500/30 rounded-none sm:rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(6,182,212,0.25),0_25px_60px_rgba(0,0,0,0.95)] flex flex-col transform transition-all">
             <!-- Modal Header -->
-            <div class="flex items-center justify-between px-3.5 sm:px-5 py-3 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800/80 gap-2">
+            <div
+                class="flex items-center justify-between px-3.5 sm:px-5 py-3 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800/80 gap-2">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+                    <div
+                        class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
                         <i class="fas fa-play text-red-400 text-xs"></i>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2 mb-0.5">
-                            <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">BEST RECORD</span>
+                            <span
+                                class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">BEST
+                                RECORD</span>
                         </div>
-                        <h3 id="map-video-title" class="text-xs sm:text-base font-extrabold text-white truncate tracking-wide">Video Best Record</h3>
+                        <h3 id="map-video-title"
+                            class="text-xs sm:text-base font-extrabold text-white truncate tracking-wide">Video Best
+                            Record</h3>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5 flex-shrink-0">
@@ -2852,21 +2874,26 @@
                         class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800/80 hover:bg-cyan-600/30 text-slate-300 hover:text-cyan-400 transition-all duration-200 border border-slate-700/60 shadow-md">
                         <i class="fas fa-expand text-xs"></i>
                     </button>
-                    <button onclick="closeMapVideoModal()" title="Đóng" class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-red-600 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 border border-slate-700/60 hover:border-red-500/50 hover:scale-105 active:scale-95 shadow-md flex-shrink-0 ml-1">
+                    <button onclick="closeMapVideoModal()" title="Đóng"
+                        class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-red-600 text-slate-400 hover:text-white flex items-center justify-center transition-all duration-200 border border-slate-700/60 hover:border-red-500/50 hover:scale-105 active:scale-95 shadow-md flex-shrink-0 ml-1">
                         <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Video Player Container -->
-            <div class="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden" id="map-video-container">
-                <div id="map-video-loading" class="absolute inset-0 z-20 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center gap-4 text-cyan-400">
+            <div class="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden"
+                id="map-video-container">
+                <div id="map-video-loading"
+                    class="absolute inset-0 z-20 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center gap-4 text-cyan-400">
                     <div class="relative flex items-center justify-center">
-                        <div class="w-14 h-14 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
+                        <div class="w-14 h-14 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin">
+                        </div>
                         <i class="fas fa-gamepad text-cyan-400 text-lg absolute animate-pulse"></i>
                     </div>
                     <div class="text-center">
-                        <p class="text-xs font-bold text-slate-200 uppercase tracking-widest">Đang kết nối Video Best Record...</p>
+                        <p class="text-xs font-bold text-slate-200 uppercase tracking-widest">Đang kết nối Video Best
+                            Record...</p>
                         <p class="text-[11px] text-slate-400 mt-1">Vui lòng chờ trong giây lát</p>
                     </div>
                 </div>

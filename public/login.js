@@ -211,12 +211,3 @@ document.addEventListener('keydown', (e) => {
         loginButton.click();
     }
 });
-
-// Check for redirect warning messages (e.g. guest trying to access discuss.html)
-window.addEventListener('DOMContentLoaded', () => {
-    const msg = sessionStorage.getItem('discuss_redirect_msg');
-    if (msg) {
-        displayError(msg);
-        sessionStorage.removeItem('discuss_redirect_msg');
-    }
-});
