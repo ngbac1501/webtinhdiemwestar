@@ -254,6 +254,11 @@ const setupRealtimeListeners = () => {
             allRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             window.allRecords = allRecords; // Export cho các modules khác sử dụng
 
+            // Tự động đồng bộ kỷ lục cao nhất của các bản đồ
+            if (typeof window.syncMapRecordsWithRecordsTab === 'function') {
+                window.syncMapRecordsWithRecordsTab();
+            }
+
             // Cập nhật table khi ở tab records
             if (currentTab === 'records') {
                 filterRecords(currentPage['raceRecords']);
@@ -484,6 +489,105 @@ window.parseRaceTime = (timeString) => {
         return Infinity;
     } catch (error) {
         return Infinity;
+    }
+};
+
+// Get best record for a map from allRecords (Tab Kỷ lục)
+window.getBestRecordForMap = (mapName) => {
+    if (!mapName || !allRecords || allRecords.length === 0) return null;
+
+    const cleanName = mapName.trim().toLowerCase();
+    const mapRecords = allRecords.filter(r => {
+        if (!r || !r.mapName) return false;
+        return r.mapName.trim().toLowerCase() === cleanName;
+    });
+
+    if (mapRecords.length === 0) return null;
+
+    const getTimeInSec = (r) => {
+        if (!r) return Infinity;
+        if (r.timeInSeconds !== undefined && r.timeInSeconds !== null && r.timeInSeconds !== '') {
+            const parsed = parseFloat(r.timeInSeconds);
+            if (!isNaN(parsed) && parsed > 0) return parsed;
+        }
+        if (r.timeString && window.parseRaceTime) {
+            return window.parseRaceTime(r.timeString);
+        }
+        return Infinity;
+    };
+
+    mapRecords.sort((a, b) => {
+        const diff = getTimeInSec(a) - getTimeInSec(b);
+        if (Math.abs(diff) > 0.0001) return diff;
+        const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return timeB - timeA;
+    });
+
+    const best = mapRecords[0];
+    const bestSec = getTimeInSec(best);
+    if (bestSec === Infinity) return null;
+
+    return {
+        recordTime: best.timeString || '--\'--\'--',
+        recordRacer: best.racerName || 'N/A',
+        recordCar: best.car || 'N/A',
+        recordPet: best.pet || 'N/A',
+        recordRacerIndex: best.racerIndex !== undefined ? best.racerIndex : 0,
+        timeInSeconds: bestSec,
+        recordId: best.id
+    };
+};
+
+// Auto sync map best records with raceRecords collection and Firestore
+window.syncMapRecordsWithRecordsTab = async (targetMapName = null) => {
+    try {
+        if (!allMaps || allMaps.length === 0) return;
+
+        const mapsToSync = targetMapName
+            ? allMaps.filter(m => (m.name || '').trim().toLowerCase() === targetMapName.trim().toLowerCase())
+            : allMaps;
+
+        for (const mapItem of mapsToSync) {
+            const bestRec = window.getBestRecordForMap(mapItem.name);
+            const newTime = bestRec ? bestRec.recordTime : "--'--'--";
+            const newRacer = bestRec ? bestRec.recordRacer : "";
+            const newCar = bestRec ? bestRec.recordCar : "";
+            const newPet = bestRec ? bestRec.recordPet : "";
+            const newRacerIndex = bestRec ? bestRec.recordRacerIndex : -1;
+
+            const needsUpdate = mapItem.recordTime !== newTime ||
+                                mapItem.recordRacer !== newRacer ||
+                                mapItem.recordCar !== newCar ||
+                                mapItem.recordPet !== newPet ||
+                                mapItem.recordRacerIndex !== newRacerIndex;
+
+            if (needsUpdate) {
+                mapItem.recordTime = newTime;
+                mapItem.recordRacer = newRacer;
+                mapItem.recordCar = newCar;
+                mapItem.recordPet = newPet;
+                mapItem.recordRacerIndex = newRacerIndex;
+
+                if (db && mapItem.id) {
+                    const mapRef = doc(db, "gameMaps", mapItem.id);
+                    await updateDoc(mapRef, {
+                        recordTime: newTime,
+                        recordRacer: newRacer,
+                        recordCar: newCar,
+                        recordPet: newPet,
+                        recordRacerIndex: newRacerIndex,
+                        lastUpdated: serverTimestamp()
+                    }).catch(err => console.warn(`Auto-sync warning for map ${mapItem.name}:`, err));
+                }
+            }
+        }
+
+        if (currentTab === 'maps') {
+            filterMaps(currentPage['gameMaps'] || 1);
+        }
+    } catch (e) {
+        console.error("Error in syncMapRecordsWithRecordsTab:", e);
     }
 };
 
@@ -1554,6 +1658,12 @@ const renderTable = (collectionName, data) => {
 
             case 'gameMaps':
                 const mapImage = item.imageUrl || 'https://via.placeholder.com/60x40/1a1a2e/00f3ff?text=Map';
+                const bestRec = window.getBestRecordForMap ? window.getBestRecordForMap(item.name) : null;
+                const displayTime = bestRec ? bestRec.recordTime : (item.recordTime || '--\'--\'--');
+                const displayRacer = bestRec ? bestRec.recordRacer : (item.recordRacer || 'N/A');
+                const displayCar = bestRec ? bestRec.recordCar : (item.recordCar || 'N/A');
+                const displayPet = bestRec ? bestRec.recordPet : (item.recordPet || 'N/A');
+
                 row.innerHTML = `
                             <td>
                                 <div class="map-image-cell">
@@ -1593,10 +1703,10 @@ const renderTable = (collectionName, data) => {
                                      ${item.difficulty || 'N/A'}
                                 </span>
                             </td>
-                            <td class="font-mono">${item.recordTime || '--\'--\'--'}</td>
-                            <td>${item.recordRacer || 'N/A'}</td>
-                            <td>${item.recordCar || 'N/A'}</td>
-                            <td>${item.recordPet || 'N/A'}</td>
+                            <td class="font-mono text-cyan-300 font-bold">${displayTime}</td>
+                            <td class="font-semibold text-slate-200">${displayRacer}</td>
+                            <td>${displayCar}</td>
+                            <td>${displayPet}</td>
                             <td>
                                 <div class="action-buttons">
                                     <button onclick="editItem('${collectionName}', '${item.id}')" class="btn-edit">
@@ -3737,6 +3847,11 @@ const generateCarForm = () => {
 // Generate map form
 const generateMapForm = () => {
     const isEditMode = !!currentEditingItem;
+    const bestRec = currentEditingItem?.name && window.getBestRecordForMap ? window.getBestRecordForMap(currentEditingItem.name) : null;
+    const defaultTime = bestRec ? bestRec.recordTime : (currentEditingItem?.recordTime || '');
+    const defaultRacer = bestRec ? bestRec.recordRacer : (currentEditingItem?.recordRacer || '');
+    const defaultCar = bestRec ? bestRec.recordCar : (currentEditingItem?.recordCar || '');
+    const defaultPet = bestRec ? bestRec.recordPet : (currentEditingItem?.recordPet || '');
 
     return `
                 <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 mb-4">
@@ -3765,20 +3880,20 @@ const generateMapForm = () => {
                         <input type="number" id="map-laps" class="field-input" placeholder="2" value="${currentEditingItem?.laps || 2}" min="1" max="10" required>
                     </div>
                     <div class="field-group">
-                        <label class="field-label">Record Time</label>
-                        <input type="text" id="map-recordTime" class="field-input" placeholder="01'04'23" value="${currentEditingItem?.recordTime || ''}">
+                        <label class="field-label">Record Time <span class="text-[10px] text-cyan-400 font-normal ml-1">(Auto theo Kỷ Lục)</span></label>
+                        <input type="text" id="map-recordTime" class="field-input bg-slate-800/50" placeholder="01'04'23" value="${defaultTime}">
                     </div>
                     <div class="field-group">
-                        <label class="field-label">Record Racer</label>
-                        <input type="text" id="map-recordRacer" class="field-input" placeholder="Tên tay đua" value="${currentEditingItem?.recordRacer || ''}">
+                        <label class="field-label">Record Racer <span class="text-[10px] text-cyan-400 font-normal ml-1">(Auto theo Kỷ Lục)</span></label>
+                        <input type="text" id="map-recordRacer" class="field-input bg-slate-800/50" placeholder="Tên tay đua" value="${defaultRacer}">
                     </div>
                     <div class="field-group">
-                        <label class="field-label">Record Car</label>
-                        <input type="text" id="map-recordCar" class="field-input" placeholder="Tên xe" value="${currentEditingItem?.recordCar || ''}">
+                        <label class="field-label">Record Car <span class="text-[10px] text-cyan-400 font-normal ml-1">(Auto theo Kỷ Lục)</span></label>
+                        <input type="text" id="map-recordCar" class="field-input bg-slate-800/50" placeholder="Tên xe" value="${defaultCar}">
                     </div>
                     <div class="field-group">
-                        <label class="field-label">Record Pet</label>
-                        <input type="text" id="map-recordPet" class="field-input" placeholder="Tên pet" value="${currentEditingItem?.recordPet || ''}">
+                        <label class="field-label">Record Pet <span class="text-[10px] text-cyan-400 font-normal ml-1">(Auto theo Kỷ Lục)</span></label>
+                        <input type="text" id="map-recordPet" class="field-input bg-slate-800/50" placeholder="Tên pet" value="${defaultPet}">
                     </div>
                     <div class="field-group col-span-2">
                         <label class="field-label">Mô tả</label>
@@ -3793,7 +3908,9 @@ const generateMapForm = () => {
                         <input type="text" id="map-imageUrl" class="field-input" placeholder="https://..." value="${currentEditingItem?.imageUrl || ''}">
                     </div>
                 </div>
-                <p class="text-sm text-slate-400 mt-4">* Trường bắt buộc</p>
+                <p class="text-xs text-cyan-400 mt-3 flex items-center gap-1.5 bg-cyan-500/10 p-2 rounded border border-cyan-500/20">
+                    <i class="fas fa-sync-alt"></i> các trường Record Time, Record Racer, Record Car, Record Pet tự động đồng bộ theo kỷ lục cao nhất của bản đồ ở Tab Kỷ lục.
+                </p>
             `;
 };
 
@@ -4194,6 +4311,11 @@ window.deleteItem = async (collection, id, name) => {
             filteredRecords = filteredRecords.filter(r => r.id !== id);
             filterRecordsNew();
 
+            // Đồng bộ lại kỷ lục bản đồ
+            if (typeof window.syncMapRecordsWithRecordsTab === 'function') {
+                window.syncMapRecordsWithRecordsTab();
+            }
+
             // Hiển thị undo toast
             showUndoToast(`Đã xóa kỷ lục "${name}"`);
         } else if (collection === 'users') {
@@ -4338,14 +4460,18 @@ window.saveItem = async () => {
                 break;
 
             case 'gameMaps':
+                const mapNameVal = document.getElementById('map-name').value.trim();
+                const bestRecSave = window.getBestRecordForMap ? window.getBestRecordForMap(mapNameVal) : null;
+
                 data = {
-                    name: document.getElementById('map-name').value.trim(),
+                    name: mapNameVal,
                     difficulty: document.getElementById('map-difficulty').value,
                     laps: parseInt(document.getElementById('map-laps').value) || 2,
-                    recordTime: document.getElementById('map-recordTime').value.trim(),
-                    recordRacer: document.getElementById('map-recordRacer').value.trim(),
-                    recordCar: document.getElementById('map-recordCar').value.trim(),
-                    recordPet: document.getElementById('map-recordPet').value.trim(),
+                    recordTime: bestRecSave ? bestRecSave.recordTime : document.getElementById('map-recordTime').value.trim(),
+                    recordRacer: bestRecSave ? bestRecSave.recordRacer : document.getElementById('map-recordRacer').value.trim(),
+                    recordCar: bestRecSave ? bestRecSave.recordCar : document.getElementById('map-recordCar').value.trim(),
+                    recordPet: bestRecSave ? bestRecSave.recordPet : document.getElementById('map-recordPet').value.trim(),
+                    recordRacerIndex: bestRecSave ? bestRecSave.recordRacerIndex : (currentEditingItem?.recordRacerIndex !== undefined ? currentEditingItem.recordRacerIndex : -1),
                     description: document.getElementById('map-description').value.trim(),
                     videoUrl: (document.getElementById('map-videoUrl')?.value || '').trim(),
                     imageUrl: document.getElementById('map-imageUrl').value.trim()
