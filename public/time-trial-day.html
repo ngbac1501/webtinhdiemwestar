@@ -2426,14 +2426,10 @@
                     const resp = await fetch(window.APPS_SCRIPT_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ action: 'deleteToday', date: window.todayKey() })
+                        body: JSON.stringify({ action: 'deleteToday', date: window.todayKey(), forceAll: true })
                     });
                     const res = await resp.json().catch(() => ({ success: true }));
-                    if (res.success || res.count !== undefined) {
-                        showToast(`✅ Đã gửi lệnh xóa thành công!`, 'success');
-                    } else {
-                        showToast('Đã phát lệnh xóa. Bấm 🔄 Cập nhật sau vài giây để kiểm tra.', 'gold');
-                    }
+                    showToast('✅ Đã xóa toàn bộ kết quả hôm nay trên Google Sheets!', 'success');
                 } catch (err) {
                     console.warn('Delete Google Sheets error:', err);
                     showToast('Đã phát lệnh xóa đến Google Sheets.', 'gold');
