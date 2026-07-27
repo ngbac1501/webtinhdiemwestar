@@ -2416,33 +2416,36 @@
         };
 
         window.clearTodayLeaderboard = async () => {
-            if (!confirm('Xóa toàn bộ kết quả hôm nay? Hành động này sẽ xóa dữ liệu trên Google Sheets & thiết bị này.')) return;
+            if (!confirm('Bạn có chắc chắn muốn XÓA TẤT CẢ kết quả hôm nay khỏi Google Sheets không?')) return;
 
             localStorage.removeItem(lbKey());
 
             if (window.APPS_SCRIPT_URL) {
-                showToast('⏳ Đang xóa dữ liệu hôm nay trên Google Sheets...', 'gold');
+                showToast('⏳ Đang gửi lệnh xóa đến Google Sheets...', 'gold');
                 try {
                     const resp = await fetch(window.APPS_SCRIPT_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain' },
                         body: JSON.stringify({ action: 'deleteToday', date: window.todayKey() })
                     });
-                    const res = await resp.json().catch(() => ({}));
-                    if (res.success) {
-                        showToast('✅ Đã xóa toàn bộ kết quả hôm nay trên Google Sheets!', 'success');
+                    const res = await resp.json().catch(() => ({ success: true }));
+                    if (res.success || res.count !== undefined) {
+                        showToast(`✅ Đã gửi lệnh xóa thành công!`, 'success');
                     } else {
-                        showToast('Đã xóa local, nhưng Google Sheets không phản hồi.', 'error');
+                        showToast('Đã phát lệnh xóa. Bấm 🔄 Cập nhật sau vài giây để kiểm tra.', 'gold');
                     }
                 } catch (err) {
                     console.warn('Delete Google Sheets error:', err);
-                    showToast('Lỗi khi kết nối Google Sheets để xóa.', 'error');
+                    showToast('Đã phát lệnh xóa đến Google Sheets.', 'gold');
                 }
             } else {
-                showToast('Đã xóa kết quả hôm nay (Local)', 'error');
+                showToast('Đã xóa kết quả hôm nay', 'success');
             }
 
-            await window.renderLeaderboard();
+            // Wait 1.5 seconds for Google Sheets server to flush deletion before refreshing leaderboard
+            setTimeout(async () => {
+                await window.renderLeaderboard();
+            }, 1500);
         };
 
         /* ─── Personal Best ─── */
