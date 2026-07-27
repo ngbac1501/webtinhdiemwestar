@@ -360,15 +360,29 @@ class MobileAppUX {
   }
 
   /**
-   * Setup responsive viewport
+   * Setup responsive viewport without auto-zooming
    */
   setupViewport() {
-    if (!document.querySelector('meta[name="viewport"]')) {
-      const viewport = document.createElement('meta');
+    let viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      viewport = document.createElement('meta');
       viewport.name = 'viewport';
-      viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
       document.head.appendChild(viewport);
     }
+    viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+
+    // Prevent double-tap zoom on non-input elements
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        const tag = e.target.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+          e.preventDefault();
+        }
+      }
+      lastTouchEnd = now;
+    }, false);
   }
 
   /**

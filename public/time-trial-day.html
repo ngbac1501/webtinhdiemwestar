@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Time Trial Day | WeStar Team</title>
     <meta name="description"
         content="Thử thách Time Trial mỗi ngày - Random map luyện tập hằng ngày cho các thành viên WeStar Team ZingSpeed Mobile">
@@ -42,6 +42,11 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            touch-action: manipulation;
+        }
+
+        @media screen and (max-width: 768px) {
+            input, select, textarea, .input-field { font-size: 16px !important; }
         }
 
         html {
@@ -1426,15 +1431,96 @@
         }
 
         /* ══════════════════════════════════════
-           RESPONSIVE TWEAKS
+           RESPONSIVE TWEAKS (TABLET & MOBILE)
         ══════════════════════════════════════ */
-        @media (max-width: 600px) {
-            .site-header {
-                padding: 0 14px;
+        @media (max-width: 1024px) {
+            .page-wrap {
+                padding: 24px 16px 64px;
             }
 
-            .page-wrap {
-                padding: 20px 14px 64px;
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .submit-card {
+                grid-column: 1;
+                grid-row: auto;
+            }
+
+            .bottom-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .bottom-grid > :last-child {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .site-header {
+                padding: 0 16px;
+                height: 56px;
+            }
+
+            .header-brand img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand-text {
+                font-size: 0.92rem;
+            }
+
+            .brand-badge {
+                font-size: 0.55rem;
+                padding: 2px 7px;
+            }
+
+            .nav-link {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+                gap: 4px;
+            }
+
+            .page-hero {
+                padding: 24px 12px 20px;
+                margin-bottom: 20px;
+            }
+
+            .hero-eyebrow {
+                font-size: 0.65rem;
+                padding: 4px 12px;
+            }
+
+            .hero-title {
+                font-size: clamp(1.6rem, 7vw, 2.5rem);
+            }
+
+            .hero-subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 16px;
+            }
+
+            .countdown-banner {
+                padding: 8px 16px;
+                gap: 8px;
+                font-size: 0.75rem;
+                max-width: 100%;
+            }
+
+            .countdown-num {
+                font-size: 1.1rem;
+            }
+
+            .map-card-inner, .submit-inner, .lb-inner, .section-inner {
+                padding: 18px 14px;
+            }
+
+            .map-hero-img, .map-img-placeholder {
+                height: 200px;
+                margin-bottom: 14px;
             }
 
             .map-stats-row {
@@ -1442,8 +1528,93 @@
                 gap: 8px;
             }
 
-            .timer-digits {
-                font-size: 2.8rem;
+            .map-stat-box {
+                padding: 10px 6px;
+            }
+
+            .map-stat-value {
+                font-size: 0.92rem;
+            }
+
+            .map-stat-label {
+                font-size: 0.6rem;
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .bottom-grid > :last-child {
+                grid-column: span 1;
+            }
+
+            .lb-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .lb-header-actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            .lb-table th, .lb-table td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+
+            .lb-table th:nth-child(6),
+            .lb-table td:nth-child(6) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hide-xs {
+                display: none;
+            }
+
+            .site-header {
+                padding: 0 10px;
+            }
+
+            .header-brand {
+                gap: 6px;
+            }
+
+            .nav-link {
+                padding: 6px 8px;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .map-hero-img, .map-img-placeholder {
+                height: 160px;
+            }
+
+            .modal-card {
+                max-height: 92vh;
+                border-radius: 16px;
+            }
+
+            .modal-header, .modal-body {
+                padding: 14px;
+            }
+
+            .toast {
+                width: calc(100% - 24px);
+                max-width: none;
+                font-size: 0.8rem;
+                padding: 12px 16px;
             }
         }
 
@@ -1890,18 +2061,20 @@
                     <div class="section-label" style="margin-bottom:0;flex:1"><i class="fas fa-crown"></i> Bảng xếp hạng
                         hôm nay</div>
                     <div class="lb-date-badge" id="lb-date-badge">—</div>
-                    <button onclick="refreshLeaderboard()" title="Tải lại"
-                        style="background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:#67e8f9;padding:6px 12px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;margin-right:6px"
-                        onmouseover="this.style.background='rgba(6,182,212,0.2)'"
-                        onmouseout="this.style.background='rgba(6,182,212,0.1)'">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button onclick="clearTodayLeaderboard()"
-                        style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;padding:6px 14px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s"
-                        onmouseover="this.style.background='rgba(239,68,68,0.2)'"
-                        onmouseout="this.style.background='rgba(239,68,68,0.1)'">
-                        <i class="fas fa-trash-alt"></i> Xóa hôm nay
-                    </button>
+                    <div class="lb-header-actions">
+                        <button onclick="refreshLeaderboard()" title="Tải lại"
+                            style="background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:#67e8f9;padding:6px 12px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s"
+                            onmouseover="this.style.background='rgba(6,182,212,0.2)'"
+                            onmouseout="this.style.background='rgba(6,182,212,0.1)'">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button id="btn-clear-today" onclick="clearTodayLeaderboard()"
+                            style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;padding:6px 14px;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:none;align-items:center;gap:6px"
+                            onmouseover="this.style.background='rgba(239,68,68,0.2)'"
+                            onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+                            <i class="fas fa-trash-alt"></i> Xóa hôm nay
+                        </button>
+                    </div>
                 </div>
                 <div id="leaderboard-body">
                     <div class="lb-empty"><i class="fas fa-trophy"></i>
@@ -2097,7 +2270,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDtFpBAuZ_3JHmMXq1uVShq4sm0zK9xqEI",
@@ -2110,7 +2284,10 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
+        window.currentUser = null;
+        window.isAdminUser = false;
         window.ALL_MAPS = [];
         window.ALL_RECORDS = [];
         window.TODAY_MAP = null;
@@ -2416,6 +2593,11 @@
         };
 
         window.clearTodayLeaderboard = async () => {
+            if (!window.isAdminUser) {
+                showToast('❌ Chỉ có Admin mới được phép sử dụng chức năng này!', 'error');
+                return;
+            }
+
             if (!confirm('Bạn có chắc chắn muốn XÓA TẤT CẢ kết quả hôm nay khỏi Google Sheets không?')) return;
 
             localStorage.removeItem(lbKey());
@@ -2539,7 +2721,45 @@
             }
         };
 
-        init();
+        /* ─── Auth Guard & Page Initialization ─── */
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // Redirect unauthenticated user to login page
+                window.location.href = 'login.html';
+                return;
+            }
+
+            window.currentUser = user;
+
+            try {
+                // Fetch user document from Firestore to verify status & admin privileges
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+
+                    if (userData.status === 'banned') {
+                        await auth.signOut();
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    window.isAdminUser = userData.isAdmin === true || userData.role === 'admin';
+                }
+            } catch (err) {
+                console.error('Error loading user profile:', err);
+            }
+
+            // Display "Xóa hôm nay" button only if user is Admin
+            const btnClear = document.getElementById('btn-clear-today');
+            if (btnClear) {
+                btnClear.style.display = window.isAdminUser ? 'inline-flex' : 'none';
+            }
+
+            // Initialize page contents
+            init();
+        });
     </script>
 
     <script>
