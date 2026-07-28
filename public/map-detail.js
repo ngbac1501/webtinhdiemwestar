@@ -579,37 +579,96 @@ const refreshGlobalCache = async (types = ['maps', 'users', 'cars', 'pets', 'rec
     const startTime = performance.now();
 
     const fetchMapData = async () => {
-        const snap = await getDocs(collection(db, "gameMaps"));
-        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        try {
+            const snap = await getDocs(collection(db, "gameMaps"));
+            return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (err) {
+            console.warn("⚠️ Không thể tải gameMaps từ Firestore:", err);
+            return [];
+        }
     };
     
     const fetchUserData = async () => {
-        const snap = await getDocs(collection(db, "users"));
-        return snap.docs.map(doc => doc.data());
+        try {
+            const snap = await getDocs(collection(db, "users"));
+            const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (users && users.length > 0) {
+                try {
+                    localStorage.setItem('cached_westar_users', JSON.stringify(users));
+                } catch (e) {}
+            }
+            return users;
+        } catch (err) {
+            console.warn("⚠️ Không thể tải users từ Firestore (có thể do chưa login):", err);
+            try {
+                const local = localStorage.getItem('cached_westar_users');
+                if (local) {
+                    const parsed = JSON.parse(local);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed;
+                    }
+                }
+            } catch (e) {}
+            return [];
+        }
     };
     
     const fetchCarData = async () => {
-        const snap = await getDocs(collection(db, "gameCars"));
-        return snap.docs.map(doc => doc.data());
+        try {
+            const snap = await getDocs(collection(db, "gameCars"));
+            return snap.docs.map(doc => doc.data());
+        } catch (err) {
+            console.warn("⚠️ Không thể tải gameCars từ Firestore:", err);
+            return [];
+        }
     };
     
     const fetchPetData = async () => {
-        const snap = await getDocs(collection(db, "gamePets"));
-        return snap.docs.map(doc => doc.data());
+        try {
+            const snap = await getDocs(collection(db, "gamePets"));
+            return snap.docs.map(doc => doc.data());
+        } catch (err) {
+            console.warn("⚠️ Không thể tải gamePets từ Firestore:", err);
+            return [];
+        }
     };
     
     const fetchRecordData = async () => {
-        const snap = await getDocs(collection(db, "raceRecords"));
-        return snap.docs.map(doc => doc.data());
+        try {
+            const snap = await getDocs(collection(db, "raceRecords"));
+            return snap.docs.map(doc => doc.data());
+        } catch (err) {
+            console.warn("⚠️ Không thể tải raceRecords từ Firestore:", err);
+            return [];
+        }
     };
 
     const tasks = [];
 
-    if (types.includes('maps')) tasks.push(performanceOptimizer.fetchWithCache('gameMaps', fetchMapData).then(data => ALL_MAPS = data));
-    if (types.includes('users')) tasks.push(performanceOptimizer.fetchWithCache('users', fetchUserData).then(data => ALL_USERS = data));
-    if (types.includes('cars')) tasks.push(performanceOptimizer.fetchWithCache('gameCars', fetchCarData).then(data => ALL_CARS = data));
-    if (types.includes('pets')) tasks.push(performanceOptimizer.fetchWithCache('gamePets', fetchPetData).then(data => ALL_PETS = data));
-    if (types.includes('records')) tasks.push(performanceOptimizer.fetchWithCache('raceRecords', fetchRecordData).then(data => ALL_RECORDS = data));
+    if (types.includes('maps')) tasks.push(performanceOptimizer.fetchWithCache('gameMaps', fetchMapData).catch(() => []).then(data => ALL_MAPS = data || []));
+    if (types.includes('users')) tasks.push(
+        performanceOptimizer.fetchWithCache('users', fetchUserData)
+            .catch(() => {
+                try {
+                    const local = localStorage.getItem('cached_westar_users');
+                    return local ? JSON.parse(local) : [];
+                } catch (e) {
+                    return [];
+                }
+            })
+            .then(data => {
+                ALL_USERS = (data && data.length > 0) ? data : [];
+                if (!ALL_USERS.length) {
+                    try {
+                        const local = localStorage.getItem('cached_westar_users');
+                        if (local) ALL_USERS = JSON.parse(local) || [];
+                    } catch (e) {}
+                }
+            })
+    );
+    if (types.includes('cars')) tasks.push(performanceOptimizer.fetchWithCache('gameCars', fetchCarData).catch(() => []).then(data => ALL_CARS = data || []));
+    if (types.includes('pets')) tasks.push(performanceOptimizer.fetchWithCache('gamePets', fetchPetData).catch(() => []).then(data => ALL_PETS = data || []));
+    if (types.includes('records')) tasks.push(performanceOptimizer.fetchWithCache('raceRecords', fetchRecordData).catch(() => []).then(data => ALL_RECORDS = data || []));
 
     await Promise.all(tasks);
     GLOBAL_CACHE_LOADED = true;
@@ -628,7 +687,8 @@ const loadMapData = async () => {
         // Get map index from URL
         const mapIndexParam = getUrlParameter('map');
         if (mapIndexParam !== null) {
-            currentMapIndex = parseInt(mapIndexParam);
+            const parsed = parseInt(mapIndexParam);
+            currentMapIndex = isNaN(parsed) ? 0 : parsed;
         }
 
         // Load race state
@@ -641,21 +701,25 @@ const loadMapData = async () => {
 
         raceState = raceDoc.data();
 
-        // Get map data
-        if (currentMapIndex >= 0 && currentMapIndex < raceState.maps.length) {
-            currentMapData = raceState.maps[currentMapIndex];
-
-            // Find map info from ALL_MAPS
-            const mapInfo = ALL_MAPS.find(m => m.name === currentMapData.name);
-
-            // Render map details - NOW AWAIT
-            await renderMapDetails(currentMapData, mapInfo, raceState, currentMapIndex);
-
-            // Update navigation buttons
-            updateNavigationButtons(currentMapIndex, raceState.maps.length);
-        } else {
-            throw new Error("Index map không hợp lệ");
+        if (!raceState || !raceState.maps || raceState.maps.length === 0) {
+            throw new Error("Chưa có dữ liệu map đấu");
         }
+
+        // Standardize index boundary
+        if (currentMapIndex < 0 || currentMapIndex >= raceState.maps.length) {
+            currentMapIndex = 0;
+        }
+
+        currentMapData = raceState.maps[currentMapIndex];
+
+        // Find map info from ALL_MAPS
+        const mapInfo = ALL_MAPS.find(m => m.name === currentMapData.name);
+
+        // Render map details - NOW AWAIT
+        await renderMapDetails(currentMapData, mapInfo, raceState, currentMapIndex);
+
+        // Update navigation buttons
+        updateNavigationButtons(currentMapIndex, raceState.maps.length);
 
     } catch (error) {
         console.error("Lỗi khi tải dữ liệu map:", error);
@@ -944,7 +1008,11 @@ const renderRacersBroadcast = async (mapData, raceState) => {
     const racersData = raceState.racers.slice(0, getNumRacers()).map((racer, index) => {
         // Find avatar in cache
         const targetName = (racer.name || "").trim().toLowerCase();
-        const userData = ALL_USERS.find(u => (u.nickname || "").trim().toLowerCase() === targetName);
+        const userData = ALL_USERS.find(u => 
+            (u.nickname && u.nickname.trim().toLowerCase() === targetName) ||
+            (u.displayName && u.displayName.trim().toLowerCase() === targetName) ||
+            (u.name && u.name.trim().toLowerCase() === targetName)
+        );
         const photoURL = userData ? (userData.photoBase64 || userData.photoURL) : null;
 
         // Fetch Car/Pet Images from cache
@@ -1051,7 +1119,7 @@ const renderRacersBroadcast = async (mapData, raceState) => {
                     ${bonusHtml}
                     <div class="player-main-area">
                         <div class="player-photo-container mx-auto">
-                            <img src="${racer.photoURL || 'assets/images/default-avatar.png'}" alt="${racer.name}">
+                            <img src="${racer.photoURL || 'assets/images/logows.png'}" alt="${racer.name}" onerror="this.onerror=null; this.src='assets/images/logows.png';">
                         </div>
                         <div class="player-equipment-area flex justify-center gap-6 mt-3">
                             <!-- Car Slot -->
