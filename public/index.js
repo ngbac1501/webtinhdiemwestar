@@ -1592,7 +1592,7 @@ const calculateMapPoints = (timeStrings, mapName) => {
         const isKingMapWinner = racerKingMap && racerKingMap === mapName.trim();
 
         if (racerTime === bestTime) {
-            points[i] = isKingMapWinner ? 12 : 11;
+            points[i] = (isKingMapWinner && !raceState.isTeamMode) ? 12 : 11;
             continue;
         }
 
@@ -1802,12 +1802,62 @@ window.calculateRacerTitles = calculateRacerTitles;
 
 const getRequiredMapNames = (state) => {
     const requiredMaps = [];
-    if (state.firstMapBtc.trim()) {
-        requiredMaps.push(state.firstMapBtc.trim());
+    const firstBtc = (state.firstMapBtc || '').trim();
+    if (firstBtc) {
+        requiredMaps.push(firstBtc);
     }
 
     // King maps only apply to non-1vs1 modes
-    if (!state.is1vs1Mode) {
+    if (state.is1vs1Mode) {
+        // 1vs1 mode: no king maps
+    } else if (state.isTeamMode) {
+        // 2vs2 mode: King map is per-team (racers[0] for team 1, racers[1] for team 2)
+        const kingMap1 = (state.racers[0]?.kingMap || '').trim();
+        const kingMap2 = (state.racers[1]?.kingMap || '').trim();
+
+        let team2StartsFirst = false;
+
+        // Check if the 1st match (Map BTC) has been raced and calculate scores to determine which King map goes first
+        if (firstBtc && state.maps && state.maps.length > 0) {
+            const btcMapObj = state.maps.find(m => (m.name || '').trim() === firstBtc);
+            if (btcMapObj && btcMapObj.times) {
+                const numRacers = state.racers.length;
+                const timesInSeconds = btcMapObj.times.map(ts => timeToSeconds(ts));
+                const validTimes = timesInSeconds.filter(t => t !== null && t > 0);
+
+                if (validTimes.length > 0) {
+                    const bestTime = Math.min(...validTimes);
+                    let team1Score = 0;
+                    let team2Score = 0;
+
+                    for (let i = 0; i < numRacers; i++) {
+                        const racerTime = timesInSeconds[i];
+                        if (racerTime === null || racerTime <= 0) continue;
+
+                        const score = (racerTime === bestTime) ? 11 : Math.max(0, 10 - Math.floor(racerTime - bestTime));
+
+                        if (i === 0 || i === 2) {
+                            team1Score += score;
+                        } else {
+                            team2Score += score;
+                        }
+                    }
+
+                    if (team2Score > team1Score) {
+                        team2StartsFirst = true;
+                    }
+                }
+            }
+        }
+
+        if (team2StartsFirst) {
+            if (kingMap2) requiredMaps.push(kingMap2);
+            if (kingMap1) requiredMaps.push(kingMap1);
+        } else {
+            if (kingMap1) requiredMaps.push(kingMap1);
+            if (kingMap2) requiredMaps.push(kingMap2);
+        }
+    } else {
         const activeRacersCount = state.racers.length;
         for (let i = 0; i < activeRacersCount; i++) {
             const racer = state.racers[i];
@@ -2116,7 +2166,17 @@ const renderMapTables = () => {
 
         let mapTypeBadge = '';
         if (mapIndex === 0 && map.name.trim() === raceState.firstMapBtc.trim()) {
-            mapTypeBadge = '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded ml-2">BTC</span>';
+            mapTypeBadge = '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded ml-2 font-bold">BTC</span>';
+        } else if (raceState.isTeamMode) {
+            const k1 = (raceState.racers[0]?.kingMap || '').trim();
+            const k2 = (raceState.racers[1]?.kingMap || '').trim();
+            if (k1 && map.name.trim() === k1) {
+                mapTypeBadge = '<span class="text-xs bg-red-600 text-white px-2 py-1 rounded ml-2 font-bold"><i class="fas fa-crown mr-1"></i>KING ĐỘI 1</span>';
+            } else if (k2 && map.name.trim() === k2) {
+                mapTypeBadge = '<span class="text-xs bg-blue-600 text-white px-2 py-1 rounded ml-2 font-bold"><i class="fas fa-crown mr-1"></i>KING ĐỘI 2</span>';
+            } else if (raceState.racers.some(r => r.kingMap.trim() === map.name.trim())) {
+                mapTypeBadge = '<span class="text-xs bg-amber-500 text-white px-2 py-1 rounded ml-2">KING</span>';
+            }
         } else if (raceState.racers.some(r => r.kingMap.trim() === map.name.trim())) {
             mapTypeBadge = '<span class="text-xs bg-amber-500 text-white px-2 py-1 rounded ml-2">KING</span>';
         }
@@ -3119,6 +3179,8 @@ const updateUI = () => {
     if (pointRuleTextEl) {
         if (raceState.is1vs1Mode) {
             pointRuleTextEl.innerHTML = `Chế độ 1vs1: Mỗi map đấu thắng được tính 1 điểm. Tuyển thủ đạt 5 điểm trước sẽ thắng BO đấu hiện tại.`;
+        } else if (raceState.isTeamMode) {
+            pointRuleTextEl.innerHTML = `Chế độ 2vs2: Tay đua nhanh nhất được 11 điểm (bản đồ King Map không cộng thêm 1 điểm). Các tay đua sau bị trừ 1 điểm cho mỗi giây trễ so với người nhanh nhất.`;
         } else {
             pointRuleTextEl.innerHTML = `Tay đua nhanh nhất được 11 điểm (hoặc 12 điểm nếu là King Map Owner). Các tay đua sau bị trừ 1 điểm cho mỗi giây trễ so với người nhanh nhất.`;
         }
@@ -3389,8 +3451,13 @@ window.handleTimeInputAndSave = (input) => {
         saveRaceRecord(mapName, racerIndex, seconds, car, pet);
     }
 
-    raceState = newState;
+    if (raceState.isTeamMode) {
+        raceState = ensureInitialMaps(newState);
+    } else {
+        raceState = newState;
+    }
     saveRaceState(raceState);
+    updateUI();
 
     // Kiểm tra xem map đã hoàn thành chưa sau khi nhập thời gian
     setTimeout(() => {
@@ -4499,8 +4566,7 @@ const renderRacerInputsWithDropdown = async () => {
                     placeholder="${!isAdminUser ? 'Chỉ xem' : 'Nhập King Map'}" 
                     onchange="${isAdminUser ? `handleKingMapChange(this.value, 0)` : ''}" />
                 <p class="text-xs text-slate-500 mt-2 italic text-center">
-                    <i class="fas fa-star text-amber-400 mr-1"></i> Đội 1 về nhất map này sẽ được 
-                    <span class="text-amber-400 font-bold">+12 điểm</span>.
+                    <i class="fas fa-crown text-amber-400 mr-1"></i> King Map do Đội 1 lựa chọn.
                 </p>
             </div>
             
@@ -4514,8 +4580,7 @@ const renderRacerInputsWithDropdown = async () => {
                     placeholder="${!isAdminUser ? 'Chỉ xem' : 'Nhập King Map'}" 
                     onchange="${isAdminUser ? `handleKingMapChange(this.value, 1)` : ''}" />
                 <p class="text-xs text-slate-500 mt-2 italic text-center">
-                    <i class="fas fa-star text-amber-400 mr-1"></i> Đội 2 về nhất map này sẽ được 
-                    <span class="text-amber-400 font-bold">+12 điểm</span>.
+                    <i class="fas fa-crown text-amber-400 mr-1"></i> King Map do Đội 2 lựa chọn.
                 </p>
             </div>
         `;
@@ -5961,7 +6026,7 @@ window.openRacerMatchesModal = (racerName) => {
                         }
                         isKingMap = kingMapName && kingMapName === session.mapName.trim();
                     }
-                    score = isKingMap ? 12 : 11;
+                    score = (isKingMap && !raceState.isTeamMode) ? 12 : 11;
                 } else {
                     const diff = racerTimeSec - bestTime;
                     score = Math.max(0, 10 - Math.floor(diff));

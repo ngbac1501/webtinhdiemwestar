@@ -199,7 +199,7 @@ const calculateMapPoints = (timeStrings, mapName) => {
         }
         const isKingMapWinner = racerKingMap && racerKingMap === mapName.trim();
         if (racerTime === bestTime) {
-            points[i] = isKingMapWinner ? 12 : 11;
+            points[i] = (isKingMapWinner && !raceState.isTeamMode) ? 12 : 11;
             continue;
         }
 
@@ -509,10 +509,22 @@ const renderDetailedScoreboard = () => {
 
                     // Badge
                     const isBtcMap  = mapIndex === 0 && map.name.trim() === raceState.firstMapBtc.trim();
-                    const isKingMap = raceState.racers.some(r => r.kingMap.trim() === map.name.trim());
                     let badgeHtml = '';
-                    if (isBtcMap)   badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(239,68,68,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">BTC</span>`;
-                    else if (isKingMap) badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(245,158,11,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">KING</span>`;
+                    if (isBtcMap) {
+                        badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(239,68,68,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">BTC</span>`;
+                    } else if (raceState.isTeamMode) {
+                        const k1 = (raceState.racers[0]?.kingMap || '').trim();
+                        const k2 = (raceState.racers[1]?.kingMap || '').trim();
+                        if (k1 && map.name.trim() === k1) {
+                            badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(239,68,68,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">KING ĐỘI 1</span>`;
+                        } else if (k2 && map.name.trim() === k2) {
+                            badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(59,130,246,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">KING ĐỘI 2</span>`;
+                        } else if (raceState.racers.some(r => (r.kingMap || '').trim() === map.name.trim())) {
+                            badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(245,158,11,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">KING</span>`;
+                        }
+                    } else if (raceState.racers.some(r => (r.kingMap || '').trim() === map.name.trim())) {
+                        badgeHtml = `<span style="position:absolute;top:6px;right:6px;z-index:5;font-size:0.52rem;background:rgba(245,158,11,0.9);color:#fff;font-weight:900;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;">KING</span>`;
+                    }
 
                     // Section backgrounds (tinted by winner)
                     const bgTop    = racer1Won

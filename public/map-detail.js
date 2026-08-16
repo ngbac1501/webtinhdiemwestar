@@ -190,7 +190,7 @@ const calculateMapPoints = (timeStrings, mapName) => {
         const isKingMapWinner = raceState.racers[i].kingMap.trim() === mapName.trim();
 
         if (racerTime === bestTime) {
-            points[i] = isKingMapWinner ? 12 : 11;
+            points[i] = (isKingMapWinner && !raceState.isTeamMode) ? 12 : 11;
             continue;
         }
 
