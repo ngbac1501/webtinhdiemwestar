@@ -4766,293 +4766,473 @@ window.handleRacerSelection = async (index, userId) => {
     }
 };
 
-// ================ VÒNG QUAY MAP BTC ================
+// ================ BẢNG QUAY MAP BTC NGẪU NHIÊN (MA TRẬN PHÂN THEO ĐỘ KHÓ) ================
 
-let wheelCanvas;
-let wheelCtx;
-let wheelRotation = 0;
-let isSpinning = false;
-let mapImages = {}; // Cache cho hình ảnh map
-let imagesLoaded = false;
+let isRandomizerSpinning = false;
+let currentRandomizerFilter = 'all';
+let currentSelectedWinner = null;
+let randomizerAudioCtx = null;
 
-// Tải trước hình ảnh map
-const preloadMapImages = async () => {
-    if (imagesLoaded) return;
-
-    const maps = ALL_MAPS.filter(m => m.name && m.name.trim() && m.imageUrl);
-    if (maps.length === 0) {
-        imagesLoaded = true;
-        return;
-    }
-
-    const loadPromises = maps.map(map => {
-        // Tránh tải lại nếu đã có trong cache
-        if (mapImages[map.name]) return Promise.resolve();
-
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.src = map.imageUrl;
-            img.onload = () => {
-                mapImages[map.name] = img;
-                resolve();
-            };
-            img.onerror = () => {
-                console.warn(`Không thể tải ảnh cho map: ${map.name}`);
-                resolve(); // Tiếp tục dù lỗi
-            };
-        });
-    });
-
-    await Promise.all(loadPromises);
-    imagesLoaded = true;
-    drawWheel(); // Vẽ lại khi đã có ảnh
-};
-
-// Khởi tạo vòng quay
-const initBtcWheel = async () => {
-    wheelCanvas = document.getElementById('btc-wheel-canvas');
-    if (!wheelCanvas) return;
-
-    wheelCtx = wheelCanvas.getContext('2d');
-
-    // Bắt đầu tải ảnh ngay lập tức
-    preloadMapImages();
-
-    drawWheel();
-
-    // Kiểm tra nếu đã có Map BTC được chọn
-    if (raceState.firstMapBtc && raceState.firstMapBtc.trim()) {
-        showSelectedBtcMap(raceState.firstMapBtc);
-    }
-};
-
-// Vẽ vòng quay
-const drawWheel = () => {
-    if (!wheelCtx || !wheelCanvas) return;
-
-    const maps = ALL_MAPS.filter(m => m.name && m.name.trim());
-    if (maps.length === 0) {
-        // Vẽ placeholder nếu chưa có map
-        wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-        wheelCtx.fillStyle = 'rgba(14, 14, 20, 0.8)';
-        wheelCtx.beginPath();
-        wheelCtx.arc(200, 200, 180, 0, Math.PI * 2);
-        wheelCtx.fill();
-
-        wheelCtx.fillStyle = '#94a3b8';
-        wheelCtx.font = 'bold 16px Inter';
-        wheelCtx.textAlign = 'center';
-        wheelCtx.fillText('Chưa có map nào', 200, 200);
-        return;
-    }
-
-    const centerX = 200;
-    const centerY = 200;
-    const radius = 180;
-    const sliceAngle = (Math.PI * 2) / maps.length;
-
-    wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-
-    // 1. Vẽ viền ngoài kim loại (Rim)
-    wheelCtx.beginPath();
-    wheelCtx.arc(centerX, centerY, radius + 10, 0, Math.PI * 2);
-    const rimGradient = wheelCtx.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius + 10);
-    rimGradient.addColorStop(0, '#1a1a24');
-    rimGradient.addColorStop(0.5, '#2a2a35');
-    rimGradient.addColorStop(1, '#0e0e14');
-    wheelCtx.fillStyle = rimGradient;
-    wheelCtx.fill();
-
-    // 2. Vẽ các phần của vòng quay (Slices)
-    maps.forEach((map, index) => {
-        const startAngle = wheelRotation + (sliceAngle * index);
-        const endAngle = startAngle + sliceAngle;
-
-        wheelCtx.save();
-
-        // Vẽ lát cắt và Clip
-        wheelCtx.beginPath();
-        wheelCtx.moveTo(centerX, centerY);
-        wheelCtx.arc(centerX, centerY, radius, startAngle, endAngle);
-        wheelCtx.closePath();
-        wheelCtx.clip();
-
-        // Kiểm tra xem có ảnh không
-        const img = mapImages[map.name];
-        if (img) {
-            // Vẽ ảnh map làm nền
-            // Scale and center the image in the slice
-            const imgScale = Math.max(radius * 2 / img.width, radius * 2 / img.height);
-            const imgW = img.width * imgScale;
-            const imgH = img.height * imgScale;
-
-            wheelCtx.globalAlpha = 0.8; // Độ trong suốt nhẹ để thấy màu nền
-            wheelCtx.drawImage(img, centerX - imgW / 2, centerY - imgH / 2, imgW, imgH);
-            wheelCtx.globalAlpha = 1.0;
-
-            // Thêm lớp phủ (Overlay) để text dễ đọc
-            const overlayGradient = wheelCtx.createRadialGradient(centerX, centerY, radius * 0.4, centerX, centerY, radius);
-            overlayGradient.addColorStop(0, 'rgba(14, 14, 20, 0.4)');
-            overlayGradient.addColorStop(1, 'rgba(14, 14, 20, 0.7)');
-            wheelCtx.fillStyle = overlayGradient;
-            wheelCtx.fill();
-        } else {
-            // Fallback nếu không có ảnh
-            let baseColor = (index % 2 === 0) ? '#161621' : '#0e0e14';
-            const sliceGradient = wheelCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-            sliceGradient.addColorStop(0.7, baseColor);
-            sliceGradient.addColorStop(1, '#2a2a35');
-            wheelCtx.fillStyle = sliceGradient;
-            wheelCtx.fill();
+// Âm thanh giả lập qua Web Audio API (Click / Tick / Fanfare)
+const playRandomizerTick = (pitch = 700) => {
+    try {
+        if (!randomizerAudioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) randomizerAudioCtx = new AudioContextClass();
         }
-
-        // Viền lát cắt
-        wheelCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-        wheelCtx.lineWidth = 1;
-        wheelCtx.stroke();
-
-        wheelCtx.restore();
-    });
-
-    // 4. Các điểm nhấn phát sáng (Dots) trên viền
-    maps.forEach((_, index) => {
-        const angle = wheelRotation + (sliceAngle * index);
-        wheelCtx.beginPath();
-        wheelCtx.arc(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius, 2, 0, Math.PI * 2);
-        wheelCtx.fillStyle = 'rgba(0, 243, 255, 0.3)';
-        wheelCtx.fill();
-    });
-
-    // 5. Vẽ vòng tròn giữa (Hub)
-    const centerGradient = wheelCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 45);
-    centerGradient.addColorStop(0, '#0e0e14');
-    centerGradient.addColorStop(0.6, '#161621');
-    centerGradient.addColorStop(1, '#2a2a35');
-
-    wheelCtx.beginPath();
-    wheelCtx.arc(centerX, centerY, 45, 0, Math.PI * 2);
-    wheelCtx.fillStyle = centerGradient;
-    wheelCtx.fill();
-
-    // Viền kim loại cho Hub
-    wheelCtx.strokeStyle = '#2a2a35';
-    wheelCtx.lineWidth = 4;
-    wheelCtx.stroke();
-
-    // Viền phát sáng cho hub
-    wheelCtx.strokeStyle = 'rgba(0, 243, 255, 0.1)';
-    wheelCtx.lineWidth = 1;
-    wheelCtx.stroke();
-
-    // 6. Text "BTC" phong cách Tech
-    wheelCtx.fillStyle = '#00f3ff';
-    wheelCtx.font = '900 14px Inter';
-    wheelCtx.textAlign = 'center';
-    wheelCtx.letterSpacing = '2px';
-    wheelCtx.fillText('BTC', centerX, centerY + 5);
-
-    // Icon tia chớp hoặc radar nhỏ dưới chữ BTC (tùy chọn)
+        if (randomizerAudioCtx && randomizerAudioCtx.state === 'suspended') {
+            randomizerAudioCtx.resume();
+        }
+        if (randomizerAudioCtx) {
+            const osc = randomizerAudioCtx.createOscillator();
+            const gain = randomizerAudioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(pitch, randomizerAudioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(140, randomizerAudioCtx.currentTime + 0.045);
+            gain.gain.setValueAtTime(0.12, randomizerAudioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, randomizerAudioCtx.currentTime + 0.045);
+            osc.connect(gain);
+            gain.connect(randomizerAudioCtx.destination);
+            osc.start();
+            osc.stop(randomizerAudioCtx.currentTime + 0.045);
+        }
+    } catch (e) {
+        // Safe failover if Web Audio is blocked or unsupported
+    }
 };
 
-// Quay vòng
-window.spinWheel = async () => {
-    if (isSpinning) return;
+const playWinnerFanfare = () => {
+    try {
+        if (!randomizerAudioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) randomizerAudioCtx = new AudioContextClass();
+        }
+        if (randomizerAudioCtx && randomizerAudioCtx.state === 'suspended') {
+            randomizerAudioCtx.resume();
+        }
+        if (randomizerAudioCtx) {
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, idx) => {
+                const osc = randomizerAudioCtx.createOscillator();
+                const gain = randomizerAudioCtx.createGain();
+                const start = randomizerAudioCtx.currentTime + idx * 0.1;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, start);
+                gain.gain.setValueAtTime(0.18, start);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+                osc.connect(gain);
+                gain.connect(randomizerAudioCtx.destination);
+                osc.start(start);
+                osc.stop(start + 0.35);
+            });
+        }
+    } catch (e) {}
+};
+
+// Xác định số sao / độ khó của map
+const getMapStarLevel = (map) => {
+    if (!map || !map.difficulty) return 4;
+    const d = String(map.difficulty).toLowerCase().trim();
+    if (d.includes('7') || d.includes('cực khó') || d.includes('extreme')) return 7;
+    if (d.includes('6') || d.includes('rất khó') || d.includes('expert')) return 6;
+    if (d.includes('5') || d.includes('khó') || d.includes('hard')) return 5;
+    if (d.includes('4') || d.includes('trung bình') || d.includes('medium')) return 4;
+    if (d.includes('3') || d.includes('dễ') || d.includes('easy')) return 3;
+    return 4;
+};
+
+// Cấu hình hiển thị theo từng mức độ khó
+const MAP_DIFFICULTY_CONFIG = {
+    7: {
+        stars: '⭐⭐⭐⭐⭐⭐⭐',
+        title: '7 SAO - CỰC KHÓ (EXTREME)',
+        badgeClass: 'text-red-400 bg-red-500/10 border-red-500/30',
+        headerClass: 'from-red-500/20 to-transparent border-red-500/40 text-red-400',
+        icon: 'fa-skull-crossbones'
+    },
+    6: {
+        stars: '⭐⭐⭐⭐⭐⭐',
+        title: '6 SAO - RẤT KHÓ (EXPERT)',
+        badgeClass: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+        headerClass: 'from-amber-500/20 to-transparent border-amber-500/40 text-amber-400',
+        icon: 'fa-fire'
+    },
+    5: {
+        stars: '⭐⭐⭐⭐⭐',
+        title: '5 SAO - KHÓ (HARD)',
+        badgeClass: 'text-purple-400 bg-purple-500/10 border-purple-500/30',
+        headerClass: 'from-purple-500/20 to-transparent border-purple-500/40 text-purple-400',
+        icon: 'fa-bolt'
+    },
+    4: {
+        stars: '⭐⭐⭐⭐',
+        title: '4 SAO - TRUNG BÌNH (MEDIUM)',
+        badgeClass: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
+        headerClass: 'from-cyan-500/20 to-transparent border-cyan-500/40 text-cyan-400',
+        icon: 'fa-compass'
+    },
+    3: {
+        stars: '⭐⭐⭐',
+        title: '3 SAO - DỄ (EASY)',
+        badgeClass: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+        headerClass: 'from-emerald-500/20 to-transparent border-emerald-500/40 text-emerald-400',
+        icon: 'fa-leaf'
+    }
+};
+
+// Render 1 card bản đồ trong bảng random
+const renderRandomizerCard = (map) => {
+    const star = getMapStarLevel(map);
+    const config = MAP_DIFFICULTY_CONFIG[star] || MAP_DIFFICULTY_CONFIG[4];
+    const imgUrl = map.imageUrl || 'assets/images/placeholder.jpg';
+    const safeName = (map.name || '').replace(/"/g, '&quot;');
+    return `
+        <div class="randomizer-card group p-2 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-cyan-400 transition-all flex flex-col"
+             data-map-name="${safeName}"
+             data-map-stars="${star}"
+             data-map-img="${imgUrl}">
+            <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black/40 mb-2">
+                <img src="${imgUrl}" alt="${safeName}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                     loading="lazy"
+                     onerror="this.src='assets/images/logows.png'">
+                <div class="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-md text-[10px] font-black ${config.badgeClass} backdrop-blur-md">
+                    ${star}★
+                </div>
+                <div class="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/70 text-slate-300 backdrop-blur-md">
+                    ${map.laps || 2} Vòng
+                </div>
+            </div>
+            <div class="px-1 pb-1 flex-1 flex flex-col justify-between">
+                <div class="font-bold text-xs text-white truncate text-center group-hover:text-cyan-300 transition-colors" title="${safeName}">
+                    ${map.name}
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+// Render danh sách bản đồ (Tất cả hoặc theo độ khó cụ thể)
+const renderRandomizerMapGrid = (filterDifficulty = 'all') => {
+    currentRandomizerFilter = filterDifficulty;
+    const container = document.getElementById('randomizer-maps-container');
+    if (!container) return;
+
+    const validMaps = (ALL_MAPS || []).filter(m => m.name && m.name.trim());
+
+    // Cập nhật số lượng từng phân loại
+    const counts = { all: validMaps.length, 7: 0, 6: 0, 5: 0, 4: 0, 3: 0 };
+    validMaps.forEach(m => {
+        const star = getMapStarLevel(m);
+        if (counts[star] !== undefined) counts[star]++;
+    });
+
+    // Cập nhật các nhãn số lượng trên toolbar
+    ['all', '7', '6', '5', '4', '3'].forEach(k => {
+        const el = document.getElementById(`rnd-count-${k}`);
+        if (el) el.textContent = counts[k] || 0;
+    });
+
+    if (validMaps.length === 0) {
+        container.innerHTML = `
+            <div class="py-16 text-center text-slate-500">
+                <i class="fas fa-map-marked-alt text-4xl mb-3 text-slate-600 block"></i>
+                <p class="text-sm font-semibold">Chưa có dữ liệu bản đồ nào trong hệ thống.</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+
+    if (filterDifficulty === 'all') {
+        // Khi chọn Tất Cả: Hiển thị toàn bộ bản đồ trong 1 lưới liên tục (gọn gàng, dễ nhìn, sắp xếp 7★ -> 3★)
+        const sortedMaps = [...validMaps].sort((a, b) => getMapStarLevel(b) - getMapStarLevel(a));
+        html = `
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                ${sortedMaps.map(renderRandomizerCard).join('')}
+            </div>
+        `;
+    } else {
+        // Khi chọn độ khó cụ thể (7, 6, 5, 4, 3)
+        const star = parseInt(filterDifficulty, 10);
+        const mapsInGroup = validMaps.filter(m => getMapStarLevel(m) === star);
+        const config = MAP_DIFFICULTY_CONFIG[star] || MAP_DIFFICULTY_CONFIG[4];
+
+        if (mapsInGroup.length === 0) {
+            html = `
+                <div class="py-16 text-center text-slate-500">
+                    <p class="text-sm font-semibold">Không có bản đồ nào thuộc độ khó ${star} sao.</p>
+                </div>
+            `;
+        } else {
+            html = `
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-white/10 bg-gradient-to-r ${config.headerClass} px-3 py-1.5 rounded-xl border">
+                        <div class="flex items-center gap-2">
+                            <i class="fas ${config.icon} text-sm"></i>
+                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider font-['Orbitron']">${config.title}</h4>
+                        </div>
+                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-white">
+                            ${mapsInGroup.length} map
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                        ${mapsInGroup.map(renderRandomizerCard).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    container.innerHTML = html;
+};
+
+// Lọc độ khó trên giao diện modal
+window.filterRandomizerDifficulty = (difficulty, btn) => {
+    if (isRandomizerSpinning) return;
+
+    // Cập nhật trạng thái active của các nút filter
+    const buttons = document.querySelectorAll('#randomizer-filter-bar .randomizer-filter-btn');
+    buttons.forEach(b => {
+        b.classList.remove('active', 'bg-cyan-500/20', 'border-cyan-500/40', 'text-cyan-300');
+        b.classList.add('bg-white/5', 'border-white/10', 'text-slate-300');
+    });
+
+    if (btn) {
+        btn.classList.add('active', 'bg-cyan-500/20', 'border-cyan-500/40', 'text-cyan-300');
+        btn.classList.remove('bg-white/5', 'border-white/10', 'text-slate-300');
+    }
+
+    renderRandomizerMapGrid(difficulty);
+};
+
+// Mở modal quay ngẫu nhiên
+window.openMapRandomizerModal = () => {
+    const modal = document.getElementById('map-randomizer-modal');
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+
+    // Ẩn overlay winner nếu đang mở
+    const winnerOverlay = document.getElementById('randomizer-winner-overlay');
+    if (winnerOverlay) winnerOverlay.classList.add('hidden');
+
+    renderRandomizerMapGrid(currentRandomizerFilter);
+};
+
+// Đóng modal quay ngẫu nhiên
+window.closeMapRandomizerModal = () => {
+    if (isRandomizerSpinning) {
+        if (!confirm("Vòng quay đang diễn ra, bạn có muốn dừng không?")) return;
+        isRandomizerSpinning = false;
+    }
+    const modal = document.getElementById('map-randomizer-modal');
+    if (modal) modal.classList.add('hidden');
+
+    const winnerOverlay = document.getElementById('randomizer-winner-overlay');
+    if (winnerOverlay) winnerOverlay.classList.add('hidden');
+};
+
+// BẮT ĐẦU QUAY NGẪU NHIÊN VỚI HIỆU ỨNG NHẢY LỘN XỘN (CHAOTIC HOPPING)
+window.startRandomMapSpin = async () => {
+    if (isRandomizerSpinning) return;
+
     if (!isAdminUser) {
         displayMessage("Chỉ Admin mới có quyền quay chọn Map BTC", true);
         return;
     }
 
-    const maps = ALL_MAPS.filter(m => m.name && m.name.trim());
-    if (maps.length === 0) {
-        displayMessage("Chưa có map nào để quay. Vui lòng thêm map vào hệ thống.", true);
+    const cards = Array.from(document.querySelectorAll('#randomizer-maps-container .randomizer-card'));
+    if (cards.length === 0) {
+        displayMessage("Không tìm thấy bản đồ nào để quay.", true);
         return;
     }
 
-    isSpinning = true;
-    const spinBtn = document.getElementById('spin-wheel-btn');
-    spinBtn.disabled = true;
-    spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ĐANG QUAY...';
+    isRandomizerSpinning = true;
 
-    wheelCanvas.classList.add('spinning');
+    // Reset overlay
+    const winnerOverlay = document.getElementById('randomizer-winner-overlay');
+    if (winnerOverlay) winnerOverlay.classList.add('hidden');
 
-    // Random số vòng quay và góc dừng
-    const minSpins = 5;
-    const maxSpins = 8;
-    const spins = minSpins + Math.random() * (maxSpins - minSpins);
-    const randomAngle = Math.random() * Math.PI * 2;
-    const totalRotation = (Math.PI * 2 * spins) + randomAngle;
+    // Cập nhật trạng thái nút bắt đầu
+    const spinBtn = document.getElementById('btn-start-random-spin');
+    if (spinBtn) {
+        spinBtn.disabled = true;
+        spinBtn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> ĐANG QUAY...';
+    }
 
-    // Animation
-    const startTime = Date.now();
-    const duration = 4000; // 4 giây
+    // Xoá mọi highlight cũ
+    cards.forEach(c => {
+        c.classList.remove('randomizer-jumping', 'randomizer-winner');
+    });
 
-    const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+    // Chọn ngẫu nhiên bản đồ chiến thắng cuối cùng
+    const targetIndex = Math.floor(Math.random() * cards.length);
+    const targetCard = cards[targetIndex];
+    const targetMapName = targetCard.getAttribute('data-map-name') || '';
+    const targetMapStars = targetCard.getAttribute('data-map-stars') || '4';
+    const targetMapImg = targetCard.getAttribute('data-map-img') || '';
 
-        // Easing function (ease-out)
-        const eased = 1 - Math.pow(1 - progress, 3);
+    // Tạo kịch bản thời gian nhảy ngẫu nhiên lộn xộn (decelerating jumps)
+    // Tổng cộng khoảng 36 nhịp nhảy, chuyển từ cực nhanh sang chậm dần
+    const delaySchedule = [
+        40, 40, 40, 45, 45, 45, 50, 50, 50, 55, 55, 60, 65, 70, 80, 90, 
+        105, 120, 140, 165, 195, 230, 270, 320, 380, 450, 530, 620, 750
+    ];
 
-        wheelRotation = totalRotation * eased;
-        drawWheel();
+    let currentHighlightedCard = null;
 
-        if (progress < 1) {
-            requestAnimationFrame(animate);
-        } else {
-            wheelCanvas.classList.remove('spinning');
-            finishSpin(maps);
+    for (let i = 0; i < delaySchedule.length; i++) {
+        if (!isRandomizerSpinning) break;
+
+        // Bỏ highlight thẻ trước
+        if (currentHighlightedCard) {
+            currentHighlightedCard.classList.remove('randomizer-jumping');
         }
-    };
 
-    animate();
-};
+        // Chọn thẻ ngẫu nhiên để nhảy tới
+        let nextCard;
+        if (i === delaySchedule.length - 1) {
+            // Bước cuối cùng: Chắc chắn dừng lại ở targetCard
+            nextCard = targetCard;
+        } else {
+            // Nhảy lộn xộn qua bất kỳ ô nào trên bảng ma trận
+            let randIdx = Math.floor(Math.random() * cards.length);
+            // Tránh lặp lại đúng cùng 1 ô liên tiếp
+            if (cards.length > 1 && cards[randIdx] === currentHighlightedCard) {
+                randIdx = (randIdx + 1) % cards.length;
+            }
+            nextCard = cards[randIdx];
+        }
 
-// Kết thúc quay và chọn map
-const finishSpin = async (maps) => {
-    // Tính góc cuối cùng
-    const normalizedRotation = wheelRotation % (Math.PI * 2);
-    const sliceAngle = (Math.PI * 2) / maps.length;
+        currentHighlightedCard = nextCard;
+        currentHighlightedCard.classList.add('randomizer-jumping');
 
-    // Mũi tên ở phía trên (góc 270 độ hoặc 3π/2)
-    const pointerAngle = Math.PI * 1.5;
+        // Cuộn khung hình tới thẻ đang nhảy để người xem theo dõi được
+        currentHighlightedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-    // Tính index của map được chọn
-    let selectedIndex = Math.floor(((pointerAngle - normalizedRotation) % (Math.PI * 2)) / sliceAngle);
-    if (selectedIndex < 0) selectedIndex += maps.length;
-    selectedIndex = maps.length - 1 - selectedIndex;
+        // Âm thanh click nhảy ngẫu nhiên (tăng pitch dần tạo cảm giác hồi hộp)
+        const currentPitch = 500 + Math.min(i * 18, 500);
+        playRandomizerTick(currentPitch);
 
-    const selectedMap = maps[selectedIndex];
+        // Chờ thời gian nhịp hiện tại
+        await new Promise(resolve => setTimeout(resolve, delaySchedule[i]));
+    }
 
-    // Hiệu ứng kết quả
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Kết thúc vòng quay tại targetCard
+    if (currentHighlightedCard) {
+        currentHighlightedCard.classList.remove('randomizer-jumping');
+    }
+    targetCard.classList.add('randomizer-winner');
+    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Lưu Map BTC
-    const newState = { ...raceState, firstMapBtc: selectedMap.name.trim() };
-    raceState = ensureInitialMaps(newState);
-    await saveRaceState(raceState);
-
-    // Hiển thị kết quả
-    showSelectedBtcMap(selectedMap.name);
-
-    // Hiển thị thông báo
-    displayMessage(`🎉 Map BTC đã được chọn: ${selectedMap.name}!`, false);
-
-    // Gửi notification
-    if (isAdminUser) {
-        await sendNotificationToAllUsers({
-            title: "🎲 Map BTC đã được chọn!",
-            content: `Ban Tổ Chức đã quay và chọn Map BTC: "${selectedMap.name}"`,
-            type: "info",
-            important: true
+    // Phát âm thanh chiến thắng & pháo hoa
+    playWinnerFanfare();
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 }
         });
     }
 
-    // Reset button
-    const spinBtn = document.getElementById('spin-wheel-btn');
-    spinBtn.disabled = false;
-    spinBtn.innerHTML = '<i class="fas fa-sync-alt mr-3"></i> QUAY NGẪU NHIÊN';
+    // Lưu thông tin map chiến thắng
+    currentSelectedWinner = {
+        name: targetMapName,
+        stars: targetMapStars,
+        img: targetMapImg
+    };
 
-    isSpinning = false;
+    // Đợi 700ms rồi hiển thị pop-up kết quả
+    await new Promise(resolve => setTimeout(resolve, 700));
+
+    const winnerNameEl = document.getElementById('winner-map-name');
+    const winnerImgEl = document.getElementById('winner-map-img');
+    const winnerStarsEl = document.getElementById('winner-map-stars');
+
+    if (winnerNameEl) winnerNameEl.textContent = targetMapName;
+    if (winnerImgEl) winnerImgEl.src = targetMapImg || 'assets/images/logows.png';
+    if (winnerStarsEl) {
+        const starConf = MAP_DIFFICULTY_CONFIG[targetMapStars] || MAP_DIFFICULTY_CONFIG[4];
+        winnerStarsEl.textContent = `${starConf.stars} ${starConf.title}`;
+    }
+
+    if (winnerOverlay) {
+        winnerOverlay.classList.remove('hidden');
+    }
+
+    // Khôi phục nút quay
+    if (spinBtn) {
+        spinBtn.disabled = false;
+        spinBtn.innerHTML = '<i class="fas fa-play text-xs"></i> BẮT ĐẦU QUAY';
+    }
+
+    isRandomizerSpinning = false;
+};
+
+// Xác nhận Map BTC được quay (Phản hồi tức thì - Optimistic UI)
+window.confirmRandomBtcMap = () => {
+    if (!currentSelectedWinner || !currentSelectedWinner.name) return;
+
+    if (!isAdminUser) {
+        displayMessage("Chỉ Admin mới có quyền xác nhận Map BTC", true);
+        return;
+    }
+
+    const chosenMapName = currentSelectedWinner.name.trim();
+
+    // 1. Phản hồi UI tức thì (0ms latency, không chờ mạng)
+    closeMapRandomizerModal();
+    showSelectedBtcMap(chosenMapName);
+
+    const btcMapInput = document.getElementById('btc-map-name');
+    if (btcMapInput) {
+        btcMapInput.value = chosenMapName;
+    }
+
+    displayMessage(`🎉 Map BTC đã được chọn: ${chosenMapName}!`, false);
+
+    // 2. Cập nhật state cục bộ ngay lập tức
+    const oldBtcMap = raceState.firstMapBtc || '';
+    const newState = { ...raceState, firstMapBtc: chosenMapName };
+    const requiredAfter = getRequiredMapNames(newState);
+    if (oldBtcMap && oldBtcMap !== chosenMapName && !requiredAfter.includes(oldBtcMap)) {
+        newState.maps = newState.maps.filter(m => m.name.trim() !== oldBtcMap);
+    }
+    raceState = ensureInitialMaps(newState);
+
+    // 3. Đồng bộ Firebase và gửi thông báo ngầm dưới nền (không block UI người dùng)
+    saveRaceState(raceState).catch(err => console.error("Lỗi lưu trạng thái Map BTC:", err));
+
+    if (isAdminUser) {
+        sendNotificationToAllUsers({
+            title: "🎲 Map BTC đã được chọn!",
+            content: `Ban Tổ Chức đã quay ngẫu nhiên và chọn Map BTC: "${chosenMapName}"`,
+            type: "info",
+            important: true
+        }).catch(err => console.error("Lỗi gửi thông báo:", err));
+    }
+};
+
+// Đóng overlay kết quả để quay lại
+window.closeWinnerOverlayAndReroll = () => {
+    const winnerOverlay = document.getElementById('randomizer-winner-overlay');
+    if (winnerOverlay) winnerOverlay.classList.add('hidden');
+
+    const cards = Array.from(document.querySelectorAll('#randomizer-maps-container .randomizer-card'));
+    cards.forEach(c => c.classList.remove('randomizer-winner', 'randomizer-jumping'));
+};
+
+// Giữ lại hàm tương thích vòng quay cũ
+window.spinWheel = window.openMapRandomizerModal;
+const drawWheel = () => {};
+window.drawWheel = drawWheel;
+
+const initBtcWheel = async () => {
+    if (raceState.firstMapBtc && raceState.firstMapBtc.trim()) {
+        showSelectedBtcMap(raceState.firstMapBtc);
+    }
 };
 
 // Hiển thị map đã chọn

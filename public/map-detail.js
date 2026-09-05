@@ -247,11 +247,14 @@ const setupRealtimeListener = () => {
                 raceState = docSnapshot.data();
                 const newMapCount = raceState.maps.length;
 
+                // Cache fresh raceState
+                try { performanceOptimizer.cacheData('currentRaceState', raceState); } catch (e) {}
+
                 // Cập nhật map cấm thời gian thực ngay lập tức
                 renderBannedMapsPanel(raceState);
 
                 // Khi có update, cũng nên làm mới cache records vì có thể vừa submit xong
-                await refreshGlobalCache(['records']);
+                refreshGlobalCache(['records']);
 
                 if (newMapCount > oldMapCount) {
                     await autoNavigateToLatestMap();
@@ -691,15 +694,22 @@ const loadMapData = async () => {
             currentMapIndex = isNaN(parsed) ? 0 : parsed;
         }
 
-        // Load race state
-        const raceDocRef = doc(db, "raceState", "current");
-        const raceDoc = await getDoc(raceDocRef);
+        // Load race state (with Cache SWR for instant load)
+        const fetchRaceDoc = async () => {
+            try {
+                const raceDocRef = doc(db, "raceState", "current");
+                const snap = await getDoc(raceDocRef);
+                return snap.exists() ? snap.data() : null;
+            } catch (err) {
+                console.warn("⚠️ Không thể tải raceState từ Firestore:", err);
+                return null;
+            }
+        };
 
-        if (!raceDoc.exists()) {
-            throw new Error("Không tìm thấy dữ liệu race state");
+        raceState = await performanceOptimizer.fetchWithCache('currentRaceState', fetchRaceDoc);
+        if (!raceState) {
+            raceState = await fetchRaceDoc();
         }
-
-        raceState = raceDoc.data();
 
         if (!raceState || !raceState.maps || raceState.maps.length === 0) {
             throw new Error("Chưa có dữ liệu map đấu");
@@ -862,11 +872,8 @@ const renderMapDetails = async (mapData, mapInfo, raceState, mapIndex) => {
     // Update navigation buttons
     updateNavigationButtons(mapIndex, raceState.maps.length);
 
-    // Render Popular Statistics
-    await renderPopularStats(mapData.name);
-
-    // 🤖 Gợi ý Combo bằng AI Strategy
-    await renderAIComboStrategy(mapData.name);
+    // Render Popular Statistics (Non-blocking in background)
+    renderPopularStats(mapData.name);
 
     // Render Banned Maps
     renderBannedMapsPanel(raceState);
@@ -1115,6 +1122,7 @@ const renderRacersBroadcast = async (mapData, raceState) => {
         if (slotElement) {
             slotElement.innerHTML = `
                 <div class="broadcast-player-card animate__animated animate__fadeIn relative ${teamStyleClass}">
+                    <div class="card-shimmer"></div>
                     ${teamNameHtml}
                     ${bonusHtml}
                     <div class="player-main-area">
@@ -1126,7 +1134,7 @@ const renderRacersBroadcast = async (mapData, raceState) => {
                             <div class="equipment-box flex flex-col items-center group">
                                 <div class="name truncate max-w-[140px] text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide opacity-80" title="${racer.car}">${racer.car || 'Chưa chọn'}</div>
                                 ${racer.carImageUrl ?
-                    `<div class="w-36 h-20 flex items-center justify-center"><img class="w-full h-full object-contain drop-shadow-md hover:scale-110 transition-transform" src="${racer.carImageUrl}" alt="Car"></div>` :
+                    `<div class="w-36 h-20 flex items-center justify-center"><img class="icon-img w-full h-full object-contain drop-shadow-md hover:scale-110 transition-transform" src="${racer.carImageUrl}" alt="Car"></div>` :
                     `<div class="w-36 h-20 flex items-center justify-center bg-black/20 rounded-lg border border-white/5 group-hover:border-cyan-500/20 transition-colors backdrop-blur-sm">
                                         <i class="fas fa-car-side text-2xl text-slate-800 group-hover:text-cyan-500/30 transition-colors"></i>
                                      </div>`
@@ -1137,7 +1145,7 @@ const renderRacersBroadcast = async (mapData, raceState) => {
                             <div class="equipment-box flex flex-col items-center group">
                                 <div class="name truncate max-w-[140px] text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide opacity-80" title="${racer.pet}">${racer.pet || 'Chưa chọn'}</div>
                                 ${racer.petImageUrl ?
-                    `<div class="w-36 h-20 flex items-center justify-center"><img class="w-full h-full object-contain drop-shadow-md hover:scale-110 transition-transform" src="${racer.petImageUrl}" alt="Pet"></div>` :
+                    `<div class="w-36 h-20 flex items-center justify-center"><img class="icon-img w-full h-full object-contain drop-shadow-md hover:scale-110 transition-transform" src="${racer.petImageUrl}" alt="Pet"></div>` :
                     `<div class="w-36 h-20 flex items-center justify-center bg-black/20 rounded-lg border border-white/5 group-hover:border-purple-500/20 transition-colors backdrop-blur-sm">
                                         <i class="fas fa-paw text-2xl text-slate-800 group-hover:text-purple-500/30 transition-colors"></i>
                                      </div>`
@@ -1520,12 +1528,15 @@ window.jumpToMap = async (index) => {
         ease: "back.out(1.2)"
     });
 
-    // Sub-animation for hero image for extra "pop"
-    gsap.from("#map-hero-image", {
-        scale: 1.2,
-        duration: 2,
-        ease: "power2.out"
-    });
+    // Sub-animation for hero image for extra "pop" with holographic pulse
+    gsap.fromTo("#map-hero-image", 
+        { filter: "brightness(2) contrast(1.3) saturate(1.5)" },
+        { filter: "brightness(1) contrast(1) saturate(1)", duration: 1.2, ease: "power2.out", clearProps: "filter" }
+    );
+    const laserScanner = document.getElementById('ai-laser-scanner');
+    if (laserScanner) {
+        gsap.fromTo(laserScanner, { opacity: 0 }, { opacity: 1, duration: 0.4 });
+    }
 };
 
 // Navigate relative (legacy wrapper)
@@ -1845,11 +1856,30 @@ const init = async () => {
         // Check authentication
         // onAuthStateChanged(auth, async (user) => {
         //     if (user) {
-        // Turbo Initial Load
+        // Fast reveal safety timer: Never let the user wait more than 1.8s on the loading screen
+        const safetyTimer = setTimeout(() => {
+            const ls = document.getElementById('loading-screen');
+            const mc = document.getElementById('main-content');
+            if (ls && !ls.classList.contains('hidden')) {
+                ls.classList.add('hidden');
+                if (mc) mc.classList.remove('hidden');
+                console.log("⚡ Fast reveal fallback: Showing UI early");
+            }
+        }, 1800);
+
+        // Turbo Initial Load: Cache SWR loads in parallel and returns in milliseconds!
         await refreshGlobalCache();
         await loadMapData();
 
-        // Setup real-time listener
+        clearTimeout(safetyTimer);
+
+        // Hide loading screen immediately
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainContent = document.getElementById('main-content');
+        if (loadingScreen) loadingScreen.classList.add('hidden');
+        if (mainContent) mainContent.classList.remove('hidden');
+
+        // Setup real-time listener (non-blocking)
         setupRealtimeListener();
 
         // Setup record notification listener if logged in
@@ -1859,12 +1889,8 @@ const init = async () => {
             }
         });
 
-        // Preload nearby images for better UX
+        // Preload nearby images for better UX (non-blocking)
         preloadAdjacentMapImages();
-
-        // Hide loading screen
-        document.getElementById('loading-screen').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
 
         // Xử lý nút back/forward của browser
         window.addEventListener('popstate', async (event) => {
@@ -1888,161 +1914,6 @@ const init = async () => {
     } catch (error) {
         console.error("Lỗi khởi tạo:", error);
         showError("Có lỗi xảy ra khi tải dữ liệu");
-    }
-};
-
-
-
-// ==================== 🤖 AI COMBO RECOMMENDER ====================
-const getMapTacticalTips = (mapName, difficulty) => {
-    const name = (mapName || "").toLowerCase();
-    if (name.includes("công viên") || name.includes("park")) {
-        return "Bản đồ có nhiều khúc cua hẹp 90 độ liên tục, yêu cầu tối ưu đường chạy sát mép (Drift góc hẹp). Combo S-Wind + Pet Phượng Hoàng giúp bứt tốc Nitro vượt trội ở góc cua gấp.";
-    } else if (name.includes("đại lộ") || name.includes("avenue") || name.includes("hoang dã") || name.includes("desert") || name.includes("tốc độ") || name.includes("speed")) {
-        return "Bản đồ thiên về tốc độ thẳng siêu dài. Combo Xe max speed cao kết hợp Pet nạp năng lượng nhanh giúp duy trì chuỗi Cw-w và Wc-w hoàn hảo để cán mốc thời gian đỉnh cao.";
-    } else if (name.includes("tuyết") || name.includes("snow") || name.includes("cực") || name.includes("ice") || name.includes("núi") || name.includes("mountain")) {
-        return "Địa hình trơn trượt có nhiều dốc nhảy và khúc cua chữ U liên tục. Hãy sử dụng Combo Xe bám đường tốt kết hợp Pet hỗ trợ chống va đập để bảo toàn Nitro tối ưu nhất.";
-    } else if (difficulty === "Khó" || difficulty === "Rất khó" || difficulty === "Cực khó" ||
-               difficulty === "5 sao" || difficulty === "6 sao" || difficulty === "7 sao") {
-        return "Đường chạy khó khăn với nhiều đoạn cua liên hoàn và lối đi hẹp. Yêu cầu Racer giữ thế Drift nhịp nhàng. Ưu tiên Combo bứt tốc mạnh mẽ ở giai đoạn sau góc cua.";
-    } else {
-        return "Bản đồ cơ bản với góc chạy thông thoáng. Thích hợp để rèn luyện Racing Line chuẩn mực. Khuyến nghị sử dụng Combo Xe cân bằng cao và Pet giảm hao hụt Nitro.";
-    }
-};
-
-const renderAIComboStrategy = async (mapName) => {
-    if (!mapName) return;
-
-    try {
-        const targetMap = mapName.trim().toLowerCase();
-        
-        // 1. Phân tích các kỷ lục trong ALL_RECORDS của map này
-        const records = ALL_RECORDS.filter(r => (r.mapName || "").trim().toLowerCase() === targetMap);
-        
-        // 2. Nhóm và tìm kỷ lục nhanh nhất cho mỗi XE ĐUA
-        const carRecords = {};
-        records.forEach(r => {
-            const carName = (r.car || r.carName || "").trim();
-            const timeSec = timeToSeconds(r.timeString || r.time);
-            if (carName && carName !== "N/A" && timeSec && timeSec > 0) {
-                if (!carRecords[carName] || timeSec < carRecords[carName].timeInSeconds) {
-                    carRecords[carName] = {
-                        name: carName,
-                        timeInSeconds: timeSec,
-                        timeString: r.timeString || r.time,
-                        racerName: r.racerName
-                    };
-                }
-            }
-        });
-        
-        // Sắp xếp các xe theo thời gian nhanh nhất tăng dần (kỷ lục cao nhất)
-        const sortedCars = Object.values(carRecords).sort((a, b) => a.timeInSeconds - b.timeInSeconds).slice(0, 3);
-
-        // 3. Nhóm và tìm kỷ lục nhanh nhất cho mỗi THÚ CƯNG
-        const petRecords = {};
-        records.forEach(r => {
-            const petName = (r.pet || r.petName || "").trim();
-            const timeSec = timeToSeconds(r.timeString || r.time);
-            if (petName && petName !== "N/A" && timeSec && timeSec > 0) {
-                if (!petRecords[petName] || timeSec < petRecords[petName].timeInSeconds) {
-                    petRecords[petName] = {
-                        name: petName,
-                        timeInSeconds: timeSec,
-                        timeString: r.timeString || r.time,
-                        racerName: r.racerName
-                    };
-                }
-            }
-        });
-        
-        // Sắp xếp các thú cưng theo thời gian nhanh nhất tăng dần (kỷ lục cao nhất)
-        const sortedPets = Object.values(petRecords).sort((a, b) => a.timeInSeconds - b.timeInSeconds).slice(0, 3);
-
-        const aiRationaleEl = document.getElementById('ai-recom-rationale');
-
-        // Tìm độ khó của map để lấy lời khuyên chiến thuật
-        const mapInfo = ALL_MAPS.find(m => m.name === mapName);
-        const difficulty = mapInfo ? mapInfo.difficulty : "Trung bình";
-
-        // 4. Render Top Xe Đua Kỷ Lục
-        const topCarsListEl = document.getElementById('ai-top-cars-list');
-        if (topCarsListEl) {
-            topCarsListEl.innerHTML = '';
-            if (sortedCars.length === 0) {
-                topCarsListEl.innerHTML = `<div class="text-slate-500 text-xs italic py-4 text-center">Chưa có dữ liệu xe kỷ lục</div>`;
-            } else {
-                sortedCars.forEach((item, index) => {
-                    const carImg = findImg("gameCars", item.name);
-                    const row = document.createElement('div');
-                    row.className = 'flex items-center justify-between p-3 sm:p-4 hover:bg-white/5 rounded-xl border border-white/5 transition-all duration-300 min-w-0 hover:scale-[1.01] hover:border-cyan-500/20';
-                    
-                    let rankBadge = index === 0 ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]' : index === 1 ? 'bg-slate-400' : 'bg-orange-600';
-                    
-                    row.innerHTML = `
-                        <div class="flex items-center gap-4 min-w-0">
-                            <span class="w-7 h-7 text-xs sm:text-sm font-black text-white ${rankBadge} rounded-full flex items-center justify-center flex-shrink-0 font-orbitron">${index + 1}</span>
-                            <div class="w-20 h-12 sm:w-24 sm:h-14 flex items-center justify-center bg-black/40 rounded-lg flex-shrink-0 overflow-hidden border border-white/10 p-1">
-                                ${carImg ? `<img src="${carImg}" class="h-full object-contain hover:scale-110 transition-transform">` : `<i class="fas fa-car text-lg text-cyan-400"></i>`}
-                            </div>
-                            <div class="flex flex-col min-w-0">
-                                <span class="text-sm sm:text-base md:text-lg font-black text-white truncate max-w-[180px] sm:max-w-[280px]" title="${item.name}">${item.name}</span>
-                                <span class="text-xs sm:text-sm text-slate-400 font-semibold truncate max-w-[180px] sm:max-w-[280px]">${item.racerName}</span>
-                            </div>
-                        </div>
-                        <span class="text-sm sm:text-base md:text-lg font-black text-yellow-400 font-orbitron flex-shrink-0 flex items-center gap-1.5"><i class="fas fa-trophy text-xs sm:text-sm text-yellow-500"></i> ${item.timeString}</span>
-                    `;
-                    topCarsListEl.appendChild(row);
-                });
-            }
-        }
-
-        // 5. Render Top Thú Cưng Kỷ Lục
-        const topPetsListEl = document.getElementById('ai-top-pets-list');
-        if (topPetsListEl) {
-            topPetsListEl.innerHTML = '';
-            if (sortedPets.length === 0) {
-                topPetsListEl.innerHTML = `<div class="text-slate-500 text-xs italic py-4 text-center">Chưa có dữ liệu pet kỷ lục</div>`;
-            } else {
-                sortedPets.forEach((item, index) => {
-                    const petImg = findImg("gamePets", item.name);
-                    const row = document.createElement('div');
-                    row.className = 'flex items-center justify-between p-3 sm:p-4 hover:bg-white/5 rounded-xl border border-white/5 transition-all duration-300 min-w-0 hover:scale-[1.01] hover:border-pink-500/20';
-                    
-                    let rankBadge = index === 0 ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]' : index === 1 ? 'bg-slate-400' : 'bg-orange-600';
-                    
-                    row.innerHTML = `
-                        <div class="flex items-center gap-4 min-w-0">
-                            <span class="w-7 h-7 text-xs sm:text-sm font-black text-white ${rankBadge} rounded-full flex items-center justify-center flex-shrink-0 font-orbitron">${index + 1}</span>
-                            <div class="w-20 h-12 sm:w-24 sm:h-14 flex items-center justify-center bg-black/40 rounded-lg flex-shrink-0 overflow-hidden border border-white/10 p-1">
-                                ${petImg ? `<img src="${petImg}" class="h-full object-contain hover:scale-110 transition-transform">` : `<i class="fas fa-paw text-lg text-pink-400"></i>`}
-                            </div>
-                            <div class="flex flex-col min-w-0">
-                                <span class="text-sm sm:text-base md:text-lg font-black text-white truncate max-w-[180px] sm:max-w-[280px]" title="${item.name}">${item.name}</span>
-                                <span class="text-xs sm:text-sm text-slate-400 font-semibold truncate max-w-[180px] sm:max-w-[280px]">${item.racerName}</span>
-                            </div>
-                        </div>
-                        <span class="text-sm sm:text-base md:text-lg font-black text-yellow-400 font-orbitron flex-shrink-0 flex items-center gap-1.5"><i class="fas fa-trophy text-xs sm:text-sm text-yellow-500"></i> ${item.timeString}</span>
-                    `;
-                    topPetsListEl.appendChild(row);
-                });
-            }
-        }
-
-        // 6. Cập nhật Rationale & Chiến thuật
-        if (aiRationaleEl) {
-            const tacticalAdvice = getMapTacticalTips(mapName, difficulty);
-            const bestCarName = sortedCars[0] ? sortedCars[0].name : "N/A";
-            const bestPetName = sortedPets[0] ? sortedPets[0].name : "N/A";
-            
-            aiRationaleEl.innerHTML = `
-                Dựa trên phân tích kỷ lục, Xe đua <span class="text-cyan-400 font-bold">${bestCarName}</span> và Thú cưng <span class="text-pink-400 font-bold">${bestPetName}</span> đang giữ kỷ lục chạy tốt nhất bản đồ. 
-                ${tacticalAdvice}
-            `;
-        }
-
-    } catch (error) {
-        console.error("❌ Lỗi khi render AI Combos:", error);
     }
 };
 

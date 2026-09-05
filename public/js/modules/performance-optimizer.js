@@ -28,41 +28,54 @@ class PerformanceOptimizer {
 
     /**
      * Stale-While-Revalidate Caching Pattern (Tối ưu Firestore load)
-     * Lấy dữ liệu từ cache trả về tức thì, đồng thời fetch Firebase ngầm để update
+     * Lấy dữ liệu từ cache trả về tức thì (<10ms), đồng thời fetch Firebase ngầm để update
      */
     async fetchWithCache(collectionName, fetchFn, updateCallback = null) {
-        let isCacheHit = false;
-
         // 1. Cố gắng lấy từ Cache (Hiển thị UI tức thì)
-        const cachedData = await this.getCachedData(collectionName);
-        if (cachedData) {
-            isCacheHit = true;
-            if (updateCallback) updateCallback(cachedData, true); // true = isCached
+        let cachedData = null;
+        try {
+            cachedData = await this.getCachedData(collectionName);
+        } catch (e) {
+            console.warn(`Cache read error [${collectionName}]:`, e);
         }
 
-        // 2. Fetch từ Firebase ngầm
+        if (cachedData && (Array.isArray(cachedData) ? cachedData.length > 0 : true)) {
+            if (updateCallback) {
+                try { updateCallback(cachedData, true); } catch (e) {}
+            }
+
+            // 2. Fetch từ Firebase ngầm (Background Revalidation - KHÔNG CHẶN UI)
+            (async () => {
+                try {
+                    const freshData = await fetchFn();
+                    if (freshData) {
+                        const freshJson = JSON.stringify(freshData);
+                        const cachedJson = JSON.stringify(cachedData);
+                        if (freshJson !== cachedJson) {
+                            await this.cacheData(collectionName, freshData);
+                            if (updateCallback) updateCallback(freshData, false);
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`Background SWR refresh failed [${collectionName}]:`, err);
+                }
+            })();
+
+            return cachedData; // ⚡ TRẢ VỀ NGAY LẬP TỨC TRONG VÀI MILLISECONDS!
+        }
+
+        // 3. Nếu chưa có cache, fetch từ Firebase
         try {
             const freshData = await fetchFn();
-            
-            // So sánh đơn giản xem dữ liệu có thay đổi không (Tùy chọn)
-            const freshJson = JSON.stringify(freshData);
-            const cachedJson = cachedData ? JSON.stringify(cachedData) : '';
-            
-            if (freshJson !== cachedJson) {
-                // Update Cache
+            if (freshData) {
                 await this.cacheData(collectionName, freshData);
-                
-                // Trả về UI bản mới nhất nếu có callback
                 if (updateCallback) updateCallback(freshData, false);
             }
-            
-            return freshData; // Trả về data mới nhất
+            return freshData;
         } catch (error) {
-            console.error(`❌ SWR Fetch Error [${collectionName}]:`, error);
-            if (!isCacheHit) {
-                throw error; // Ném lỗi nếu cả cache và fetch đều tịt
-            }
-            return cachedData;
+            console.error(`❌ Fetch Error [${collectionName}]:`, error);
+            if (cachedData) return cachedData;
+            throw error;
         }
     }
 
@@ -103,6 +116,10 @@ class PerformanceOptimizer {
      */
     async cacheData(key, data, expiryMs = this.cacheExpiry) {
         try {
+            if (!this.db) {
+                this.db = await this.openDB();
+            }
+            if (!this.db) return;
             const transaction = this.db.transaction(['cache'], 'readwrite');
             const store = transaction.objectStore('cache');
 
@@ -129,6 +146,10 @@ class PerformanceOptimizer {
      */
     async getCachedData(key) {
         try {
+            if (!this.db) {
+                this.db = await this.openDB();
+            }
+            if (!this.db) return null;
             const transaction = this.db.transaction(['cache'], 'readonly');
             const store = transaction.objectStore('cache');
 
