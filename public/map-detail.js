@@ -234,36 +234,150 @@ const calculateRanking = () => {
     return rankingData;
 };
 
+// Lưu tham chiếu listener để cleanup
+let _unsubRaceState = null;
+let _unsubRecords = null;
+let _unsubMaps = null;
+let _unsubUsers = null;
+let _recordsDebounceTimer = null;
+
+// Debounce helper: tránh re-render liên tục khi nhiều records update cùng lúc
+const debounceRender = (fn, delay = 100) => {
+    if (_recordsDebounceTimer) clearTimeout(_recordsDebounceTimer);
+    _recordsDebounceTimer = setTimeout(fn, delay);
+};
+
+// ⚡ Real-time listener cho raceRecords — cập nhật ngay khi có kỷ lục mới hoặc chỉnh sửa
+const setupRecordsListener = () => {
+    if (_unsubRecords) { _unsubRecords(); _unsubRecords = null; }
+
+    try {
+        const recordsRef = collection(db, "raceRecords");
+        _unsubRecords = onSnapshot(recordsRef, (snapshot) => {
+            // Cập nhật ALL_RECORDS trong bộ nhớ ngay lập tức
+            ALL_RECORDS = snapshot.docs.map(d => d.data());
+
+            // Cập nhật cache background (không chặn UI)
+            try {
+                performanceOptimizer.cacheData('raceRecords', ALL_RECORDS);
+                performanceOptimizer._lsSet('raceRecords', ALL_RECORDS);
+            } catch (e) {}
+
+            // Debounce re-render để cập nhật Top 5, thống kê xe/pet và thành tích cá nhân của các racer
+            debounceRender(() => {
+                if (currentMapData && currentMapData.name) {
+                    renderTop5RecordsBroadcast(currentMapData.name);
+                    renderPopularStats(currentMapData.name);
+                    if (raceState) {
+                        renderRacersBroadcast(currentMapData, raceState);
+                    }
+                    console.log("⚡ Records updated — UI refreshed instantly");
+                }
+            }, 100);
+        }, (error) => {
+            console.error("Records listener error:", error);
+        });
+    } catch (e) {
+        console.error("Error setting up records listener:", e);
+    }
+};
+
+// ⚡ Real-time listener cho gameMaps — cập nhật ảnh/thông tin map ngay khi admin chỉnh sửa
+const setupMapsListener = () => {
+    if (_unsubMaps) { _unsubMaps(); _unsubMaps = null; }
+
+    try {
+        const mapsRef = collection(db, "gameMaps");
+        _unsubMaps = onSnapshot(mapsRef, (snapshot) => {
+            ALL_MAPS = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // Cập nhật cache background
+            try {
+                performanceOptimizer.cacheData('gameMaps', ALL_MAPS);
+                performanceOptimizer._lsSet('gameMaps', ALL_MAPS);
+            } catch (e) {}
+
+            // Nếu đang hiển thị map thì re-render ngay
+            if (currentMapData && raceState) {
+                const mapInfo = ALL_MAPS.find(m => m.name === currentMapData.name);
+                renderMapDetails(currentMapData, mapInfo, raceState, currentMapIndex);
+                console.log("⚡ Maps updated — UI refreshed instantly");
+            }
+        }, (error) => {
+            console.error("Maps listener error:", error);
+        });
+    } catch (e) {
+        console.error("Error setting up maps listener:", e);
+    }
+};
+
+// ⚡ Real-time listener cho users — cập nhật avatar, frame, tên tuyển thủ tức thì
+const setupUsersListener = () => {
+    if (_unsubUsers) { _unsubUsers(); _unsubUsers = null; }
+
+    try {
+        const usersRef = collection(db, "users");
+        _unsubUsers = onSnapshot(usersRef, (snapshot) => {
+            ALL_USERS = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // Cập nhật cache background
+            try {
+                performanceOptimizer.cacheData('users', ALL_USERS);
+                performanceOptimizer._lsSet('users', ALL_USERS);
+            } catch (e) {}
+
+            // Re-render racer cards để cập nhật avatar/frame mới
+            debounceRender(() => {
+                if (currentMapData && raceState) {
+                    renderRacersBroadcast(currentMapData, raceState);
+                    console.log("⚡ Users updated — racer avatars refreshed");
+                }
+            }, 150);
+        }, (error) => {
+            console.warn("Users listener error:", error);
+        });
+    } catch (e) {
+        console.warn("Error setting up users listener:", e);
+    }
+};
+
 // Setup real-time listener for race state changes
 const setupRealtimeListener = () => {
+    if (_unsubRaceState) { _unsubRaceState(); _unsubRaceState = null; }
+
     try {
         const raceDocRef = doc(db, "raceState", "current");
 
-        onSnapshot(raceDocRef, async (docSnapshot) => {
+        _unsubRaceState = onSnapshot(raceDocRef, async (docSnapshot) => {
             if (docSnapshot.exists()) {
-                console.log("⚡ Real-time update received!");
+                console.log("⚡ Real-time update received! [raceState]");
 
-                const oldMapCount = raceState ? raceState.maps.length : 0;
+                const oldMapCount = raceState && raceState.maps ? raceState.maps.length : 0;
                 raceState = docSnapshot.data();
-                const newMapCount = raceState.maps.length;
+                const newMapCount = raceState && raceState.maps ? raceState.maps.length : 0;
 
-                // Cache fresh raceState
-                try { performanceOptimizer.cacheData('currentRaceState', raceState); } catch (e) {}
+                // Cache fresh raceState ngay lập tức (không chặn)
+                try {
+                    performanceOptimizer.cacheData('currentRaceState', raceState);
+                    performanceOptimizer._lsSet('currentRaceState', raceState);
+                } catch (e) {}
+
+                if (!raceState || !raceState.maps || raceState.maps.length === 0) return;
 
                 // Cập nhật map cấm thời gian thực ngay lập tức
                 renderBannedMapsPanel(raceState);
 
-                // Khi có update, cũng nên làm mới cache records vì có thể vừa submit xong
-                refreshGlobalCache(['records']);
-
                 if (newMapCount > oldMapCount) {
                     await autoNavigateToLatestMap();
                 } else {
+                    if (currentMapIndex >= raceState.maps.length) {
+                        currentMapIndex = Math.max(0, raceState.maps.length - 1);
+                    }
                     if (currentMapIndex >= 0 && currentMapIndex < raceState.maps.length) {
                         currentMapData = raceState.maps[currentMapIndex];
                         const mapInfo = ALL_MAPS.find(m => m.name === currentMapData.name);
 
-                        // Render updated data - don't await everything to keep UI responsive
+                        // Render updated data ngay - không chờ records (records có listener riêng)
                         renderMapDetails(currentMapData, mapInfo, raceState, currentMapIndex);
                     }
                 }
@@ -562,10 +676,14 @@ const addCardEffects = (card, type = 'normal') => {
 
 // Auto navigate to the latest map (called on real-time update)
 const autoNavigateToLatestMap = async () => {
-    if (raceState && raceState.maps.length > 0) {
+    if (raceState && raceState.maps && raceState.maps.length > 0) {
         const latestIndex = raceState.maps.length - 1;
         if (latestIndex !== currentMapIndex) {
             await window.jumpToMap(latestIndex);
+        } else {
+            currentMapData = raceState.maps[latestIndex];
+            const mapInfo = ALL_MAPS.find(m => m.name === currentMapData.name);
+            await renderMapDetails(currentMapData, mapInfo, raceState, latestIndex);
         }
     }
 };
@@ -1879,8 +1997,19 @@ const init = async () => {
         if (loadingScreen) loadingScreen.classList.add('hidden');
         if (mainContent) mainContent.classList.remove('hidden');
 
-        // Setup real-time listener (non-blocking)
-        setupRealtimeListener();
+        // Setup real-time listeners (non-blocking)
+        setupRealtimeListener();   // raceState/current — thời gian thực
+        setupRecordsListener();    // raceRecords — thời gian thực (mới!)
+        setupMapsListener();       // gameMaps — thời gian thực (mới!)
+        setupUsersListener();      // users — thời gian thực (mới!)
+
+        // Cleanup listeners khi rời trang
+        window.addEventListener('beforeunload', () => {
+            if (_unsubRaceState) _unsubRaceState();
+            if (_unsubRecords) _unsubRecords();
+            if (_unsubMaps) _unsubMaps();
+            if (_unsubUsers) _unsubUsers();
+        });
 
         // Setup record notification listener if logged in
         onAuthStateChanged(auth, (user) => {
