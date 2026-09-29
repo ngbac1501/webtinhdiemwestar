@@ -624,23 +624,7 @@
             }
         }
 
-        /* Banner carousel styles */
-        .banner-slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10;
-        }
 
-        .banner-slide.active {
-            opacity: 1;
-            z-index: 20;
-        }
-
-        .carousel-indicator {
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
     </style>
 </head>
 
@@ -1124,29 +1108,6 @@
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 lg:p-8 space-y-8">
 
-                <!-- Auto-sliding banner carousel -->
-                <div id="banner-carousel-container"
-                    class="relative w-full rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.15)] border border-slate-800 bg-slate-950/40 mb-8 hidden group"
-                    style="z-index: 0;">
-                    <div id="banner-slides"
-                        class="relative w-full h-[260px] sm:h-[360px] md:h-[430px] lg:h-[520px] overflow-hidden">
-                        <!-- Slides will be loaded dynamically -->
-                    </div>
-                    <!-- Prev/Next navigation -->
-                    <button id="carousel-prev"
-                        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button id="carousel-next"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-30">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                    <!-- Indicators -->
-                    <div id="carousel-indicators"
-                        class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
-                        <!-- Indicators will be loaded dynamically -->
-                    </div>
-                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
 

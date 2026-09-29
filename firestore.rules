@@ -37,10 +37,7 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
-    match /banners/{bannerId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
+
 
     match /racers/{racerId} {
       allow read: if true;

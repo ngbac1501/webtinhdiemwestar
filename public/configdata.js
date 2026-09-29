@@ -105,8 +105,7 @@ let currentPage = {
     'gamePets': 1,
     'raceRecords': 1,
     'users': 1,
-    'notifications': 1,
-    'banners': 1
+    'notifications': 1
 };
 
 const itemsPerPage = 10;
@@ -214,14 +213,6 @@ const checkAdminStatus = async (user) => {
 const setupRealtimeListeners = () => {
     console.log("Setting up realtime listeners...");
 
-    // Listener cho banner
-    if (!unsubscribeFunctions.banners) {
-        unsubscribeFunctions.banners = onSnapshot(collection(db, "banners"), async (snapshot) => {
-            if (currentTab === 'banners') {
-                await loadCollectionData('banners', currentPage['banners'] || 1);
-            }
-        });
-    }
 
     // Listener cho xe
     if (!unsubscribeFunctions.gameCars) {
@@ -1522,8 +1513,7 @@ const renderTable = (collectionName, data) => {
         'gameMaps': 'maps',
         'gamePets': 'pets',
         'raceRecords': 'records',
-        'users': 'users',
-        'banners': 'banners'
+        'users': 'users'
     };
 
     const tabName = collectionToTabMap[collectionName];
@@ -1538,16 +1528,14 @@ const renderTable = (collectionName, data) => {
     if (data.length === 0) {
         const colSpan = collectionName === 'raceRecords' ? 9 :
             collectionName === 'users' ? 8 :
-                collectionName === 'gameMaps' ? 7 :
-                    collectionName === 'banners' ? 5 : 6;
+                collectionName === 'gameMaps' ? 7 : 6;
 
         const emptyIcons = {
             'gameCars': 'fa-car',
             'gameMaps': 'fa-map',
             'gamePets': 'fa-paw',
             'raceRecords': 'fa-trophy',
-            'users': 'fa-users',
-            'banners': 'fa-image'
+            'users': 'fa-users'
         };
 
         const emptyTitles = {
@@ -1555,8 +1543,7 @@ const renderTable = (collectionName, data) => {
             'gameMaps': 'Chưa có bản đồ nào',
             'gamePets': 'Chưa có pet nào',
             'raceRecords': 'Chưa có kỷ lục nào',
-            'users': 'Chưa có người dùng nào',
-            'banners': 'Chưa có banner nào'
+            'users': 'Chưa có người dùng nào'
         };
 
         const emptyDescriptions = {
@@ -1564,8 +1551,7 @@ const renderTable = (collectionName, data) => {
             'gameMaps': 'Thêm bản đồ đua để bắt đầu ghi nhận kỷ lục',
             'gamePets': 'Thêm pet để tăng sức mạnh cho tay đua',
             'raceRecords': 'Các kỷ lục sẽ xuất hiện khi có dữ liệu đua',
-            'users': 'Người dùng sẽ xuất hiện khi đăng nhập vào hệ thống',
-            'banners': 'Thêm banner để trình chiếu tại trang chủ'
+            'users': 'Người dùng sẽ xuất hiện khi đăng nhập vào hệ thống'
         };
 
         tableBody.innerHTML = `
@@ -1592,38 +1578,6 @@ const renderTable = (collectionName, data) => {
         const globalIndex = (currentPage[collectionName] - 1) * itemsPerPage + index + 1;
 
         switch (collectionName) {
-            case 'banners':
-                const bannerImage = item.imageUrl || 'https://via.placeholder.com/120x60/1a1a2e/00f3ff?text=Banner';
-                row.innerHTML = `
-                    <td>
-                        <div class="map-image-cell">
-                            <img src="${bannerImage}" 
-                                 alt="${item.title || 'Banner'}" 
-                                 class="map-thumbnail !w-[100px] !h-[50px] object-cover rounded"
-                                 style="width: 100px; height: 50px;"
-                                 onclick="viewMapImage('${bannerImage}', '${item.title || 'Banner'}')"
-                                 onerror="this.src='https://via.placeholder.com/120x60/1a1a2e/00f3ff?text=Banner'">
-                        </div>
-                    </td>
-                    <td><div class="map-name-with-image">${item.title || 'N/A'}</div></td>
-                    <td>${item.order !== undefined ? item.order : 0}</td>
-                    <td>
-                        <span class="difficulty-badge ${item.active !== false ? 'difficulty-easy' : 'difficulty-very-hard'}">
-                            ${item.active !== false ? 'Hoạt động' : 'Ẩn'}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button onclick="editItem('${collectionName}', '${item.id}')" class="btn-edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteItem('${collectionName}', '${item.id}', '${item.title || 'Banner'}')" class="btn-delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                break;
             case 'gameCars':
                 const carImage = item.imageUrl || 'https://via.placeholder.com/60x40/1a1a2e/00f3ff?text=Car';
                 row.innerHTML = `
@@ -1925,8 +1879,7 @@ const renderPagination = (collectionName, totalItems, currentPageNum) => {
         'gameMaps': 'maps',
         'gamePets': 'pets',
         'raceRecords': 'records',
-        'users': 'users',
-        'banners': 'banners'
+        'users': 'users'
     };
 
     const tabName = collectionToTabMap[collectionName];
@@ -1996,8 +1949,7 @@ window.changePage = (tabName, page) => {
         'maps': 'gameMaps',
         'pets': 'gamePets',
         'records': 'raceRecords',
-        'users': 'users',
-        'banners': 'banners'
+        'users': 'users'
     };
 
     const collectionName = tabToCollectionMap[tabName];
@@ -2101,8 +2053,7 @@ window.switchTab = async (tab) => {
         const collections = {
             'cars': 'gameCars',
             'maps': 'gameMaps',
-            'pets': 'gamePets',
-            'banners': 'banners'
+            'pets': 'gamePets'
         };
         const collectionName = collections[tab];
         if (collectionName) {
@@ -3750,8 +3701,7 @@ window.openAddModal = (type) => {
             'map': 'gameMaps',
             'pet': 'gamePets',
             'record': 'raceRecords',
-            'user': 'users',
-            'banner': 'banners'
+            'user': 'users'
         };
 
         currentCollection = typeToCollectionMap[type] || '';
@@ -3761,8 +3711,7 @@ window.openAddModal = (type) => {
             'map': 'Thêm Bản đồ mới',
             'pet': 'Thêm Pet mới',
             'record': 'Thêm Kỷ lục mới',
-            'user': 'Thêm Người dùng mới',
-            'banner': 'Thêm Banner mới'
+            'user': 'Thêm Người dùng mới'
         };
 
         document.getElementById('modal-title').textContent = titles[type] || 'Thêm mới';
@@ -3786,8 +3735,7 @@ const generateForm = (type) => {
             'map': generateMapForm(),
             'pet': generatePetForm(),
             'record': generateRecordForm(),
-            'user': generateUserForm(),
-            'banner': typeof generateBannerForm === 'function' ? generateBannerForm() : ''
+            'user': generateUserForm()
         };
 
         form.innerHTML = forms[type] || '<p>Form không khả dụng</p>';
@@ -4159,84 +4107,7 @@ const generateUserForm = () => {
                 <p class="text-sm text-slate-400 mt-4">* Trường bắt buộc</p>
             `;
 };
-// Generate banner form
-const generateBannerForm = () => {
-    return `
-        <div class="space-y-6">
-            <div class="field-group">
-                <label class="field-label">Tiêu đề Banner</label>
-                <input type="text" id="banner-title" class="field-input" 
-                       placeholder="Ví dụ: Chào mừng đến với WeStar" 
-                       value="${currentEditingItem?.title || ''}">
-            </div>
 
-            <div class="field-group">
-                <label class="field-label">URL Hình Ảnh *</label>
-                <div class="flex items-center space-x-3">
-                    <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-link text-slate-500"></i>
-                        </div>
-                        <input type="text" id="banner-imageUrl" class="field-input pl-10" 
-                               placeholder="https://example.com/banner.jpg" 
-                               value="${currentEditingItem?.imageUrl || ''}" required
-                               onchange="document.getElementById('admin-banner-preview').src = this.value || 'https://via.placeholder.com/800x400/1a1a2e/00f3ff?text=Banner'">
-                    </div>
-                </div>
-                <div class="mt-4 rounded-xl overflow-hidden border border-slate-700 bg-slate-900 w-full aspect-video shadow-inner">
-                    <img id="admin-banner-preview" 
-                         src="${currentEditingItem?.imageUrl || 'https://via.placeholder.com/800x400/1a1a2e/00f3ff?text=Banner'}" 
-                         alt="Banner preview" 
-                         class="w-full h-full object-cover"
-                         onerror="this.src='https://via.placeholder.com/800x400/1a1a2e/00f3ff?text=Error'">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="field-group">
-                    <label class="field-label">Kiểu hiển thị ảnh (Object Fit)</label>
-                    <select id="banner-objectFit" class="field-input">
-                        <option value="cover" ${currentEditingItem?.objectFit === 'cover' ? 'selected' : ''}>Bao phủ (Cover - mặc định)</option>
-                        <option value="contain" ${currentEditingItem?.objectFit === 'contain' ? 'selected' : ''}>Thu nhỏ vừa vặn (Contain)</option>
-                        <option value="fill" ${currentEditingItem?.objectFit === 'fill' ? 'selected' : ''}>Kéo giãn (Fill)</option>
-                    </select>
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label">Căn chỉnh vị trí ảnh (Object Position)</label>
-                    <select id="banner-objectPosition" class="field-input">
-                        <option value="center" ${currentEditingItem?.objectPosition === 'center' ? 'selected' : ''}>Giữa (Center - mặc định)</option>
-                        <option value="top" ${currentEditingItem?.objectPosition === 'top' ? 'selected' : ''}>Trên cùng (Top)</option>
-                        <option value="bottom" ${currentEditingItem?.objectPosition === 'bottom' ? 'selected' : ''}>Dưới cùng (Bottom)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="field-group">
-                    <label class="field-label">Thứ tự hiển thị</label>
-                    <input type="number" id="banner-order" class="field-input" 
-                           placeholder="0" 
-                           value="${currentEditingItem?.order !== undefined ? currentEditingItem.order : 0}">
-                </div>
-                
-                <div class="field-group flex flex-col justify-center">
-                    <label class="field-label">Trạng thái</label>
-                    <label class="flex items-center cursor-pointer group mt-2">
-                        <input type="checkbox" id="banner-active" class="sr-only" 
-                               ${currentEditingItem?.active !== false ? 'checked' : ''}>
-                        <div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 transition-colors">
-                            <div class="w-5 h-5 bg-white rounded-full mt-0.5 ml-0.5 peer-checked:translate-x-5 transition-transform shadow-md"></div>
-                        </div>
-                        <span class="ml-3 text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Hoạt động</span>
-                    </label>
-                </div>
-            </div>
-
-            <p class="text-sm text-slate-400 mt-4">* Trường bắt buộc</p>
-        </div>
-    `;
-};
 
 // Edit item
 window.editItem = async (collection, id) => {
@@ -4253,8 +4124,7 @@ window.editItem = async (collection, id) => {
                 'gameMaps': 'Chỉnh sửa Bản đồ',
                 'gamePets': 'Chỉnh sửa Pet',
                 'raceRecords': 'Chỉnh sửa Kỷ lục',
-                'users': 'Chỉnh sửa Người dùng',
-                'banners': 'Chỉnh sửa Banner'
+                'users': 'Chỉnh sửa Người dùng'
             };
 
             document.getElementById('modal-title').textContent = titles[collection] || 'Chỉnh sửa';
@@ -4264,8 +4134,7 @@ window.editItem = async (collection, id) => {
                 'gameMaps': 'map',
                 'gamePets': 'pet',
                 'raceRecords': 'record',
-                'users': 'user',
-                'banners': 'banner'
+                'users': 'user'
             };
 
             generateForm(typeMap[collection]);
@@ -4541,17 +4410,6 @@ window.saveItem = async () => {
                 idToUse = currentEditingItem.id;
                 break;
 
-            case 'banners':
-                data = {
-                    title: document.getElementById('banner-title').value.trim(),
-                    imageUrl: document.getElementById('banner-imageUrl').value.trim(),
-                    order: parseInt(document.getElementById('banner-order').value) || 0,
-                    active: document.getElementById('banner-active').checked,
-                    objectFit: document.getElementById('banner-objectFit').value,
-                    objectPosition: document.getElementById('banner-objectPosition').value
-                };
-                idToUse = currentEditingItem ? currentEditingItem.id : generateUniqueId('banner');
-                break;
 
             default:
                 showMessage(`Loại dữ liệu không hợp lệ: ${currentCollection}`, true);
@@ -4606,8 +4464,7 @@ const getCollectionDisplayName = (collection) => {
         'gameMaps': 'Bản đồ',
         'gamePets': 'Pet',
         'raceRecords': 'Kỷ lục',
-        'users': 'Người dùng',
-        'banners': 'Banner'
+        'users': 'Người dùng'
     };
     return names[collection] || collection;
 };
@@ -4625,8 +4482,6 @@ const validateFormData = (collection, data) => {
             return data.mapName && data.racerName && data.timeInSeconds && data.timeString;
         case 'users':
             return data.displayName && data.role && data.status;
-        case 'banners':
-            return !!data.imageUrl;
         default:
             return true;
     }

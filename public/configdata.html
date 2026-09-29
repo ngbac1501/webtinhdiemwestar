@@ -1055,9 +1055,6 @@
                     <button onclick="switchTab('users')" class="cd-nav-link" id="nav-users">
                         <div class="cd-nav-icon"><i class="fas fa-users"></i></div>Người dùng
                     </button>
-                    <button onclick="switchTab('banners')" class="cd-nav-link" id="nav-banners">
-                        <div class="cd-nav-icon"><i class="fas fa-image"></i></div>Quản lý Banner
-                    </button>
                     <div class="cd-sidebar-divider"></div>
                     <div class="cd-sidebar-label">PHÂN TÍCH</div>
                     <button onclick="switchTab('racer-stats')" class="cd-nav-link" id="nav-racer-stats">
@@ -1876,49 +1873,7 @@
                     </div>
 
 
-                    <!-- Banners Tab -->
-                    <div id="banners-tab" class="tab-pane hidden">
-                        <div class="page-header">
-                            <div class="page-header-left">
-                                <h2>Banner</h2>
-                                <p>Cấu hình hình ảnh slide trình chiếu ở trang chủ</p>
-                            </div>
-                            <div class="page-header-actions">
-                                <button onclick="openAddModal('banner')" class="btn-primary">
-                                    <i class="fas fa-plus"></i>
-                                    Thêm Banner mới
-                                </button>
-                            </div>
-                        </div>
 
-                        <!-- Banners Table -->
-                        <div class="data-table">
-                            <div class="table-responsive-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th style="min-width: 150px;">Ảnh Banner</th>
-                                            <th>Tiêu đề</th>
-                                            <th>Thứ tự</th>
-                                            <th>Trạng thái</th>
-                                            <th>Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="banners-table-body">
-                                        <tr>
-                                            <td colspan="5" class="text-center py-8">
-                                                <div class="loading-spinner mx-auto"></div>
-                                                <p class="mt-2 text-slate-500">Đang tải dữ liệu...</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div id="banners-pagination" class="pagination"></div>
-                    </div>
 
                     <!-- Racer Stats Tab -->
                     <div id="racer-stats-tab" class="tab-pane hidden">
