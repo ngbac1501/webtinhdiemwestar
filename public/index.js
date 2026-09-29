@@ -6446,11 +6446,12 @@ const initFirebase = async () => {
                         }
                     }));
 
-                    // Lấy dữ liệu từ Firestore
-                    await fetchGameDataFromFirestore();
-
+                    // Hiển thị UI ngay - KHÔNG chờ data fetch (cache sẽ xử lý data tức thì)
                     document.getElementById('loading-screen').classList.add('hidden');
                     document.getElementById('app').classList.remove('hidden');
+
+                    // Tải dữ liệu game (sẽ dùng cache localStorage tức thì nếu có)
+                    fetchGameDataFromFirestore();
 
                     const displayName = user.displayName || (isAdmin ? 'Admin' : 'User');
                     const nickname = userData.nickname || '';

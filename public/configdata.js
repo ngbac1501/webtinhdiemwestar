@@ -317,99 +317,91 @@ const setupRealtimeListeners = () => {
     }
 };
 
-// Load dashboard stats
+// Load dashboard stats - chia 2 phase: stats c\u01a1 b\u1ea3n ngay, charts defer
 const loadDashboardStats = async () => {
     try {
         console.log("Loading dashboard stats...");
 
-        const [carsSnapshot, recordsSnapshot, usersSnapshot, notificationsSnapshot, mapsSnapshot, petsSnapshot] = await Promise.all([
-            performanceOptimizer.fetchWithCache('gameCars', async () => { const snap = await getDocs(collection(db, "gameCars")); return snap; }),
-            performanceOptimizer.fetchWithCache('raceRecords', async () => { const snap = await getDocs(collection(db, "raceRecords")); return snap; }),
-            performanceOptimizer.fetchWithCache('users', async () => { const snap = await getDocs(collection(db, "users")); return snap; }),
-            getDocs(query(collection(db, "notifications"), orderBy("timestamp", "desc"))), // Realtime better for notifications
-            performanceOptimizer.fetchWithCache('gameMaps', async () => { const snap = await getDocs(collection(db, "gameMaps")); return snap; }),
-            performanceOptimizer.fetchWithCache('gamePets', async () => { const snap = await getDocs(collection(db, "gamePets")); return snap; })
+        // ======== PHASE 1: L\u1ea5y s\u1ed1 li\u1ec7u c\u01a1 b\u1ea3n \u2014 hi\u1ec3n th\u1ecb ngay ========
+        // T\u1ea5t c\u1ea3 ch\u1ea1y song song, nh\u01b0ng m\u1ed7i c\u00e1i t\u1ef1 c\u00f3 cache ri\u00eang
+        const fetchCars        = () => getDocs(collection(db, "gameCars")).then(s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+        const fetchRecords     = () => getDocs(collection(db, "raceRecords")).then(s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+        const fetchUsers       = () => getDocs(collection(db, "users")).then(s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+        const fetchMaps        = () => getDocs(collection(db, "gameMaps")).then(s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+        const fetchPets        = () => getDocs(collection(db, "gamePets")).then(s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+        const fetchNotifs      = () => getDocs(query(collection(db, "notifications"), orderBy("timestamp", "desc"))).then(s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+
+        const [carsData, recordsData, usersData, mapsData, petsData, notifsData] = await Promise.all([
+            performanceOptimizer.fetchWithCache('cd_gameCars', fetchCars),
+            performanceOptimizer.fetchWithCache('cd_raceRecords', fetchRecords),
+            performanceOptimizer.fetchWithCache('cd_users', fetchUsers),
+            performanceOptimizer.fetchWithCache('cd_gameMaps', fetchMaps),
+            performanceOptimizer.fetchWithCache('cd_gamePets', fetchPets),
+            fetchNotifs() // notifications lu\u00f4n fresh
         ]);
 
-        // Update basic stats
-        document.getElementById('total-cars').textContent = carsSnapshot.size;
-        document.getElementById('total-records').textContent = recordsSnapshot.size;
-        document.getElementById('total-users').textContent = usersSnapshot.size;
-        document.getElementById('total-notifications').textContent = notificationsSnapshot.size;
+        // Update basic stats ngay l\u1eadp t\u1ee9c
+        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        setEl('total-cars', carsData.length);
+        setEl('total-records', recordsData.length);
+        setEl('total-users', usersData.length);
+        setEl('total-notifications', notifsData.length);
+        setEl('total-maps', mapsData.length);
+        setEl('total-pets', petsData.length);
 
-        // Update additional stats
-        const totalMapsEl = document.getElementById('total-maps');
-        const totalPetsEl = document.getElementById('total-pets');
-        if (totalMapsEl) totalMapsEl.textContent = mapsSnapshot.size;
-        if (totalPetsEl) totalPetsEl.textContent = petsSnapshot.size;
-
-        // Calculate active users
-        let activeUsersCount = 0;
-        let adminUsersCount = 0;
-        usersSnapshot.forEach(doc => {
-            const userData = doc.data();
-            if (userData.status === 'active') activeUsersCount++;
-            if (userData.isAdmin === true) adminUsersCount++;
+        // Th\u1ed1ng k\u00ea users
+        let activeUsersCount = 0, adminUsersCount = 0, newUsersCount = 0;
+        const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        usersData.forEach(u => {
+            if (u.status === 'active') activeUsersCount++;
+            if (u.isAdmin === true) adminUsersCount++;
+            if (u.createdAt && new Date(u.createdAt) >= sevenDaysAgo) newUsersCount++;
         });
+        setEl('active-users', activeUsersCount);
+        setEl('admin-users', adminUsersCount);
+        setEl('new-users', newUsersCount);
 
-        const activeUsersEl = document.getElementById('active-users');
-        const adminUsersEl = document.getElementById('admin-users');
-        if (activeUsersEl) activeUsersEl.textContent = activeUsersCount;
-        if (adminUsersEl) adminUsersEl.textContent = adminUsersCount;
-
-        // Calculate today's records
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        let todayRecordsCount = 0;
-
-        recordsSnapshot.forEach(doc => {
-            const recordData = doc.data();
-            if (recordData.timestamp) {
-                const recordDate = new Date(recordData.timestamp);
-                recordDate.setHours(0, 0, 0, 0);
-                if (recordDate.getTime() === today.getTime()) {
-                    todayRecordsCount++;
-                }
-            }
-        });
-
-        const recordsTodayEl = document.getElementById('records-today');
-        const recordsTodayCountEl = document.getElementById('records-today-count');
-        if (recordsTodayEl) recordsTodayEl.textContent = todayRecordsCount;
-        if (recordsTodayCountEl) recordsTodayCountEl.textContent = todayRecordsCount;
-
-        // Calculate new users (last 7 days)
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        let newUsersCount = 0;
-
-        usersSnapshot.forEach(doc => {
-            const userData = doc.data();
-            if (userData.createdAt) {
-                const createdDate = new Date(userData.createdAt);
-                if (createdDate >= sevenDaysAgo) {
-                    newUsersCount++;
-                }
-            }
-        });
-
-        const newUsersEl = document.getElementById('new-users');
-        if (newUsersEl) newUsersEl.textContent = newUsersCount;
-
-        // Update charts
-        updateCarsRarityChart(carsSnapshot);
-        updateRecordsMonthChart(recordsSnapshot);
-        updateUsersRoleChart(usersSnapshot);
-        updateMapsDifficultyChart(mapsSnapshot);
-
-        // Load recent activity
-        await loadRecentActivity();
-
-        // Load top racers
-        await loadTopRacers();
+        // Records h\u00f4m nay
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const todayCount = recordsData.filter(r => {
+            if (!r.timestamp) return false;
+            const d = new Date(r.timestamp); d.setHours(0, 0, 0, 0);
+            return d.getTime() === today.getTime();
+        }).length;
+        setEl('records-today', todayCount);
+        setEl('records-today-count', todayCount);
 
         dashboardLoaded = true;
-        console.log("Dashboard stats loaded");
+        console.log("Dashboard stats loaded (Phase 1)");
+
+        // ======== PHASE 2: Charts v\u00e0 heavy tasks \u2014 defer khi browser r\u1ea3nh ========
+        const runPhase2 = async () => {
+            try {
+                // Wrap QuerySnapshot-like object \u0111\u1ec3 t\u01b0\u01a1ng th\u00edch v\u1edbi h\u00e0m update chart c\u0169
+                const wrapAsSnapshot = (arr) => ({
+                    size: arr.length,
+                    forEach: (fn) => arr.forEach(item => fn({ data: () => item, id: item.id }))
+                });
+
+                updateCarsRarityChart(wrapAsSnapshot(carsData));
+                updateRecordsMonthChart(wrapAsSnapshot(recordsData));
+                updateUsersRoleChart(wrapAsSnapshot(usersData));
+                updateMapsDifficultyChart(wrapAsSnapshot(mapsData));
+
+                await loadRecentActivity();
+                await loadTopRacers();
+                console.log("Dashboard stats loaded (Phase 2 - charts)");
+            } catch (e) {
+                console.error("Error loading Phase 2 dashboard:", e);
+            }
+        };
+
+        // D\u00f9ng requestIdleCallback n\u1ebfu tr\u00ecnh duy\u1ec7t h\u1ed7 tr\u1ee3, fallback setTimeout
+        if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(() => runPhase2(), { timeout: 3000 });
+        } else {
+            setTimeout(runPhase2, 500);
+        }
 
     } catch (error) {
         console.error("Error loading dashboard stats:", error);

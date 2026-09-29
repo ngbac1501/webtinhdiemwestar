@@ -8,7 +8,8 @@ class PerformanceOptimizer {
         this.dbName = 'WeStar-Cache';
         this.version = 1;
         this.db = null;
-        this.cacheExpiry = 30 * 60 * 1000; // 30 minutes
+        this.cacheExpiry = 2 * 60 * 60 * 1000; // 2 hours (tăng từ 30 phút)
+        this.lsCacheExpiry = 30 * 60 * 1000;   // localStorage fallback: 30 phút
         this.pendingRequests = new Map();
         this.init();
     }
@@ -28,10 +29,18 @@ class PerformanceOptimizer {
 
     /**
      * Stale-While-Revalidate Caching Pattern (Tối ưu Firestore load)
-     * Lấy dữ liệu từ cache trả về tức thì (<10ms), đồng thời fetch Firebase ngầm để update
+     * Ưu tiên: localStorage sync (<1ms) → IndexedDB async (<10ms) → Firebase fetch
      */
     async fetchWithCache(collectionName, fetchFn, updateCallback = null) {
-        // 1. Cố gắng lấy từ Cache (Hiển thị UI tức thì)
+        // 0. THử NGAY localStorage (Đồng bộ, <1ms) — hiển thị UI tức thì!
+        const lsData = this._lsGet(collectionName);
+        if (lsData) {
+            if (updateCallback) {
+                try { updateCallback(lsData, true); } catch (e) {}
+            }
+        }
+
+        // 1. Cố gắng lấy từ IndexedDB Cache
         let cachedData = null;
         try {
             cachedData = await this.getCachedData(collectionName);
@@ -39,8 +48,13 @@ class PerformanceOptimizer {
             console.warn(`Cache read error [${collectionName}]:`, e);
         }
 
-        if (cachedData && (Array.isArray(cachedData) ? cachedData.length > 0 : true)) {
-            if (updateCallback) {
+        // Nếu có dữ liệu cache (IndexedDB hoặc localStorage), cập nhật localStorage và thực hiện SWR
+        const effectiveCache = cachedData || lsData;
+        if (effectiveCache && (Array.isArray(effectiveCache) ? effectiveCache.length > 0 : true)) {
+            // Cập nhật localStorage nếu IndexedDB có dữ liệu mới hơn
+            if (cachedData) this._lsSet(collectionName, cachedData);
+
+            if (updateCallback && cachedData) {
                 try { updateCallback(cachedData, true); } catch (e) {}
             }
 
@@ -50,9 +64,10 @@ class PerformanceOptimizer {
                     const freshData = await fetchFn();
                     if (freshData) {
                         const freshJson = JSON.stringify(freshData);
-                        const cachedJson = JSON.stringify(cachedData);
+                        const cachedJson = JSON.stringify(effectiveCache);
                         if (freshJson !== cachedJson) {
                             await this.cacheData(collectionName, freshData);
+                            this._lsSet(collectionName, freshData);
                             if (updateCallback) updateCallback(freshData, false);
                         }
                     }
@@ -61,7 +76,7 @@ class PerformanceOptimizer {
                 }
             })();
 
-            return cachedData; // ⚡ TRẢ VỀ NGAY LẬP TỨC TRONG VÀI MILLISECONDS!
+            return effectiveCache; // ⚡ TRẢ VỀ NGAY LẬP TỨC!
         }
 
         // 3. Nếu chưa có cache, fetch từ Firebase
@@ -69,13 +84,44 @@ class PerformanceOptimizer {
             const freshData = await fetchFn();
             if (freshData) {
                 await this.cacheData(collectionName, freshData);
+                this._lsSet(collectionName, freshData);
                 if (updateCallback) updateCallback(freshData, false);
             }
             return freshData;
         } catch (error) {
             console.error(`❌ Fetch Error [${collectionName}]:`, error);
-            if (cachedData) return cachedData;
+            if (effectiveCache) return effectiveCache;
             throw error;
+        }
+    }
+
+    /**
+     * localStorage get với expiry check (đồng bộ, <1ms)
+     */
+    _lsGet(key) {
+        try {
+            const raw = localStorage.getItem(`ws_cache_${key}`);
+            if (!raw) return null;
+            const { data, expiry } = JSON.parse(raw);
+            if (Date.now() < expiry) return data;
+            localStorage.removeItem(`ws_cache_${key}`);
+            return null;
+        } catch (e) { return null; }
+    }
+
+    /**
+     * localStorage set với expiry
+     */
+    _lsSet(key, data) {
+        try {
+            // Chỉ lưu dữ liệu nhỏ (< 500KB) vào localStorage
+            const json = JSON.stringify({ data, expiry: Date.now() + this.lsCacheExpiry });
+            if (json.length < 500 * 1024) {
+                localStorage.setItem(`ws_cache_${key}`, json);
+            }
+        } catch (e) {
+            // localStorage có thể bị đầy, bỏ qua
+            try { localStorage.removeItem(`ws_cache_${key}`); } catch (_) {}
         }
     }
 
